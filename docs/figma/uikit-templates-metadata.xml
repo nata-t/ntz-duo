@@ -1,0 +1,819 @@
+<canvas id="0:1" name="Templates" x="0" y="0" width="0" height="0">
+  <frame id="17:19204" name="Inner Open Portrait - Keyboard" x="-3702" y="-1241" width="951" height="669">
+    <frame id="17:19205" name="Container" x="0" y="0" width="951" height="669">
+      <frame id="17:19206" name="Trailing pane" x="0" y="0" width="867" height="669">
+        <instance id="17:19207" name="Toolbar" x="40" y="40" width="787" height="54" />
+      </frame>
+      <instance id="17:19208" name="Pane controls" x="867" y="0" width="84" height="669">
+        <instance id="I17:19208;13:10165" name="Status bar" x="14" y="30" width="44" height="68" />
+        <slot id="I17:19208;13:10086" name="Controls" x="12" y="122" width="48" height="523">
+          <frame id="I17:19208;13:10086;17:19308" name="Container" x="0" y="0" width="48" height="158">
+            <instance id="I17:19208;13:10086;17:19309" name="Buttons" x="0" y="0" width="48" height="48" />
+            <instance id="I17:19208;13:10086;17:19310" name="Buttons" x="0" y="58" width="48" height="100">
+              <instance id="I17:19208;13:10086;17:19310;7:687" name="Liquid Glass - Regular - Small" x="0" y="0" width="48" height="100" />
+              <slot id="I17:19208;13:10086;17:19310;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                <instance id="I17:19208;13:10086;17:19310;7:689" name="_Button - Symbol" x="2" y="0" width="36" height="36" />
+                <instance id="I17:19208;13:10086;17:19310;7:690" name="_Button - Symbol" x="2" y="56" width="36" height="36" />
+              </slot>
+            </instance>
+          </frame>
+        </slot>
+      </instance>
+      <frame id="17:19209" name="Keyboard" x="0" y="427" width="950" height="242">
+        <instance id="17:19210" name="Background" x="0" y="0" width="950" height="242" />
+        <frame id="17:19211" name="Frame 3" x="0" y="12" width="950" height="208">
+          <frame id="17:19212" name="Frame 2" x="0" y="0" width="66" height="208">
+            <vector id="17:19213" name="Emoji" x="31" y="178" width="28" height="28" />
+            <text id="17:19214" name="Mike" x="31" y="0" width="27" height="29" />
+          </frame>
+          <frame id="17:19215" name="_Keyboard Layouts/iPhone/Web Search" x="74" y="0" width="802" height="208">
+            <frame id="17:19216" name="Row 1" x="10" y="0" width="782" height="43">
+              <instance id="17:19217" name="Key" x="6" y="0" width="68" height="43" />
+              <instance id="17:19218" name="Key" x="84" y="0" width="68" height="43" />
+              <instance id="17:19219" name="Key" x="162" y="0" width="68" height="43" />
+              <instance id="17:19220" name="Key" x="240" y="0" width="68" height="43" />
+              <instance id="17:19221" name="Key" x="318" y="0" width="68" height="43" />
+              <instance id="17:19222" name="Key" x="396" y="0" width="68" height="43" />
+              <instance id="17:19223" name="Key" x="474" y="0" width="68" height="43" />
+              <instance id="17:19224" name="Key" x="552" y="0" width="68" height="43" />
+              <instance id="17:19225" name="Key" x="630" y="0" width="68" height="43" />
+              <instance id="17:19226" name="Key" x="708" y="0" width="68" height="43" />
+            </frame>
+            <frame id="17:19227" name="Row 2" x="10" y="55" width="782" height="43">
+              <instance id="17:19228" name="Key" x="45" y="0" width="68" height="43" />
+              <instance id="17:19229" name="Key" x="123" y="0" width="68" height="43" />
+              <instance id="17:19230" name="Key" x="201" y="0" width="68" height="43" />
+              <instance id="17:19231" name="Key" x="279" y="0" width="68" height="43" />
+              <instance id="17:19232" name="Key" x="357" y="0" width="68" height="43" />
+              <instance id="17:19233" name="Key" x="435" y="0" width="68" height="43" />
+              <instance id="17:19234" name="Key" x="513" y="0" width="68" height="43" />
+              <instance id="17:19235" name="Key" x="591" y="0" width="68" height="43" />
+              <instance id="17:19236" name="Key" x="669" y="0" width="68" height="43" />
+            </frame>
+            <frame id="17:19237" name="Row 3" x="10" y="110" width="782" height="43">
+              <instance id="17:19238" name="Shift Key" x="0" y="0" width="94" height="43" />
+              <frame id="17:19239" name="Row 3" x="118" y="0" width="546" height="43">
+                <instance id="17:19240" name="Key" x="0" y="0" width="68" height="43" />
+                <instance id="17:19241" name="Key" x="78" y="0" width="68" height="43" />
+                <instance id="17:19242" name="Key" x="156" y="0" width="68" height="43" />
+                <instance id="17:19243" name="Key" x="234" y="0" width="68" height="43" />
+                <instance id="17:19244" name="Key" x="312" y="0" width="68" height="43" />
+                <instance id="17:19245" name="Key" x="390" y="0" width="68" height="43" />
+                <instance id="17:19246" name="Key" x="468" y="0" width="68" height="43" />
+              </frame>
+              <instance id="17:19247" name="Delete Key" x="688" y="0" width="94" height="43" />
+            </frame>
+            <frame id="17:19248" name="Row 4" x="10" y="165" width="782" height="43">
+              <instance id="17:19249" name="Keyboard Switch" x="32" y="0" width="72" height="43" />
+              <frame id="17:19250" name="Keyboard Switch" x="110" y="0" width="72" height="43" />
+              <instance id="17:19252" name="Space" x="188" y="0" width="408" height="43" />
+              <instance id="17:19253" name="Return" x="602" y="0" width="148" height="43" />
+            </frame>
+          </frame>
+          <frame id="17:19254" name="Frame 3" x="884" y="0" width="66" height="208">
+            <text id="17:19255" name="Mike" x="8" y="174" width="30" height="36" />
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <instance id="30:1461" name="Bezel" x="-40" y="-40" width="1031" height="749" />
+  </frame>
+  <frame id="17:15798" name="Inner Open Portrait" x="-3702" y="-3188" width="951" height="669">
+    <frame id="17:15799" name="Container" x="0" y="0" width="951" height="669">
+      <frame id="17:15800" name="Leading pane" x="0" y="0" width="340" height="669">
+        <instance id="17:15801" name="Toolbar" x="0" y="24" width="339.3399963378906" height="54">
+          <slot id="I17:15801;5553:35134" name="Leading" x="16" y="0" width="48" height="48">
+            <instance id="I17:15801;5553:35134;17:15827" name="Buttons" x="0" y="0" width="48" height="48" />
+          </slot>
+          <frame id="I17:15801;5661:34483" name="Spacer" x="168.6699981689453" y="0" width="8" height="44" />
+          <slot id="I17:15801;5553:33054" name="Trailing" x="281.3399963378906" y="0" width="48" height="48">
+            <instance id="I17:15801;5553:33054;17:15829" name="Buttons" x="0" y="0" width="48" height="48" />
+          </slot>
+          <instance id="I17:15801;5827:58547" name="Title" x="152" y="13" width="36" height="22" hidden="true" />
+        </instance>
+        <instance id="17:15802" name="Toolbar - Bottom - iPhone" x="0" y="593" width="340" height="76" />
+      </frame>
+      <frame id="17:15803" name="Trailing pane" x="340" y="0" width="527" height="669">
+        <instance id="17:15804" name="Toolbar" x="0" y="24" width="527" height="54" />
+      </frame>
+      <instance id="17:15805" name="Pane controls" x="867" y="0" width="84" height="669">
+        <instance id="I17:15805;13:10165" name="Status bar" x="14" y="30" width="44" height="68" />
+        <slot id="I17:15805;13:10086" name="Controls" x="12" y="122" width="48" height="523">
+          <frame id="I17:15805;13:10086;17:16222" name="Container" x="0" y="0" width="48" height="158">
+            <instance id="I17:15805;13:10086;17:16223" name="Buttons" x="0" y="0" width="48" height="48" />
+            <instance id="I17:15805;13:10086;17:16224" name="Buttons" x="0" y="58" width="48" height="100">
+              <instance id="I17:15805;13:10086;17:16224;7:687" name="BG" x="0" y="0" width="48" height="100" />
+              <slot id="I17:15805;13:10086;17:16224;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                <instance id="I17:15805;13:10086;17:16224;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                <instance id="I17:15805;13:10086;17:16224;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+              </slot>
+            </instance>
+          </frame>
+          <instance id="I17:15805;13:10086;17:16225" name="Tab Bar" x="1" y="285" width="46" height="238">
+            <instance id="I17:15805;13:10086;17:16225;17:13734" name="BG" x="-1" y="-2" width="48" height="242" />
+            <slot id="I17:15805;13:10086;17:16225;17:13735" name="Tabs" x="4" y="0" width="38" height="238">
+              <instance id="I17:15805;13:10086;17:16225;17:15684" name="_Tab Bar Button - iPhone" x="-1.5" y="0" width="41" height="54" />
+              <instance id="I17:15805;13:10086;17:16225;17:15685" name="_Tab Bar Button - iPhone" x="-1.5" y="46" width="41" height="54" />
+              <instance id="I17:15805;13:10086;17:16225;17:15686" name="_Tab Bar Button - iPhone" x="-1.5" y="92" width="41" height="54" />
+              <instance id="I17:15805;13:10086;17:16225;17:15687" name="_Tab Bar Button - iPhone" x="-1.5" y="138" width="41" height="54" />
+              <instance id="I17:15805;13:10086;17:16225;17:15688" name="_Tab Bar Button - iPhone" x="-1.5" y="184" width="41" height="54" />
+            </slot>
+          </instance>
+        </slot>
+      </instance>
+    </frame>
+    <instance id="30:1455" name="Bezel" x="-40" y="-40" width="1031" height="749" />
+  </frame>
+  <frame id="36:6393" name="Inner Open Portrait - Sheet" x="-3702" y="-263" width="951" height="669">
+    <frame id="36:6394" name="Container" x="0" y="0" width="951" height="669">
+      <frame id="36:6395" name="Leading pane" x="0" y="0" width="340" height="669">
+        <instance id="36:6396" name="Toolbar" x="0" y="24" width="340" height="54">
+          <slot id="I36:6396;5553:35134" name="Leading" x="16" y="0" width="48" height="48">
+            <instance id="I36:6396;5553:35134;36:6405" name="Buttons" x="0" y="0" width="48" height="48" />
+          </slot>
+          <frame id="I36:6396;5661:34483" name="Spacer" x="169" y="0" width="8" height="44" />
+          <slot id="I36:6396;5553:33054" name="Trailing" x="282" y="0" width="48" height="48">
+            <instance id="I36:6396;5553:33054;36:6403" name="Buttons" x="0" y="0" width="48" height="48" />
+          </slot>
+          <instance id="I36:6396;5827:58547" name="Title" x="152" y="13" width="36" height="22" hidden="true" />
+        </instance>
+        <instance id="36:6397" name="Toolbar - Bottom - iPhone" x="0" y="593" width="340" height="76" />
+      </frame>
+      <frame id="36:6398" name="Trailing pane" x="340" y="0" width="527" height="669">
+        <instance id="36:6399" name="Toolbar" x="0" y="24" width="527" height="54" />
+      </frame>
+      <instance id="36:6400" name="Pane controls" x="867" y="0" width="84" height="669">
+        <instance id="I36:6400;13:10165" name="Status bar" x="14" y="30" width="44" height="68" />
+        <slot id="I36:6400;13:10086" name="Controls" x="12" y="122" width="48" height="523">
+          <frame id="I36:6400;13:10086;36:6411" name="Container" x="0" y="0" width="48" height="158">
+            <instance id="I36:6400;13:10086;36:6412" name="Buttons" x="0" y="0" width="48" height="48" />
+            <instance id="I36:6400;13:10086;36:6413" name="Buttons" x="0" y="58" width="48" height="100">
+              <instance id="I36:6400;13:10086;36:6413;7:687" name="BG" x="0" y="0" width="48" height="100" />
+              <slot id="I36:6400;13:10086;36:6413;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                <instance id="I36:6400;13:10086;36:6413;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                <instance id="I36:6400;13:10086;36:6413;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+              </slot>
+            </instance>
+          </frame>
+          <instance id="I36:6400;13:10086;36:6414" name="Tab Bar" x="1" y="285" width="46" height="238">
+            <instance id="I36:6400;13:10086;36:6414;17:13734" name="BG" x="-1" y="-2" width="48" height="242" />
+            <slot id="I36:6400;13:10086;36:6414;17:13735" name="Tabs" x="4" y="0" width="38" height="238">
+              <instance id="I36:6400;13:10086;36:6414;17:15684" name="_Tab Bar Button - iPhone" x="-1.5" y="0" width="41" height="54" />
+              <instance id="I36:6400;13:10086;36:6414;17:15685" name="_Tab Bar Button - iPhone" x="-1.5" y="46" width="41" height="54" />
+              <instance id="I36:6400;13:10086;36:6414;17:15686" name="_Tab Bar Button - iPhone" x="-1.5" y="92" width="41" height="54" />
+              <instance id="I36:6400;13:10086;36:6414;17:15687" name="_Tab Bar Button - iPhone" x="-1.5" y="138" width="41" height="54" />
+              <instance id="I36:6400;13:10086;36:6414;17:15688" name="_Tab Bar Button - iPhone" x="-1.5" y="184" width="41" height="54" />
+            </slot>
+          </instance>
+        </slot>
+      </instance>
+      <frame id="36:6724" name="Sheet - iPhone" x="0" y="0" width="951" height="669">
+        <instance id="36:6725" name="Overlay" x="0" y="0" width="950" height="874" />
+        <frame id="36:6726" name="Frame" x="149.5" y="8" width="652" height="661">
+          <frame id="36:6727" name="Content" x="0" y="0" width="652" height="661">
+            <instance id="36:6732" name="Toolbar - Top - iPhone" x="0" y="16" width="652" height="58">
+              <slot id="I36:6732;5553:35134" name="Leading" x="16" y="0" width="48" height="48">
+                <instance id="I36:6732;5553:35134;36:6731" name="Buttons" x="0" y="0" width="48" height="48" />
+              </slot>
+              <frame id="I36:6732;5661:34483" name="Spacer" x="322" y="0" width="8" height="48" />
+              <slot id="I36:6732;5553:33054" name="Trailing" x="588" y="0" width="48" height="48">
+                <instance id="I36:6732;5553:33054;36:6729" name="Buttons" x="0" y="0" width="48" height="48" />
+              </slot>
+              <instance id="I36:6732;5827:58547" name="_Title - Body" x="308" y="13" width="36" height="22" />
+            </instance>
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <instance id="36:6401" name="Bezel" x="-40" y="-40" width="1031" height="749" />
+  </frame>
+  <frame id="17:19257" name="Outer Closed Landscape - Keyboard" x="-2551" y="-1245" width="466" height="678">
+    <frame id="17:19258" name="Container" x="0" y="0" width="466" height="678">
+      <frame id="17:19259" name="Trailing pane" x="0" y="0" width="382" height="678">
+        <instance id="17:19260" name="Toolbar" x="0" y="24" width="382" height="54" />
+      </frame>
+      <instance id="17:19261" name="Pane controls" x="382" y="0" width="84" height="669">
+        <instance id="I17:19261;13:10165" name="Status bar" x="14" y="30" width="44" height="118" />
+        <slot id="I17:19261;13:10086" name="Controls" x="12" y="172" width="48" height="473">
+          <frame id="I17:19261;13:10086;17:19316" name="Container" x="0" y="0" width="48" height="158">
+            <instance id="I17:19261;13:10086;17:19317" name="Buttons" x="0" y="0" width="48" height="48" />
+            <instance id="I17:19261;13:10086;17:19318" name="Buttons" x="0" y="58" width="48" height="100">
+              <instance id="I17:19261;13:10086;17:19318;7:687" name="Liquid Glass - Regular - Small" x="0" y="0" width="48" height="100" />
+              <slot id="I17:19261;13:10086;17:19318;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                <instance id="I17:19261;13:10086;17:19318;7:689" name="_Button - Symbol" x="2" y="0" width="36" height="36" />
+                <instance id="I17:19261;13:10086;17:19318;7:690" name="_Button - Symbol" x="2" y="56" width="36" height="36" />
+              </slot>
+            </instance>
+          </frame>
+        </slot>
+      </instance>
+      <frame id="17:19262" name="Keyboard" x="0" y="434" width="466" height="244">
+        <instance id="17:19263" name="Background" x="0" y="0" width="466" height="244" />
+        <frame id="17:19264" name="_Keyboard Layouts/iPhone/Web Search" x="0" y="12" width="466" height="205">
+          <frame id="17:19265" name="Row 1" x="12" y="0" width="442" height="43">
+            <instance id="17:19266" name="Key" x="0" y="0" width="38.79999923706055" height="43" />
+            <instance id="17:19267" name="Key" x="44.79996871948242" y="0" width="38.80000305175781" height="43" />
+            <instance id="17:19268" name="Key" x="89.5999755859375" y="0" width="38.80000305175781" height="43" />
+            <instance id="17:19269" name="Key" x="134.3999786376953" y="0" width="38.80000686645508" height="43" />
+            <instance id="17:19270" name="Key" x="179.19998168945312" y="0" width="38.80000686645508" height="43" />
+            <instance id="17:19271" name="Key" x="223.99998474121094" y="0" width="38.80000686645508" height="43" />
+            <instance id="17:19272" name="Key" x="268.79998779296875" y="0" width="38.80000686645508" height="43" />
+            <instance id="17:19273" name="Key" x="313.6000061035156" y="0" width="38.80000686645508" height="43" />
+            <instance id="17:19274" name="Key" x="358.4000244140625" y="0" width="38.800010681152344" height="43" />
+            <instance id="17:19275" name="Key" x="403.2000427246094" y="0" width="38.800010681152344" height="43" />
+          </frame>
+          <frame id="17:19276" name="Row 2" x="12" y="54" width="442" height="43">
+            <instance id="17:19277" name="Key" x="19.999984741210938" y="0" width="39.33333206176758" height="43" />
+            <instance id="17:19278" name="Key" x="65.33332824707031" y="0" width="39.33333206176758" height="43" />
+            <instance id="17:19279" name="Key" x="110.66665649414062" y="0" width="39.33333206176758" height="43" />
+            <instance id="17:19280" name="Key" x="155.99998474121094" y="0" width="39.33333206176758" height="43" />
+            <instance id="17:19281" name="Key" x="201.33331298828125" y="0" width="39.33333206176758" height="43" />
+            <instance id="17:19282" name="Key" x="246.66664123535156" y="0" width="39.33333206176758" height="43" />
+            <instance id="17:19283" name="Key" x="291.9999694824219" y="0" width="39.33333206176758" height="43" />
+            <instance id="17:19284" name="Key" x="337.33331298828125" y="0" width="39.333335876464844" height="43" />
+            <instance id="17:19285" name="Key" x="382.6666564941406" y="0" width="39.333335876464844" height="43" />
+          </frame>
+          <frame id="17:19286" name="Row 3" x="12" y="108" width="442" height="43">
+            <instance id="17:19287" name="Shift Key" x="0" y="0" width="45" height="43" />
+            <frame id="17:19288" name="Row 3" x="58.33300018310547" y="0" width="325.333984375" height="43">
+              <instance id="17:19289" name="Key" x="0" y="0" width="41.33342742919922" height="43" />
+              <instance id="17:19290" name="Key" x="47.33342742919922" y="0" width="41.33342361450195" height="43" />
+              <instance id="17:19291" name="Key" x="94.66685485839844" y="0" width="41.33342742919922" height="43" />
+              <instance id="17:19292" name="Key" x="142.00027465820312" y="0" width="41.33342742919922" height="43" />
+              <instance id="17:19293" name="Key" x="189.33370971679688" y="0" width="41.33342742919922" height="43" />
+              <instance id="17:19294" name="Key" x="236.66714477539062" y="0" width="41.33342742919922" height="43" />
+              <instance id="17:19295" name="Key" x="284.0005798339844" y="0" width="41.33342742919922" height="43" />
+            </frame>
+            <instance id="17:19296" name="Delete Key" x="397" y="0" width="45" height="43" />
+          </frame>
+          <frame id="17:19297" name="Row 4" x="12" y="162" width="442" height="43">
+            <frame id="17:19298" name="Keyboard Switch" x="0" y="0" width="56" height="43" />
+            <instance id="17:19300" name="Space" x="62" y="0" width="311" height="43" />
+            <instance id="17:19301" name="Return" x="379" y="0" width="63" height="43" />
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <instance id="30:1467" name="Bezel" x="-29" y="-26" width="524" height="730" />
+  </frame>
+  <frame id="17:15807" name="Outer Closed Landscape" x="-2551" y="-3192" width="466" height="678">
+    <frame id="17:15808" name="Container" x="0" y="0" width="466" height="678">
+      <frame id="17:15809" name="Trailing pane" x="0" y="0" width="382" height="678">
+        <instance id="17:15810" name="Toolbar" x="0" y="24" width="382" height="54" />
+      </frame>
+      <instance id="17:15811" name="Pane controls" x="382" y="0" width="84" height="669">
+        <instance id="I17:15811;13:10165" name="Status bar" x="14" y="30" width="44" height="118" />
+        <slot id="I17:15811;13:10086" name="Controls" x="12" y="172" width="48" height="473">
+          <frame id="I17:15811;13:10086;17:16232" name="Container" x="0" y="0" width="48" height="158">
+            <instance id="I17:15811;13:10086;17:16233" name="Buttons" x="0" y="0" width="48" height="48" />
+            <instance id="I17:15811;13:10086;17:16234" name="Buttons" x="0" y="58" width="48" height="100">
+              <instance id="I17:15811;13:10086;17:16234;7:687" name="BG" x="0" y="0" width="48" height="100" />
+              <slot id="I17:15811;13:10086;17:16234;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                <instance id="I17:15811;13:10086;17:16234;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                <instance id="I17:15811;13:10086;17:16234;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+              </slot>
+            </instance>
+          </frame>
+          <instance id="I17:15811;13:10086;17:16235" name="Tab Bar" x="1" y="235" width="46" height="238">
+            <instance id="I17:15811;13:10086;17:16235;17:13734" name="BG" x="-1" y="-2" width="48" height="242" />
+            <slot id="I17:15811;13:10086;17:16235;17:13735" name="Tabs" x="4" y="0" width="38" height="238">
+              <instance id="I17:15811;13:10086;17:16235;17:15684" name="_Tab Bar Button - iPhone" x="-1.5" y="0" width="41" height="54" />
+              <instance id="I17:15811;13:10086;17:16235;17:15685" name="_Tab Bar Button - iPhone" x="-1.5" y="46" width="41" height="54" />
+              <instance id="I17:15811;13:10086;17:16235;17:15686" name="_Tab Bar Button - iPhone" x="-1.5" y="92" width="41" height="54" />
+              <instance id="I17:15811;13:10086;17:16235;17:15687" name="_Tab Bar Button - iPhone" x="-1.5" y="138" width="41" height="54" />
+              <instance id="I17:15811;13:10086;17:16235;17:15688" name="_Tab Bar Button - iPhone" x="-1.5" y="184" width="41" height="54" />
+            </slot>
+          </instance>
+        </slot>
+      </instance>
+    </frame>
+    <instance id="30:1464" name="Bezel" x="-29" y="-26" width="524" height="730" />
+  </frame>
+  <frame id="36:6601" name="Outer Closed Landscape - Sheet" x="-2551" y="-267" width="466" height="678">
+    <frame id="36:6602" name="Container" x="0" y="0" width="466" height="678">
+      <frame id="36:6603" name="Trailing pane" x="0" y="0" width="382" height="678">
+        <instance id="36:6604" name="Toolbar" x="0" y="24" width="382" height="54" />
+      </frame>
+      <instance id="36:6605" name="Pane controls" x="382" y="0" width="84" height="669">
+        <instance id="I36:6605;13:10165" name="Status bar" x="14" y="30" width="44" height="118" />
+        <slot id="I36:6605;13:10086" name="Controls" x="12" y="172" width="48" height="473">
+          <frame id="I36:6605;13:10086;36:6612" name="Container" x="0" y="0" width="48" height="158">
+            <instance id="I36:6605;13:10086;36:6613" name="Buttons" x="0" y="0" width="48" height="48" />
+            <instance id="I36:6605;13:10086;36:6614" name="Buttons" x="0" y="58" width="48" height="100">
+              <instance id="I36:6605;13:10086;36:6614;7:687" name="BG" x="0" y="0" width="48" height="100" />
+              <slot id="I36:6605;13:10086;36:6614;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                <instance id="I36:6605;13:10086;36:6614;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                <instance id="I36:6605;13:10086;36:6614;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+              </slot>
+            </instance>
+          </frame>
+          <instance id="I36:6605;13:10086;36:6615" name="Tab Bar" x="1" y="235" width="46" height="238">
+            <instance id="I36:6605;13:10086;36:6615;17:13734" name="BG" x="-1" y="-2" width="48" height="242" />
+            <slot id="I36:6605;13:10086;36:6615;17:13735" name="Tabs" x="4" y="0" width="38" height="238">
+              <instance id="I36:6605;13:10086;36:6615;17:15684" name="_Tab Bar Button - iPhone" x="-1.5" y="0" width="41" height="54" />
+              <instance id="I36:6605;13:10086;36:6615;17:15685" name="_Tab Bar Button - iPhone" x="-1.5" y="46" width="41" height="54" />
+              <instance id="I36:6605;13:10086;36:6615;17:15686" name="_Tab Bar Button - iPhone" x="-1.5" y="92" width="41" height="54" />
+              <instance id="I36:6605;13:10086;36:6615;17:15687" name="_Tab Bar Button - iPhone" x="-1.5" y="138" width="41" height="54" />
+              <instance id="I36:6605;13:10086;36:6615;17:15688" name="_Tab Bar Button - iPhone" x="-1.5" y="184" width="41" height="54" />
+            </slot>
+          </instance>
+        </slot>
+      </instance>
+      <frame id="36:6903" name="Sheet - iPhone" x="0" y="0" width="466" height="678">
+        <instance id="36:6904" name="Overlay" x="0" y="0" width="950" height="874" />
+        <frame id="36:6905" name="Frame" x="8" y="8" width="450" height="670">
+          <frame id="36:6906" name="Content" x="0" y="0" width="374" height="670">
+            <frame id="36:6907" name="Toolbar - Top - iPhone" x="0" y="32" width="374" height="22">
+              <instance id="36:6908" name="Title" x="16" y="0" width="36" height="22" />
+            </frame>
+          </frame>
+          <instance id="36:6913" name="Pane controls" x="374" y="0" width="76" height="669">
+            <instance id="I36:6913;13:10165" name="Status bar" x="14" y="22" width="44" height="118" />
+            <slot id="I36:6913;13:10086" name="Controls" x="12" y="164" width="48" height="481">
+              <frame id="I36:6913;13:10086;36:6910" name="Container" x="0" y="0" width="48" height="106">
+                <instance id="I36:6913;13:10086;36:6911" name="Buttons" x="0" y="0" width="48" height="48" />
+                <instance id="I36:6913;13:10086;36:6912" name="Buttons" x="0" y="58" width="48" height="48" />
+              </frame>
+            </slot>
+          </instance>
+        </frame>
+      </frame>
+    </frame>
+    <instance id="36:6606" name="Bezel" x="-29" y="-26" width="524" height="730" />
+  </frame>
+  <frame id="17:15813" name="Inner Open Portrait - Split View" x="-3702" y="-2214" width="951" height="669">
+    <frame id="17:15814" name="Container" x="0" y="0" width="951" height="669">
+      <frame id="17:15815" name="Container" x="0" y="0" width="470" height="669">
+        <instance id="17:15816" name="Pane controls" x="0" y="0" width="84" height="669">
+          <slot id="I17:15816;16:12328" name="Controls" x="24" y="24" width="48" height="621">
+            <frame id="I17:15816;16:12329" name="Container" x="0" y="0" width="48" height="158">
+              <instance id="I17:15816;16:12330" name="Buttons" x="0" y="0" width="48" height="48" />
+              <instance id="I17:15816;16:12331" name="Buttons" x="0" y="58" width="48" height="100">
+                <instance id="I17:15816;16:12331;7:687" name="BG" x="0" y="0" width="48" height="100" />
+                <slot id="I17:15816;16:12331;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                  <instance id="I17:15816;16:12331;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                  <instance id="I17:15816;16:12331;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+                </slot>
+              </instance>
+            </frame>
+            <frame id="I17:15816;16:12606" name="Container" x="0" y="521" width="48" height="100">
+              <instance id="I17:15816;16:12608" name="Buttons" x="0" y="0" width="48" height="100">
+                <instance id="I17:15816;16:12608;7:687" name="BG" x="0" y="0" width="48" height="100" />
+                <slot id="I17:15816;16:12608;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                  <instance id="I17:15816;16:12608;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                  <instance id="I17:15816;16:12608;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+                </slot>
+              </instance>
+            </frame>
+          </slot>
+        </instance>
+        <frame id="17:15817" name="Trailing pane" x="84" y="0" width="386" height="669">
+          <instance id="17:15818" name="Toolbar" x="0" y="24" width="386" height="54" />
+        </frame>
+      </frame>
+      <frame id="17:15819" name="Grabber" x="474" y="311.5" width="3" height="46">
+        <frame id="17:15820" name="Grabber" x="0" y="-0.5" width="3" height="46" />
+      </frame>
+      <frame id="17:15821" name="Container" x="481" y="0" width="470" height="669">
+        <frame id="17:15822" name="Trailing pane" x="0" y="0" width="385.5" height="669">
+          <instance id="17:15823" name="Toolbar" x="0" y="24" width="385.5" height="54" />
+        </frame>
+        <instance id="17:15824" name="Pane controls" x="385.5" y="0" width="84" height="669">
+          <instance id="I17:15824;13:10165" name="Status bar" x="14" y="30" width="44" height="68" />
+          <slot id="I17:15824;13:10086" name="Controls" x="12" y="122" width="48" height="523">
+            <frame id="I17:15824;13:10086;17:16227" name="Container" x="0" y="0" width="48" height="158">
+              <instance id="I17:15824;13:10086;17:16228" name="Buttons" x="0" y="0" width="48" height="48" />
+              <instance id="I17:15824;13:10086;17:16229" name="Buttons" x="0" y="58" width="48" height="100">
+                <instance id="I17:15824;13:10086;17:16229;7:687" name="BG" x="0" y="0" width="48" height="100" />
+                <slot id="I17:15824;13:10086;17:16229;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                  <instance id="I17:15824;13:10086;17:16229;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                  <instance id="I17:15824;13:10086;17:16229;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+                </slot>
+              </instance>
+            </frame>
+            <instance id="I17:15824;13:10086;17:16230" name="Tab Bar" x="1" y="285" width="46" height="238">
+              <instance id="I17:15824;13:10086;17:16230;17:13734" name="BG" x="-1" y="-2" width="48" height="242" />
+              <slot id="I17:15824;13:10086;17:16230;17:13735" name="Tabs" x="4" y="0" width="38" height="238">
+                <instance id="I17:15824;13:10086;17:16230;17:15684" name="_Tab Bar Button - iPhone" x="-1.5" y="0" width="41" height="54" />
+                <instance id="I17:15824;13:10086;17:16230;17:15685" name="_Tab Bar Button - iPhone" x="-1.5" y="46" width="41" height="54" />
+                <instance id="I17:15824;13:10086;17:16230;17:15686" name="_Tab Bar Button - iPhone" x="-1.5" y="92" width="41" height="54" />
+                <instance id="I17:15824;13:10086;17:16230;17:15687" name="_Tab Bar Button - iPhone" x="-1.5" y="138" width="41" height="54" />
+                <instance id="I17:15824;13:10086;17:16230;17:15688" name="_Tab Bar Button - iPhone" x="-1.5" y="184" width="41" height="54" />
+              </slot>
+            </instance>
+          </slot>
+        </instance>
+      </frame>
+    </frame>
+    <instance id="30:1458" name="Bezel" x="-40" y="-40" width="1031" height="749" />
+  </frame>
+  <frame id="15:11855" name="Inner Open Portrait" x="-5819" y="-3188" width="951" height="669">
+    <frame id="15:11856" name="Container" x="0" y="0" width="951" height="669">
+      <frame id="15:11857" name="Leading pane" x="0" y="0" width="340" height="669">
+        <instance id="15:11858" name="Toolbar" x="0" y="24" width="339.3399963378906" height="54">
+          <slot id="I15:11858;5553:35134" name="Leading" x="16" y="0" width="48" height="48">
+            <instance id="I15:11858;5553:35134;15:11876" name="Buttons" x="0" y="0" width="48" height="48" />
+          </slot>
+          <frame id="I15:11858;5661:34483" name="Spacer" x="168.6699981689453" y="0" width="8" height="44" />
+          <slot id="I15:11858;5553:33054" name="Trailing" x="281.3399963378906" y="0" width="48" height="48">
+            <instance id="I15:11858;5553:33054;15:11878" name="Buttons" x="0" y="0" width="48" height="48" />
+          </slot>
+          <instance id="I15:11858;5827:58547" name="Title" x="152" y="13" width="36" height="22" hidden="true" />
+        </instance>
+        <instance id="15:11859" name="Toolbar - Bottom - iPhone" x="0" y="593" width="340" height="76" />
+      </frame>
+      <frame id="15:11869" name="Trailing pane" x="340" y="0" width="527" height="669">
+        <instance id="15:12010" name="Toolbar" x="0" y="24" width="527" height="54" />
+      </frame>
+      <instance id="15:12060" name="Pane controls" x="867" y="0" width="84" height="669">
+        <instance id="I15:12060;13:10165" name="Status bar" x="14" y="30" width="44" height="68" />
+        <slot id="I15:12060;13:10086" name="Controls" x="12" y="122" width="48" height="523">
+          <frame id="I15:12060;13:10194" name="Container" x="0" y="0" width="48" height="158">
+            <instance id="I15:12060;13:10177" name="Buttons" x="0" y="0" width="48" height="48" />
+            <instance id="I15:12060;13:10184" name="Buttons" x="0" y="58" width="48" height="100">
+              <instance id="I15:12060;13:10184;7:687" name="BG" x="0" y="0" width="48" height="100" />
+              <slot id="I15:12060;13:10184;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                <instance id="I15:12060;13:10184;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                <instance id="I15:12060;13:10184;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+              </slot>
+            </instance>
+          </frame>
+          <instance id="I15:12060;13:10203" name="Tab Bar" x="1" y="285" width="46" height="238">
+            <instance id="I15:12060;13:10203;7:679" name="BG" x="-1" y="-2" width="48" height="242" />
+            <slot id="I15:12060;13:10203;7:680" name="Tabs" x="4" y="0" width="38" height="238">
+              <instance id="I15:12060;13:10203;17:15126" name="_Tab Bar Button - iPhone" x="-1.5" y="0" width="41" height="54" />
+              <instance id="I15:12060;13:10203;17:15207" name="_Tab Bar Button - iPhone" x="-1.5" y="46" width="41" height="54" />
+              <instance id="I15:12060;13:10203;17:15271" name="_Tab Bar Button - iPhone" x="-1.5" y="92" width="41" height="54" />
+              <instance id="I15:12060;13:10203;17:15335" name="_Tab Bar Button - iPhone" x="-1.5" y="138" width="41" height="54" />
+              <instance id="I15:12060;13:10203;17:15399" name="_Tab Bar Button - iPhone" x="-1.5" y="184" width="41" height="54" />
+            </slot>
+          </instance>
+        </slot>
+      </instance>
+    </frame>
+    <instance id="30:1448" name="Bezel" x="-40" y="-40" width="1031" height="749" />
+  </frame>
+  <frame id="36:4099" name="Inner Open Portrait - Sheet" x="-5819" y="-263" width="951" height="669">
+    <frame id="36:4100" name="Container" x="0" y="0" width="951" height="669">
+      <frame id="36:4101" name="Leading pane" x="0" y="0" width="340" height="669">
+        <instance id="36:4102" name="Toolbar" x="0" y="24" width="340" height="54">
+          <slot id="I36:4102;5553:35134" name="Leading" x="16" y="0" width="48" height="48">
+            <instance id="I36:4102;5553:35134;36:4111" name="Buttons" x="0" y="0" width="48" height="48" />
+          </slot>
+          <frame id="I36:4102;5661:34483" name="Spacer" x="169" y="0" width="8" height="44" />
+          <slot id="I36:4102;5553:33054" name="Trailing" x="282" y="0" width="48" height="48">
+            <instance id="I36:4102;5553:33054;36:4109" name="Buttons" x="0" y="0" width="48" height="48" />
+          </slot>
+          <instance id="I36:4102;5827:58547" name="Title" x="152" y="13" width="36" height="22" hidden="true" />
+        </instance>
+        <instance id="36:4103" name="Toolbar - Bottom - iPhone" x="0" y="593" width="340" height="76" />
+      </frame>
+      <frame id="36:4104" name="Trailing pane" x="340" y="0" width="527" height="669">
+        <instance id="36:4105" name="Toolbar" x="0" y="24" width="527" height="54" />
+      </frame>
+      <instance id="36:4106" name="Pane controls" x="867" y="0" width="84" height="669">
+        <instance id="I36:4106;13:10165" name="Status bar" x="14" y="30" width="44" height="68" />
+        <slot id="I36:4106;13:10086" name="Controls" x="12" y="122" width="48" height="523">
+          <frame id="I36:4106;13:10194" name="Container" x="0" y="0" width="48" height="158">
+            <instance id="I36:4106;13:10177" name="Buttons" x="0" y="0" width="48" height="48" />
+            <instance id="I36:4106;13:10184" name="Buttons" x="0" y="58" width="48" height="100">
+              <instance id="I36:4106;13:10184;7:687" name="BG" x="0" y="0" width="48" height="100" />
+              <slot id="I36:4106;13:10184;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                <instance id="I36:4106;13:10184;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                <instance id="I36:4106;13:10184;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+              </slot>
+            </instance>
+          </frame>
+          <instance id="I36:4106;13:10203" name="Tab Bar" x="1" y="285" width="46" height="238">
+            <instance id="I36:4106;13:10203;7:679" name="BG" x="-1" y="-2" width="48" height="242" />
+            <slot id="I36:4106;13:10203;7:680" name="Tabs" x="4" y="0" width="38" height="238">
+              <instance id="I36:4106;13:10203;17:15126" name="_Tab Bar Button - iPhone" x="-1.5" y="0" width="41" height="54" />
+              <instance id="I36:4106;13:10203;17:15207" name="_Tab Bar Button - iPhone" x="-1.5" y="46" width="41" height="54" />
+              <instance id="I36:4106;13:10203;17:15271" name="_Tab Bar Button - iPhone" x="-1.5" y="92" width="41" height="54" />
+              <instance id="I36:4106;13:10203;17:15335" name="_Tab Bar Button - iPhone" x="-1.5" y="138" width="41" height="54" />
+              <instance id="I36:4106;13:10203;17:15399" name="_Tab Bar Button - iPhone" x="-1.5" y="184" width="41" height="54" />
+            </slot>
+          </instance>
+        </slot>
+      </instance>
+      <frame id="36:4293" name="Sheet - iPhone" x="0" y="0" width="951" height="669">
+        <instance id="36:4294" name="Overlay" x="0" y="0" width="950" height="874" />
+        <frame id="36:4295" name="Frame" x="149.5" y="8" width="652" height="661">
+          <frame id="36:4296" name="Content" x="0" y="0" width="652" height="661">
+            <instance id="36:4297" name="Toolbar - Top - iPhone" x="0" y="16" width="652" height="58">
+              <slot id="I36:4297;5553:35134" name="Leading" x="16" y="0" width="48" height="48">
+                <instance id="I36:4297;5553:35134;36:4342" name="Buttons" x="0" y="0" width="48" height="48" />
+              </slot>
+              <frame id="I36:4297;5661:34483" name="Spacer" x="322" y="0" width="8" height="48" />
+              <slot id="I36:4297;5553:33054" name="Trailing" x="588" y="0" width="48" height="48">
+                <instance id="I36:4297;5553:33054;36:6116" name="Buttons" x="0" y="0" width="48" height="48" />
+              </slot>
+              <instance id="I36:4297;5827:58547" name="Title" x="308" y="13" width="36" height="22" />
+            </instance>
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <instance id="36:4107" name="Bezel" x="-40" y="-40" width="1031" height="749" />
+  </frame>
+  <frame id="17:16490" name="Inner Open Portrait - Keyboard" x="-5819" y="-1241" width="951" height="669">
+    <frame id="17:16491" name="Container" x="0" y="0" width="951" height="669">
+      <frame id="17:16495" name="Trailing pane" x="0" y="0" width="867" height="669">
+        <instance id="17:16496" name="Toolbar" x="40" y="40" width="787" height="54" />
+      </frame>
+      <instance id="17:16497" name="Pane controls" x="867" y="0" width="84" height="669">
+        <instance id="I17:16497;13:10165" name="Status bar" x="14" y="30" width="44" height="68" />
+        <slot id="I17:16497;13:10086" name="Controls" x="12" y="122" width="48" height="523">
+          <frame id="I17:16497;13:10086;17:18204" name="Container" x="0" y="0" width="48" height="158">
+            <instance id="I17:16497;13:10086;17:18205" name="Buttons" x="0" y="0" width="48" height="48" />
+            <instance id="I17:16497;13:10086;17:18206" name="Buttons" x="0" y="58" width="48" height="100">
+              <instance id="I17:16497;13:10086;17:18206;7:687" name="BG" x="0" y="0" width="48" height="100" />
+              <slot id="I17:16497;13:10086;17:18206;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                <instance id="I17:16497;13:10086;17:18206;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                <instance id="I17:16497;13:10086;17:18206;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+              </slot>
+            </instance>
+          </frame>
+        </slot>
+      </instance>
+      <frame id="17:18286" name="Keyboard" x="0" y="427" width="950" height="242">
+        <instance id="17:18287" name="Background" x="0" y="0" width="950" height="242" />
+        <frame id="17:18288" name="Frame 3" x="0" y="12" width="950" height="208">
+          <frame id="17:18289" name="Frame 2" x="0" y="0" width="66" height="208">
+            <vector id="17:18290" name="Emoji" x="31" y="178" width="28" height="28" />
+            <text id="17:18291" name="Mike" x="31" y="0" width="27" height="29" />
+          </frame>
+          <frame id="17:18292" name="_Keyboard Layouts/iPhone/Web Search" x="74" y="0" width="802" height="208">
+            <frame id="17:18293" name="Row 1" x="10" y="0" width="782" height="43">
+              <instance id="17:18294" name="Key" x="6" y="0" width="68" height="43" />
+              <instance id="17:18295" name="Key" x="84" y="0" width="68" height="43" />
+              <instance id="17:18296" name="Key" x="162" y="0" width="68" height="43" />
+              <instance id="17:18297" name="Key" x="240" y="0" width="68" height="43" />
+              <instance id="17:18298" name="Key" x="318" y="0" width="68" height="43" />
+              <instance id="17:18299" name="Key" x="396" y="0" width="68" height="43" />
+              <instance id="17:18300" name="Key" x="474" y="0" width="68" height="43" />
+              <instance id="17:18301" name="Key" x="552" y="0" width="68" height="43" />
+              <instance id="17:18302" name="Key" x="630" y="0" width="68" height="43" />
+              <instance id="17:18303" name="Key" x="708" y="0" width="68" height="43" />
+            </frame>
+            <frame id="17:18304" name="Row 2" x="10" y="55" width="782" height="43">
+              <instance id="17:18305" name="Key" x="45" y="0" width="68" height="43" />
+              <instance id="17:18306" name="Key" x="123" y="0" width="68" height="43" />
+              <instance id="17:18307" name="Key" x="201" y="0" width="68" height="43" />
+              <instance id="17:18308" name="Key" x="279" y="0" width="68" height="43" />
+              <instance id="17:18309" name="Key" x="357" y="0" width="68" height="43" />
+              <instance id="17:18310" name="Key" x="435" y="0" width="68" height="43" />
+              <instance id="17:18311" name="Key" x="513" y="0" width="68" height="43" />
+              <instance id="17:18312" name="Key" x="591" y="0" width="68" height="43" />
+              <instance id="17:18313" name="Key" x="669" y="0" width="68" height="43" />
+            </frame>
+            <frame id="17:18314" name="Row 3" x="10" y="110" width="782" height="43">
+              <instance id="17:18315" name="Shift Key" x="0" y="0" width="94" height="43" />
+              <frame id="17:18316" name="Row 3" x="118" y="0" width="546" height="43">
+                <instance id="17:18317" name="Key" x="0" y="0" width="68" height="43" />
+                <instance id="17:18318" name="Key" x="78" y="0" width="68" height="43" />
+                <instance id="17:18319" name="Key" x="156" y="0" width="68" height="43" />
+                <instance id="17:18320" name="Key" x="234" y="0" width="68" height="43" />
+                <instance id="17:18321" name="Key" x="312" y="0" width="68" height="43" />
+                <instance id="17:18322" name="Key" x="390" y="0" width="68" height="43" />
+                <instance id="17:18323" name="Key" x="468" y="0" width="68" height="43" />
+              </frame>
+              <instance id="17:18324" name="Delete Key" x="688" y="0" width="94" height="43" />
+            </frame>
+            <frame id="17:18325" name="Row 4" x="10" y="165" width="782" height="43">
+              <instance id="17:18326" name="Keyboard Switch" x="32" y="0" width="72" height="43" />
+              <frame id="17:18327" name="Keyboard Switch" x="110" y="0" width="72" height="43" />
+              <instance id="17:18329" name="Space" x="188" y="0" width="408" height="43" />
+              <instance id="17:18330" name="Return" x="602" y="0" width="148" height="43" />
+            </frame>
+          </frame>
+          <frame id="17:18331" name="Frame 3" x="884" y="0" width="66" height="208">
+            <text id="17:18332" name="Mike" x="8" y="174" width="30" height="36" />
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <instance id="30:1478" name="Bezel" x="-40" y="-40" width="1031" height="749" />
+  </frame>
+  <frame id="15:12253" name="Outer Closed Landscape" x="-4668" y="-3192" width="466" height="678">
+    <frame id="15:12120" name="Container" x="0" y="0" width="466" height="678">
+      <frame id="15:12124" name="Trailing pane" x="0" y="0" width="382" height="678">
+        <instance id="15:12125" name="Toolbar" x="0" y="24" width="382" height="54" />
+      </frame>
+      <instance id="15:12126" name="Pane controls" x="382" y="0" width="84" height="669">
+        <instance id="I15:12126;13:10165" name="Status bar" x="14" y="30" width="44" height="118" />
+        <slot id="I15:12126;13:10086" name="Controls" x="12" y="172" width="48" height="473">
+          <frame id="I15:12126;13:10194" name="Container" x="0" y="0" width="48" height="158">
+            <instance id="I15:12126;13:10177" name="Buttons" x="0" y="0" width="48" height="48" />
+            <instance id="I15:12126;13:10184" name="Buttons" x="0" y="58" width="48" height="100">
+              <instance id="I15:12126;13:10184;7:687" name="BG" x="0" y="0" width="48" height="100" />
+              <slot id="I15:12126;13:10184;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                <instance id="I15:12126;13:10184;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                <instance id="I15:12126;13:10184;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+              </slot>
+            </instance>
+          </frame>
+          <instance id="I15:12126;13:10203" name="Tab Bar" x="1" y="235" width="46" height="238">
+            <instance id="I15:12126;13:10203;7:679" name="BG" x="-1" y="-2" width="48" height="242" />
+            <slot id="I15:12126;13:10203;7:680" name="Tabs" x="4" y="0" width="38" height="238">
+              <instance id="I15:12126;13:10203;17:15126" name="_Tab Bar Button - iPhone" x="-1.5" y="0" width="41" height="54" />
+              <instance id="I15:12126;13:10203;17:15207" name="_Tab Bar Button - iPhone" x="-1.5" y="46" width="41" height="54" />
+              <instance id="I15:12126;13:10203;17:15271" name="_Tab Bar Button - iPhone" x="-1.5" y="92" width="41" height="54" />
+              <instance id="I15:12126;13:10203;17:15335" name="_Tab Bar Button - iPhone" x="-1.5" y="138" width="41" height="54" />
+              <instance id="I15:12126;13:10203;17:15399" name="_Tab Bar Button - iPhone" x="-1.5" y="184" width="41" height="54" />
+            </slot>
+          </instance>
+        </slot>
+      </instance>
+    </frame>
+    <instance id="30:1451" name="Bezel" x="-29" y="-26" width="524" height="730" />
+  </frame>
+  <frame id="36:7131" name="Outer Closed Landscape - Sheet" x="-4668" y="-263" width="466" height="678">
+    <frame id="36:7132" name="Container" x="0" y="0" width="466" height="678">
+      <frame id="36:7133" name="Trailing pane" x="0" y="0" width="382" height="678">
+        <instance id="36:7134" name="Toolbar" x="0" y="24" width="382" height="54" />
+      </frame>
+      <instance id="36:7135" name="Pane controls" x="382" y="0" width="84" height="669">
+        <instance id="I36:7135;13:10165" name="Status bar" x="14" y="30" width="44" height="118" />
+        <slot id="I36:7135;13:10086" name="Controls" x="12" y="172" width="48" height="473">
+          <frame id="I36:7135;13:10194" name="Container" x="0" y="0" width="48" height="158">
+            <instance id="I36:7135;13:10177" name="Buttons" x="0" y="0" width="48" height="48" />
+            <instance id="I36:7135;13:10184" name="Buttons" x="0" y="58" width="48" height="100">
+              <instance id="I36:7135;13:10184;7:687" name="BG" x="0" y="0" width="48" height="100" />
+              <slot id="I36:7135;13:10184;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                <instance id="I36:7135;13:10184;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                <instance id="I36:7135;13:10184;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+              </slot>
+            </instance>
+          </frame>
+          <instance id="I36:7135;13:10203" name="Tab Bar" x="1" y="235" width="46" height="238">
+            <instance id="I36:7135;13:10203;7:679" name="BG" x="-1" y="-2" width="48" height="242" />
+            <slot id="I36:7135;13:10203;7:680" name="Tabs" x="4" y="0" width="38" height="238">
+              <instance id="I36:7135;13:10203;17:15126" name="_Tab Bar Button - iPhone" x="-1.5" y="0" width="41" height="54" />
+              <instance id="I36:7135;13:10203;17:15207" name="_Tab Bar Button - iPhone" x="-1.5" y="46" width="41" height="54" />
+              <instance id="I36:7135;13:10203;17:15271" name="_Tab Bar Button - iPhone" x="-1.5" y="92" width="41" height="54" />
+              <instance id="I36:7135;13:10203;17:15335" name="_Tab Bar Button - iPhone" x="-1.5" y="138" width="41" height="54" />
+              <instance id="I36:7135;13:10203;17:15399" name="_Tab Bar Button - iPhone" x="-1.5" y="184" width="41" height="54" />
+            </slot>
+          </instance>
+        </slot>
+      </instance>
+      <frame id="36:7201" name="Sheet - iPhone" x="0" y="0" width="466" height="678">
+        <instance id="36:7202" name="Overlay" x="0" y="0" width="950" height="874" />
+        <frame id="36:7203" name="Frame" x="8" y="8" width="450" height="670">
+          <frame id="36:7204" name="Content" x="0" y="0" width="374" height="670">
+            <frame id="36:7205" name="Toolbar - Top - iPhone" x="0" y="32" width="374" height="22">
+              <instance id="36:7206" name="Title" x="16" y="0" width="36" height="22" />
+            </frame>
+          </frame>
+          <instance id="36:7211" name="Pane controls" x="374" y="0" width="76" height="669">
+            <instance id="I36:7211;13:10165" name="Status bar" x="14" y="22" width="44" height="118" />
+            <slot id="I36:7211;13:10086" name="Controls" x="12" y="164" width="48" height="481">
+              <frame id="I36:7211;13:10086;36:7208" name="Container" x="0" y="0" width="48" height="106">
+                <instance id="I36:7211;13:10086;36:7209" name="Buttons" x="0" y="0" width="48" height="48" />
+                <instance id="I36:7211;13:10086;36:7210" name="Buttons" x="0" y="58" width="48" height="48" />
+              </frame>
+            </slot>
+          </instance>
+        </frame>
+      </frame>
+    </frame>
+    <instance id="36:7136" name="Bezel" x="-29" y="-26" width="524" height="730" />
+  </frame>
+  <frame id="17:18369" name="Outer Closed Landscape - Keyboard" x="-4668" y="-1245" width="466" height="678">
+    <frame id="17:18370" name="Container" x="0" y="0" width="466" height="678">
+      <frame id="17:18371" name="Trailing pane" x="0" y="0" width="382" height="678">
+        <instance id="17:18372" name="Toolbar" x="0" y="24" width="382" height="54" />
+      </frame>
+      <instance id="17:18373" name="Pane controls" x="382" y="0" width="84" height="669">
+        <instance id="I17:18373;13:10165" name="Status bar" x="14" y="30" width="44" height="118" />
+        <slot id="I17:18373;13:10086" name="Controls" x="12" y="172" width="48" height="473">
+          <frame id="I17:18373;13:10086;17:18439" name="Container" x="0" y="0" width="48" height="158">
+            <instance id="I17:18373;13:10086;17:18440" name="Buttons" x="0" y="0" width="48" height="48" />
+            <instance id="I17:18373;13:10086;17:18441" name="Buttons" x="0" y="58" width="48" height="100">
+              <instance id="I17:18373;13:10086;17:18441;7:687" name="BG" x="0" y="0" width="48" height="100" />
+              <slot id="I17:18373;13:10086;17:18441;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                <instance id="I17:18373;13:10086;17:18441;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                <instance id="I17:18373;13:10086;17:18441;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+              </slot>
+            </instance>
+          </frame>
+        </slot>
+      </instance>
+      <frame id="17:19054" name="Keyboard" x="0" y="434" width="466" height="244">
+        <instance id="17:19055" name="Background" x="0" y="0" width="466" height="244" />
+        <frame id="17:19129" name="_Keyboard Layouts/iPhone/Web Search" x="0" y="12" width="466" height="205">
+          <frame id="17:19130" name="Row 1" x="12" y="0" width="442" height="43">
+            <instance id="17:19131" name="Key" x="0" y="0" width="38.79999923706055" height="43" />
+            <instance id="17:19132" name="Key" x="44.79996871948242" y="0" width="38.80000305175781" height="43" />
+            <instance id="17:19133" name="Key" x="89.5999755859375" y="0" width="38.80000305175781" height="43" />
+            <instance id="17:19134" name="Key" x="134.3999786376953" y="0" width="38.80000686645508" height="43" />
+            <instance id="17:19135" name="Key" x="179.19998168945312" y="0" width="38.80000686645508" height="43" />
+            <instance id="17:19136" name="Key" x="223.99998474121094" y="0" width="38.80000686645508" height="43" />
+            <instance id="17:19137" name="Key" x="268.79998779296875" y="0" width="38.80000686645508" height="43" />
+            <instance id="17:19138" name="Key" x="313.6000061035156" y="0" width="38.80000686645508" height="43" />
+            <instance id="17:19139" name="Key" x="358.4000244140625" y="0" width="38.800010681152344" height="43" />
+            <instance id="17:19140" name="Key" x="403.2000427246094" y="0" width="38.800010681152344" height="43" />
+          </frame>
+          <frame id="17:19141" name="Row 2" x="12" y="54" width="442" height="43">
+            <instance id="17:19142" name="Key" x="19.999984741210938" y="0" width="39.33333206176758" height="43" />
+            <instance id="17:19143" name="Key" x="65.33332824707031" y="0" width="39.33333206176758" height="43" />
+            <instance id="17:19144" name="Key" x="110.66665649414062" y="0" width="39.33333206176758" height="43" />
+            <instance id="17:19145" name="Key" x="155.99998474121094" y="0" width="39.33333206176758" height="43" />
+            <instance id="17:19146" name="Key" x="201.33331298828125" y="0" width="39.33333206176758" height="43" />
+            <instance id="17:19147" name="Key" x="246.66664123535156" y="0" width="39.33333206176758" height="43" />
+            <instance id="17:19148" name="Key" x="291.9999694824219" y="0" width="39.33333206176758" height="43" />
+            <instance id="17:19149" name="Key" x="337.33331298828125" y="0" width="39.333335876464844" height="43" />
+            <instance id="17:19150" name="Key" x="382.6666564941406" y="0" width="39.333335876464844" height="43" />
+          </frame>
+          <frame id="17:19151" name="Row 3" x="12" y="108" width="442" height="43">
+            <instance id="17:19152" name="Shift Key" x="0" y="0" width="45" height="43" />
+            <frame id="17:19153" name="Row 3" x="58.33300018310547" y="0" width="325.333984375" height="43">
+              <instance id="17:19154" name="Key" x="0" y="0" width="41.33342742919922" height="43" />
+              <instance id="17:19155" name="Key" x="47.33342742919922" y="0" width="41.33342361450195" height="43" />
+              <instance id="17:19156" name="Key" x="94.66685485839844" y="0" width="41.33342742919922" height="43" />
+              <instance id="17:19157" name="Key" x="142.00027465820312" y="0" width="41.33342742919922" height="43" />
+              <instance id="17:19158" name="Key" x="189.33370971679688" y="0" width="41.33342742919922" height="43" />
+              <instance id="17:19159" name="Key" x="236.66714477539062" y="0" width="41.33342742919922" height="43" />
+              <instance id="17:19160" name="Key" x="284.0005798339844" y="0" width="41.33342742919922" height="43" />
+            </frame>
+            <instance id="17:19161" name="Delete Key" x="397" y="0" width="45" height="43" />
+          </frame>
+          <frame id="17:19162" name="Row 4" x="12" y="162" width="442" height="43">
+            <frame id="17:19201" name="Keyboard Switch" x="0" y="0" width="56" height="43" />
+            <instance id="17:19164" name="Space" x="62" y="0" width="311" height="43" />
+            <instance id="17:19166" name="Return" x="379" y="0" width="63" height="43" />
+          </frame>
+        </frame>
+      </frame>
+    </frame>
+    <instance id="30:1472" name="Bezel" x="-29" y="-26" width="524" height="730" />
+  </frame>
+  <frame id="17:13296" name="Inner Open Portrait - Split View" x="-5819" y="-2214" width="951" height="669">
+    <frame id="17:13180" name="Container" x="0" y="0" width="951" height="669">
+      <frame id="17:13181" name="Container" x="0" y="0" width="470" height="669">
+        <instance id="17:13182" name="Pane controls" x="0" y="0" width="84" height="669">
+          <slot id="I17:13182;16:12328" name="Controls" x="24" y="24" width="48" height="621">
+            <frame id="I17:13182;16:12329" name="Container" x="0" y="0" width="48" height="158">
+              <instance id="I17:13182;16:12330" name="Buttons" x="0" y="0" width="48" height="48" />
+              <instance id="I17:13182;16:12331" name="Buttons" x="0" y="58" width="48" height="100">
+                <instance id="I17:13182;16:12331;7:687" name="BG" x="0" y="0" width="48" height="100" />
+                <slot id="I17:13182;16:12331;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                  <instance id="I17:13182;16:12331;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                  <instance id="I17:13182;16:12331;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+                </slot>
+              </instance>
+            </frame>
+            <frame id="I17:13182;16:12606" name="Container" x="0" y="521" width="48" height="100">
+              <instance id="I17:13182;16:12608" name="Buttons" x="0" y="0" width="48" height="100">
+                <instance id="I17:13182;16:12608;7:687" name="BG" x="0" y="0" width="48" height="100" />
+                <slot id="I17:13182;16:12608;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                  <instance id="I17:13182;16:12608;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                  <instance id="I17:13182;16:12608;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+                </slot>
+              </instance>
+            </frame>
+          </slot>
+        </instance>
+        <frame id="17:13183" name="Trailing pane" x="84" y="0" width="386" height="669">
+          <instance id="17:13188" name="Toolbar" x="0" y="24" width="386" height="54" />
+        </frame>
+      </frame>
+      <frame id="17:13189" name="Grabber" x="474" y="311.5" width="3" height="46">
+        <frame id="17:13190" name="Grabber" x="0" y="-0.5" width="3" height="46" />
+      </frame>
+      <frame id="17:13191" name="Container" x="481" y="0" width="470" height="669">
+        <frame id="17:13192" name="Trailing pane" x="0" y="0" width="385.5" height="669">
+          <instance id="17:13197" name="Toolbar" x="0" y="24" width="385.5" height="54" />
+        </frame>
+        <instance id="17:13198" name="Pane controls" x="385.5" y="0" width="84" height="669">
+          <instance id="I17:13198;13:10165" name="Status bar" x="14" y="30" width="44" height="68" />
+          <slot id="I17:13198;13:10086" name="Controls" x="12" y="122" width="48" height="523">
+            <frame id="I17:13198;13:10194" name="Container" x="0" y="0" width="48" height="158">
+              <instance id="I17:13198;13:10177" name="Buttons" x="0" y="0" width="48" height="48" />
+              <instance id="I17:13198;13:10184" name="Buttons" x="0" y="58" width="48" height="100">
+                <instance id="I17:13198;13:10184;7:687" name="BG" x="0" y="0" width="48" height="100" />
+                <slot id="I17:13198;13:10184;7:688" name="Buttons" x="4" y="4" width="40" height="92">
+                  <instance id="I17:13198;13:10184;7:689" name="Symbol 1" x="2" y="0" width="36" height="36" />
+                  <instance id="I17:13198;13:10184;7:690" name="Symbol 2" x="2" y="56" width="36" height="36" />
+                </slot>
+              </instance>
+            </frame>
+            <instance id="I17:13198;13:10203" name="Tab Bar" x="1" y="285" width="46" height="238">
+              <instance id="I17:13198;13:10203;7:679" name="BG" x="-1" y="-2" width="48" height="242" />
+              <slot id="I17:13198;13:10203;7:680" name="Tabs" x="4" y="0" width="38" height="238">
+                <instance id="I17:13198;13:10203;17:15126" name="_Tab Bar Button - iPhone" x="-1.5" y="0" width="41" height="54" />
+                <instance id="I17:13198;13:10203;17:15207" name="_Tab Bar Button - iPhone" x="-1.5" y="46" width="41" height="54" />
+                <instance id="I17:13198;13:10203;17:15271" name="_Tab Bar Button - iPhone" x="-1.5" y="92" width="41" height="54" />
+                <instance id="I17:13198;13:10203;17:15335" name="_Tab Bar Button - iPhone" x="-1.5" y="138" width="41" height="54" />
+                <instance id="I17:13198;13:10203;17:15399" name="_Tab Bar Button - iPhone" x="-1.5" y="184" width="41" height="54" />
+              </slot>
+            </instance>
+          </slot>
+        </instance>
+      </frame>
+    </frame>
+    <instance id="30:1475" name="Bezel" x="-40" y="-40" width="1031" height="749" />
+  </frame>
+  <frame id="40:11015" name="carousel 1" x="-2940" y="-3585" width="48" height="48" />
+</canvas>
