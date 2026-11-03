@@ -1,0 +1,207 @@
+/* The device's 3D build. Every plane keeps backface-visibility hidden so
+   only the side facing the camera paints; that also keeps the browser from
+   sorting planes it can't see. */
+
+.group {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 0;
+  height: 0;
+  transform-style: preserve-3d;
+  will-change: transform;
+}
+
+.half {
+  position: absolute;
+  transform-style: preserve-3d;
+}
+
+.strip {
+  position: absolute;
+  left: 0;
+  top: 0;
+  backface-visibility: hidden;
+}
+
+.face {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+  overflow: hidden;
+}
+
+/* Star white titanium band; the glass sits inside it. */
+.front {
+  background: linear-gradient(160deg, #f4f2ee 0%, #cfccc5 38%, #e7e4de 62%, #b9b5ad 100%);
+}
+
+.back {
+  background: linear-gradient(160deg, #eeebe5 0%, #c9c5bd 45%, #dedad3 100%);
+}
+
+.glass {
+  position: absolute;
+  background: #050506;
+  overflow: hidden;
+}
+
+.screen {
+  position: absolute;
+  overflow: hidden;
+  background: #000;
+  isolation: isolate;
+}
+
+.mirror {
+  position: absolute;
+  top: 0;
+  pointer-events: none;
+}
+
+/* Black over the display while it is asleep or waking. */
+.sleep {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  pointer-events: none;
+}
+
+/* The fold reads as a soft crease once the halves leave the flat. */
+.crease {
+  position: absolute;
+  top: 0;
+  bottom: 0;
+  left: -18px;
+  width: 36px;
+  pointer-events: none;
+  background: linear-gradient(
+    90deg,
+    rgba(0, 0, 0, 0) 0%,
+    rgba(0, 0, 0, 0.16) 38%,
+    rgba(255, 255, 255, 0.1) 52%,
+    rgba(0, 0, 0, 0.12) 62%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  opacity: 0;
+}
+
+/* A broad reflection that slides as the glass turns. */
+.glare {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background-image: linear-gradient(
+    105deg,
+    rgba(255, 255, 255, 0) 30%,
+    rgba(255, 255, 255, 0.07) 44%,
+    rgba(255, 255, 255, 0.13) 50%,
+    rgba(255, 255, 255, 0.04) 56%,
+    rgba(255, 255, 255, 0) 70%
+  );
+  background-size: 260% 100%;
+  mix-blend-mode: screen;
+}
+
+.shade {
+  position: absolute;
+  inset: 0;
+  background: #000;
+  opacity: 0;
+  pointer-events: none;
+}
+
+.outer {
+  position: absolute;
+  overflow: hidden;
+  background: #000;
+  isolation: isolate;
+}
+
+.outerContent {
+  position: absolute;
+  left: 0;
+  top: 0;
+}
+
+.punch {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle at 42% 38%, #2a2d36 0 18%, #07080a 30% 100%);
+  box-shadow: 0 0 0 1px rgba(255, 255, 255, 0.04);
+  z-index: 2;
+}
+
+/* Back glass: a soft-touch frost, warm white. */
+.backGlass {
+  position: absolute;
+  background:
+    radial-gradient(120% 80% at 20% 0%, rgba(255, 255, 255, 0.55), rgba(255, 255, 255, 0) 60%),
+    linear-gradient(170deg, #f1eee8 0%, #e4e0d8 55%, #d6d1c8 100%);
+}
+
+.plateau {
+  position: absolute;
+  backface-visibility: hidden;
+  background: linear-gradient(170deg, #f6f4ef 0%, #e2ded6 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.8);
+}
+
+.lens {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #1a1b1f 0 54%, #8f8c86 55% 58%, #d7d3cc 60% 68%, #a29e97 70% 100%);
+  box-shadow:
+    0 2px 6px rgba(0, 0, 0, 0.25),
+    inset 0 -2px 3px rgba(0, 0, 0, 0.2);
+}
+
+.lensGlass {
+  position: absolute;
+  inset: 22%;
+  border-radius: 50%;
+  background:
+    radial-gradient(circle at 36% 32%, rgba(140, 170, 255, 0.55) 0 6%, rgba(0, 0, 0, 0) 14%),
+    radial-gradient(circle at 60% 64%, rgba(90, 60, 180, 0.35) 0 8%, rgba(0, 0, 0, 0) 22%),
+    radial-gradient(circle, #0b0c12 0 40%, #151826 41% 60%, #050508 62% 100%);
+}
+
+.flash {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle, #fff7e0 0 30%, #e9dfc4 40%, #cfc8b8 100%);
+  box-shadow: inset 0 0 0 2px rgba(0, 0, 0, 0.08);
+}
+
+.mic {
+  position: absolute;
+  border-radius: 50%;
+  background: #6f6c66;
+}
+
+.live {
+  position: absolute;
+  overflow: hidden;
+  transform: translateZ(0.6px);
+  background: #000;
+}
+
+/* Night Sky: dark blue titanium, a deep glass back. */
+.group[data-finish="night"] .front {
+  background: linear-gradient(160deg, #6a7590 0%, #2a3142 38%, #4a5470 62%, #1d2230 100%);
+}
+.group[data-finish="night"] .back {
+  background: linear-gradient(160deg, #4a5470 0%, #232a3a 45%, #343c52 100%);
+}
+.group[data-finish="night"] .backGlass {
+  background:
+    radial-gradient(120% 80% at 20% 0%, rgba(150, 170, 220, 0.22), rgba(150, 170, 220, 0) 60%),
+    linear-gradient(170deg, #2b3346 0%, #1f2534 55%, #161b27 100%);
+}
+.group[data-finish="night"] .plateau {
+  background: linear-gradient(170deg, #353e55 0%, #1d2331 100%);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.18);
+}
+.group[data-finish="night"] .lens {
+  background: radial-gradient(circle, #0c0d10 0 54%, #4a5266 55% 58%, #6c7690 60% 68%, #3a4256 70% 100%);
+}
