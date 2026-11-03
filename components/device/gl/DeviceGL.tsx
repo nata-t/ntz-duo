@@ -38,7 +38,8 @@ type GL = {
   L: THREE.Group;
   R: THREE.Group;
   meshes: THREE.Object3D[];
-  cover: THREE.MeshPhysicalMaterial | null;
+  cover: THREE.MeshBasicMaterial | null;
+  lights: { box: THREE.RectAreaLight; strip: THREE.RectAreaLight };
   objects: CSS3DObject[];
   tex: { inner: Record<Finish, THREE.Texture>; outer: Record<Finish, THREE.Texture> };
   env: Partial<Record<Finish, THREE.Texture>>;
@@ -104,9 +105,15 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
     const box = new THREE.RectAreaLight(0xfffaf2, 3.4, 2600, 1500);
     box.position.set(-1200, 1300, 1900);
     box.lookAt(0, 0, 0);
+    // A narrow strip box close in front of the device, off to the right, as
+    // a product photographer would set it: its reflection is the soft band
+    // and falloff that make glass read as glass.
+    const strip = new THREE.RectAreaLight(0xffffff, 9, 300, 1800);
+    strip.position.set(380, 120, 1000);
+    strip.lookAt(0, 0, 0);
     const key = new THREE.DirectionalLight(0xffffff, 0.35);
     key.position.set(-0.6, 0.8, 1);
-    scene.add(box, key);
+    scene.add(box, strip, key);
 
     const root = new THREE.Group();
     root.matrixAutoUpdate = false;
@@ -142,7 +149,7 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       attach(els.outer, L, SCREENS.outer, true),
     ];
 
-    gl.current = { renderer, css, scene, camera, root, L, R, meshes: [], cover: null, objects, tex, env: {}, size: { w: 1, h: 1 } };
+    gl.current = { renderer, css, scene, camera, root, L, R, meshes: [], cover: null, lights: { box, strip }, objects, tex, env: {}, size: { w: 1, h: 1 } };
 
     const resize = () => {
       const w = el.clientWidth, h = el.clientHeight;
@@ -186,6 +193,9 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
     g.R.add(R);
     g.meshes = [L, R];
     g.cover = m.cover;
+    // Dark glass shows a light's reflection far more than white glass does.
+    g.lights.strip.intensity = finish === "night" ? 2.6 : 9;
+    g.lights.box.intensity = finish === "night" ? 2.6 : 3.4;
     redraw();
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [finish]);
@@ -236,7 +246,7 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
     g.L.rotation.y = rad(p.fold);
     // Cover-glass reflections belong to the turning object, not to the
     // phone in use: they fade almost away as it comes flat and close.
-    if (g.cover) g.cover.envMapIntensity = 0.03 + 0.45 * Math.min(1, p.fold / 30 + Math.abs(1 - p.s) * 1.5);
+    if (g.cover) g.cover.reflectivity = 0.02 + 0.16 * Math.min(1, p.fold / 30 + Math.abs(1 - p.s) * 1.5);
 
     sleep.current.forEach((el) => (el.style.opacity = (1 - p.wake).toFixed(3)));
     // Blur steps in half pixels: fewer distinct filters, fewer re-rasters.

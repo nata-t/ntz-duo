@@ -5,6 +5,9 @@ import { useOS } from "@/lib/os";
 import { OUTER } from "@/components/device/geometry";
 import { useNow } from "@/components/os/widgets";
 
+/** The outer camera's centre (from the UI kit): the rail's controls line up under it. */
+const CAM_X = 418.2;
+
 // The outer display (466 × 678 pt). Closed, it shows the Lock Screen; stood
 // up in a tent at the end of the story, it shows StandBy in landscape. The
 // two cross-fade so the change reads as the phone switching modes.
@@ -34,9 +37,9 @@ function LockScreen() {
       <img src={`/wallpapers/outer-${dark ? "dark" : "light"}.webp`} alt="" draggable={false} className="absolute inset-0 h-full w-full object-cover" />
       <div className="absolute inset-x-0 top-0 h-[55%] bg-gradient-to-b from-black/10 to-transparent" />
 
-      {/* Rail: status on the trailing edge, under the camera. */}
-      <div className="absolute top-[78px] right-[22px] flex flex-col items-center gap-[7px] text-[15px] font-semibold">
-        <svg width="16" height="12" viewBox="0 0 16 12" aria-hidden="true">
+      {/* Rail: status on the trailing edge, centred under the camera. */}
+      <div className="absolute top-[76px] flex -translate-x-1/2 flex-col items-center gap-[7px]" style={{ left: CAM_X }}>
+        <svg width="17" height="13" viewBox="0 0 16 12" aria-hidden="true">
           <path d="M8 2.4c2.3 0 4.4.9 6 2.4l1.1-1.1A10 10 0 0 0 8 .8 10 10 0 0 0 .9 3.7L2 4.8a8.4 8.4 0 0 1 6-2.4M8 5.6c1.4 0 2.7.5 3.7 1.4l1.1-1.1A7 7 0 0 0 8 4a7 7 0 0 0-4.8 1.9L4.3 7c1-.9 2.3-1.4 3.7-1.4M8 8.8c.6 0 1.1.2 1.5.6L8 11 6.5 9.4c.4-.4.9-.6 1.5-.6" fill="#fff" />
         </svg>
         <svg width="25" height="12" viewBox="0 0 25 12" aria-hidden="true">
@@ -61,7 +64,7 @@ function LockScreen() {
       </div>
 
       {/* One notification: the invitation. */}
-      <div className="glass-clear absolute right-[96px] bottom-[118px] left-[18px] rounded-[26px] p-[14px]">
+      <div className="glass-clear absolute right-[96px] bottom-[34px] left-[18px] rounded-[26px] p-[14px]">
         <div className="flex items-start gap-[11px]">
           <span className="grid size-[38px] shrink-0 place-items-center overflow-hidden rounded-[9px] bg-[#c9d6ff]">
             <img src="/portrait/source.webp" alt="" className="mt-[6px] w-full" draggable={false} />
@@ -76,8 +79,8 @@ function LockScreen() {
         </div>
       </div>
 
-      {/* Flashlight and camera, and the home bar. */}
-      <div className="absolute right-[96px] bottom-[34px] left-[18px] flex justify-between">
+      {/* Flashlight and camera, stacked in the rail under the camera. */}
+      <div className="absolute bottom-[28px] flex -translate-x-1/2 flex-col items-center gap-[14px]" style={{ left: CAM_X }}>
         {["M9 2h6v4l-2 4v12h-2V10L9 6z", "M4 8h3l2-3h6l2 3h3v11H4zM12 10.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7"].map((d) => (
           <span key={d} className="glass-clear grid size-[50px] place-items-center rounded-full">
             <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">

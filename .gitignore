@@ -11,3 +11,4 @@ next-env.d.ts
 docs/figma/assets/
 docs/figma/*.png
 docs/research/img/
+.vercel

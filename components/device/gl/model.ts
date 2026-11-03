@@ -20,7 +20,9 @@ const SCREEN_Z = 0.5;
 const SCREEN_R = 40;
 const OUTER_CAM = { x: 418.2, y: 46.3, r: 17.5 };
 /** Raised plateau: height, the round of its top edge, the fillet at its foot. */
-const PD = 9, P_ROUND = 4.5, P_FILLET = 4;
+const PD = 7, P_ROUND = 4, P_FILLET = 3.5;
+/** Lens rings stand this far proud of the plateau (≈1.5 mm). */
+const LENS_H = 8.5, LENS_R = 55;
 
 const hw = HALF.w, hh = HALF.h / 2;
 
@@ -103,8 +105,8 @@ function canvas(n: number) {
   return [c, c.getContext("2d")!] as const;
 }
 
-/** What you see through a camera lens: element rings, a dark aperture, a
- *  faint violet bloom. */
+/** What you see through a camera lens: element rings stepping down into
+ *  a dark aperture, tinted by the coating's wine and violet. */
 function opticsTexture() {
   const n = 512, [c, x] = canvas(n), r = n / 2;
   const ring = (r1: number, stops: [number, string][]) => {
@@ -115,21 +117,64 @@ function opticsTexture() {
     x.arc(r, r, r1 * r, 0, Math.PI * 2);
     x.fill();
   };
-  ring(1, [[0, "#0d0f16"], [0.82, "#090a0e"], [0.9, "#17181d"], [0.94, "#07080a"], [1, "#020203"]]);
-  ring(0.7, [[0, "#030306"], [0.86, "#0a0c14"], [0.92, "#2b2f3d"], [0.96, "#0a0b10"], [1, "#050608"]]);
-  ring(0.42, [[0, "#0b0d1e"], [0.55, "#05060c"], [0.85, "#1c2033"], [1, "#040408"]]);
-  const bloom = x.createRadialGradient(r * 1.25, r * 1.3, 0, r * 1.25, r * 1.3, r * 0.5);
-  bloom.addColorStop(0, "rgba(110,80,200,0.3)");
-  bloom.addColorStop(1, "rgba(110,80,200,0)");
+  ring(1, [[0, "#140a12"], [0.8, "#0c070b"], [0.88, "#241823"], [0.93, "#0a0609"], [1, "#030203"]]);
+  ring(0.72, [[0, "#050306"], [0.82, "#0d0810"], [0.9, "#2a1f2e"], [0.95, "#0b070c"], [1, "#060407"]]);
+  ring(0.46, [[0, "#110a1c"], [0.5, "#06040a"], [0.82, "#1d1428"], [1, "#050307"]]);
+  ring(0.2, [[0, "#02020a"], [0.7, "#0a0716"], [1, "#030208"]]);
+  // A soft wine bloom and a cool arc, the coating catching the room.
+  const bloom = x.createRadialGradient(r * 1.22, r * 1.28, 0, r * 1.22, r * 1.28, r * 0.55);
+  bloom.addColorStop(0, "rgba(150,40,80,0.35)");
+  bloom.addColorStop(1, "rgba(150,40,80,0)");
   x.fillStyle = bloom;
   x.fillRect(0, 0, n, n);
-  x.strokeStyle = "rgba(90,170,190,0.2)";
-  x.lineWidth = n * 0.012;
+  x.strokeStyle = "rgba(120,90,200,0.22)";
+  x.lineWidth = n * 0.01;
   x.beginPath();
-  x.arc(r, r, r * 0.56, Math.PI * 1.05, Math.PI * 1.45);
+  x.arc(r, r, r * 0.6, Math.PI * 1.05, Math.PI * 1.42);
   x.stroke();
   const t = new THREE.CanvasTexture(c);
   t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+/** The flash: a frosted Fresnel lens, fine rings around a warm centre. */
+function flashTexture() {
+  const n = 256, [c, x] = canvas(n), r = n / 2;
+  const g = x.createRadialGradient(r, r, 0, r, r, r);
+  g.addColorStop(0, "#fbf3dc");
+  g.addColorStop(0.55, "#efe4c6");
+  g.addColorStop(1, "#d9cfba");
+  x.fillStyle = g;
+  x.fillRect(0, 0, n, n);
+  x.strokeStyle = "rgba(120,100,70,0.28)";
+  x.lineWidth = 1.2;
+  for (let k = 0.14; k < 1; k += 0.075) {
+    x.beginPath();
+    x.arc(r, r, k * r, 0, Math.PI * 2);
+    x.stroke();
+  }
+  const t = new THREE.CanvasTexture(c);
+  t.colorSpace = THREE.SRGBColorSpace;
+  return t;
+}
+
+/** Frosted glass: a fine, soft variation in roughness. Mipmapped, so at a
+ *  distance it averages to satin instead of sparkling. */
+function frostTexture() {
+  const n = 256, [c, x] = canvas(n);
+  const img = x.createImageData(n, n);
+  let seed = 7;
+  const rnd = () => ((seed = (seed * 16807) % 2147483647) / 2147483647);
+  for (let i = 0; i < n * n; i++) {
+    const v = 214 + rnd() * 41;
+    img.data[i * 4] = img.data[i * 4 + 1] = img.data[i * 4 + 2] = v;
+    img.data[i * 4 + 3] = 255;
+  }
+  x.putImageData(img, 0, 0);
+  const t = new THREE.CanvasTexture(c);
+  t.wrapS = t.wrapT = THREE.RepeatWrapping;
+  // Shape UVs are in points: one tile every 40 pt.
+  t.repeat.set(1 / 40, 1 / 40);
   return t;
 }
 
@@ -153,17 +198,6 @@ function occlusionTexture(w: number, h: number, margin: number) {
   return new THREE.CanvasTexture(c);
 }
 
-/** A ring that fades from bright at its inner edge to nothing (alpha map). */
-function radialFade() {
-  const n = 128, [c, x] = canvas(n);
-  const g = x.createLinearGradient(0, 0, n, 0);
-  g.addColorStop(0, "#fff");
-  g.addColorStop(1, "#000");
-  x.fillStyle = g;
-  x.fillRect(0, 0, n, n);
-  return new THREE.CanvasTexture(c);
-}
-
 export type Materials = ReturnType<typeof makeMaterials>;
 
 export function makeMaterials(finish: Finish, env: THREE.Texture, inner: THREE.Texture, outer: THREE.Texture) {
@@ -180,49 +214,60 @@ export function makeMaterials(finish: Finish, env: THREE.Texture, inner: THREE.T
   // only a faint sheen of the studio sits on it.
   const glass = (map: THREE.Texture) =>
     lift(new THREE.MeshPhysicalMaterial({ map, roughness: 0.32, metalness: 0, specularIntensity: 0.35, envMap: env, envMapIntensity: 0.22 }));
-  // Satin back glass: a soft, broad sheen, never a mirror.
+  // The back: white glass with a frosted, satin face. Its clear coat keeps
+  // soft reflections of the studio; the frost breaks them up.
+  const frost = frostTexture();
   const satin = lift(
     new THREE.MeshPhysicalMaterial({
-      color: night ? "#232b42" : "#ebe6dc",
-      roughness: 0.5,
+      color: night ? "#222a40" : "#d9d8d4",
+      roughness: 0.3,
+      roughnessMap: frost,
       metalness: 0,
-      clearcoat: 0.25,
-      clearcoatRoughness: 0.5,
+      clearcoat: 0.85,
+      clearcoatRoughness: 0.16,
+      clearcoatRoughnessMap: frost,
       envMap: env,
-      envMapIntensity: night ? 1.2 : 1.45,
+      envMapIntensity: night ? 1.15 : 0.95,
     }),
   );
-  const plateau = new THREE.MeshPhysicalMaterial({
-    color: night ? "#262f47" : "#efeae0",
-    roughness: 0.38,
-    metalness: 0,
-    clearcoat: 0.5,
-    clearcoatRoughness: 0.3,
-    envMap: env,
-    envMapIntensity: night ? 1.2 : 1.4,
-  });
-  // Lens glass: clear with a faint coating; the optics underneath show
-  // through. Transparent rather than transmissive: no extra render pass.
+  // The plateau is the same glass, a little glossier.
+  const plateau = satin.clone();
+  plateau.polygonOffset = false;
+  plateau.roughness = 0.3;
+  plateau.clearcoatRoughness = 0.12;
+  // Lens cover glass: near black, its reflections tinted wine by the
+  // anti-reflective coating. Transparent, so the optics read beneath.
   const lensGlass = new THREE.MeshPhysicalMaterial({
     color: "#000000",
-    roughness: 0.03,
+    roughness: 0.02,
     metalness: 0,
-    specularIntensity: 0.9,
-    iridescence: 0.35,
-    iridescenceIOR: 1.38,
-    iridescenceThicknessRange: [300, 460],
+    specularIntensity: 1,
+    specularColor: new THREE.Color("#d0436b"),
+    iridescence: 0.25,
+    iridescenceIOR: 1.35,
+    iridescenceThicknessRange: [400, 520],
     envMap: env,
-    envMapIntensity: 1.1,
+    envMapIntensity: 1.6,
     transparent: true,
-    opacity: 0.35,
+    opacity: 0.42,
     depthWrite: false,
   });
   const optics = new THREE.MeshBasicMaterial({ map: opticsTexture() });
-  const lensRing = metal.clone();
-  lensRing.roughness = night ? 0.15 : 0.1;
-  const barrel = new THREE.MeshPhysicalMaterial({ color: "#0b0c10", roughness: 0.4, metalness: 0.5, envMap: env, envMapIntensity: 0.5 });
-  const flash = new THREE.MeshPhysicalMaterial({ color: "#efe3c2", roughness: 0.3, clearcoat: 1, envMap: env, emissive: "#3a3426", emissiveIntensity: 0.35 });
+  // The lens rings: mirror-polished, brighter than the band.
+  const lensRing = new THREE.MeshPhysicalMaterial({
+    color: night ? "#7d88a6" : "#eeece8",
+    metalness: 1,
+    roughness: 0.06,
+    envMap: env,
+    envMapIntensity: 1.15,
+  });
+  const barrel = new THREE.MeshPhysicalMaterial({ color: "#0b0a0d", roughness: 0.45, metalness: 0.3, envMap: env, envMapIntensity: 0.4 });
+  const flash = new THREE.MeshPhysicalMaterial({ map: flashTexture(), roughness: 0.45, clearcoat: 1, clearcoatRoughness: 0.08, envMap: env, envMapIntensity: 0.9 });
   const black = new THREE.MeshPhysicalMaterial({ color: "#050506", roughness: 0.1, clearcoat: 1, envMap: env });
+  // The outer camera sits over the display's hole: lifted hard, so the
+  // hole never wins the depth test at a steep angle.
+  const camera = lift(black.clone(), -24);
+  const camEye = lift(optics.clone(), -28);
   // Contact shadows: drawn just above what they darken, never pulled
   // forward in depth, so whatever stands on them still covers them.
   const shadow = (map: THREE.Texture, opacity: number) =>
@@ -230,14 +275,14 @@ export function makeMaterials(finish: Finish, env: THREE.Texture, inner: THREE.T
   // Where a screen shows through: transparent black that still writes depth,
   // so the slabs hide whatever screen they pass in front of.
   const hole = lift(new THREE.MeshBasicMaterial({ color: 0x000000, opacity: 0, blending: THREE.NoBlending }), -6);
-  // Cover glass over the screens: reflections only, added onto the live
-  // display underneath without touching its alpha.
-  const cover = new THREE.MeshPhysicalMaterial({
-    color: "#000000",
-    roughness: 0.06,
-    metalness: 0,
+  // Cover glass over the screens: reflections of the room only (an unlit
+  // material, so the studio's lights never wash across a live display),
+  // added onto the display underneath without touching its alpha.
+  const cover = new THREE.MeshBasicMaterial({
+    color: 0x000000,
     envMap: env,
-    envMapIntensity: 0.5,
+    combine: THREE.AddOperation,
+    reflectivity: 0.12,
     transparent: true,
     depthWrite: false,
     blending: THREE.CustomBlending,
@@ -246,7 +291,7 @@ export function makeMaterials(finish: Finish, env: THREE.Texture, inner: THREE.T
     blendSrcAlpha: THREE.ZeroFactor,
     blendDstAlpha: THREE.OneFactor,
   });
-  return { metal, innerGlass: glass(inner), outerGlass: glass(outer), satin, plateau, lensGlass, optics, lensRing, barrel, flash, black, shadow, hole, cover };
+  return { metal, innerGlass: glass(inner), outerGlass: glass(outer), satin, plateau, lensGlass, optics, lensRing, barrel, flash, black, camera, camEye, shadow, hole, cover };
 }
 
 /** One slab: hollow band, front glass with its screen hole, back. */
@@ -307,11 +352,13 @@ function slab(side: "L" | "R", m: Materials) {
     c.renderOrder = 3;
     back.add(c);
     // The outer camera, over the display.
-    const cam = new THREE.Mesh(new THREE.CircleGeometry(OUTER_CAM.r, 48), m.black);
-    cam.position.set(s.x0 + OUTER_CAM.x, s.y1 - OUTER_CAM.y, SCREEN_Z);
+    const cam = new THREE.Mesh(new THREE.CircleGeometry(OUTER_CAM.r, 64), m.camera);
+    cam.position.set(s.x0 + OUTER_CAM.x, s.y1 - OUTER_CAM.y, SCREEN_Z + 0.4);
+    cam.renderOrder = 4;
     back.add(cam);
-    const eye = new THREE.Mesh(new THREE.CircleGeometry(OUTER_CAM.r * 0.38, 32), m.optics);
-    eye.position.set(cam.position.x - 1.5, cam.position.y + 1.5, SCREEN_Z + 0.1);
+    const eye = new THREE.Mesh(new THREE.CircleGeometry(OUTER_CAM.r * 0.42, 48), m.camEye);
+    eye.position.set(cam.position.x, cam.position.y, SCREEN_Z + 0.5);
+    eye.renderOrder = 5;
     back.add(eye);
   }
   g.add(back);
@@ -383,8 +430,9 @@ function cameras(m: Materials) {
 
   // Its shadow on the glass, so it sits rather than floats.
   const margin = 26;
-  const ao = new THREE.Mesh(new THREE.PlaneGeometry(pw + 2 * margin, ph + 2 * margin), m.shadow(occlusionTexture(pw, ph, margin), 0.3));
-  ao.position.set(cx, cy, 0.12);
+  // Lit from above, so the shadow sits a little low.
+  const ao = new THREE.Mesh(new THREE.PlaneGeometry(pw + 2 * margin, ph + 2 * margin), m.shadow(occlusionTexture(pw, ph, margin), 0.28));
+  ao.position.set(cx, cy - 4.5, 0.12);
   g.add(ao);
 
   // The plateau: rounded over at the top; its lower round is sunk into the
@@ -396,48 +444,58 @@ function cameras(m: Materials) {
   g.add(new THREE.Mesh(filletGeometry(cx, cy, pw, ph, P_FILLET), m.plateau));
   const top = PD;
 
+  // Each lens: a polished ring standing well proud of the plateau, its
+  // top rolled over into a short inner wall that drops to the cover glass,
+  // with the optics beneath.
+  const R = LENS_R, H = LENS_H;
+  const prof = [
+    [R + 0.4, -0.6],
+    [R + 0.2, 0.3],
+    [R, 0.9],
+    [R, H - 2.2],
+    [R - 0.4, H - 1],
+    [R - 1.3, H - 0.25],
+    [R - 2.4, H],
+    [R - 6.6, H],
+    [R - 7.6, H - 0.4],
+    [R - 8.2, H - 1.3],
+    [R - 8.4, H - 2.6],
+  ].map(([r, z]) => new THREE.Vector2(r!, z!));
+  const lathe = new THREE.LatheGeometry(prof, 160);
+  lathe.rotateX(Math.PI / 2);
+  const rg = R - 8.3, RS = 520;
+  const dome = new THREE.SphereGeometry(RS, 128, 6, 0, Math.PI * 2, 0, Math.asin(rg / RS));
+  dome.rotateX(Math.PI / 2);
+  const sag = RS - Math.sqrt(RS * RS - rg * rg);
   const lens = (lx: number) => {
-    const ly = cy, R = 56;
-    // Occlusion around the ring on the plateau.
-    const ring = new THREE.Mesh(new THREE.RingGeometry(R - 1, R + 9, 96), m.shadow(radialFade(), 0.2));
-    ring.position.set(lx, ly, top + 0.12);
-    g.add(ring);
-    // A turned ring: rises from the plateau, rolls over, drops into the barrel.
-    const prof = [
-      [R, -0.5],
-      [R, 2.2],
-      [R - 1, 3.6],
-      [R - 3.2, 4.4],
-      [R - 6.5, 4.4],
-      [R - 8.5, 3.5],
-      [R - 9.2, 1.6],
-      [R - 9.5, 0.2],
-    ].map(([r, z]) => new THREE.Vector2(r!, z!));
-    const lathe = new THREE.LatheGeometry(prof, 128);
-    lathe.rotateX(Math.PI / 2);
+    const ly = cy;
     const rm = new THREE.Mesh(lathe, m.lensRing);
     rm.position.set(lx, ly, top);
     g.add(rm);
-    const floor = new THREE.Mesh(new THREE.CircleGeometry(R - 9.5, 96), m.optics);
-    floor.position.set(lx, ly, top + 0.3);
+    const floor = new THREE.Mesh(new THREE.CircleGeometry(rg + 0.2, 128), m.optics);
+    floor.position.set(lx, ly, top + H - 3.4);
     g.add(floor);
-    const RS = 400, rg = R - 9.6;
-    const dome = new THREE.SphereGeometry(RS, 96, 6, 0, Math.PI * 2, 0, Math.asin(rg / RS));
-    dome.rotateX(Math.PI / 2);
     const gm = new THREE.Mesh(dome, m.lensGlass);
     gm.renderOrder = 2;
-    gm.position.set(lx, ly, top + 0.6 + (RS - Math.sqrt(RS * RS - rg * rg)) - RS + 2.2);
+    // The glass crowns just under the ring's lip.
+    gm.position.set(lx, ly, top + H - 2.7 + sag - RS);
     g.add(gm);
   };
-  lens(x0 + 16 + 56);
-  lens(x0 + 16 + 56 + 124);
+  const lx0 = x0 + 15 + R;
+  lens(lx0);
+  lens(lx0 + 2 * R + 10);
 
-  const flash = new THREE.Mesh(new THREE.CircleGeometry(12, 48), m.flash);
-  flash.position.set(x0 + 284, y1 - 46, top + 0.25);
-  g.add(flash);
-  const mic = new THREE.Mesh(new THREE.CircleGeometry(4, 24), m.black);
-  mic.position.set(x0 + 284, y1 - 104, top + 0.25);
+  // To the right of the lenses, one above the other: the mic, then the flash.
+  const col = x0 + 15 + 4 * R + 10 + (pw - (15 + 4 * R + 10)) / 2 - 2;
+  const mic = new THREE.Mesh(new THREE.CircleGeometry(3.4, 32), m.black);
+  mic.position.set(col, y1 - ph * 0.3, top + 0.2);
   g.add(mic);
+  const flash = new THREE.Mesh(new THREE.CircleGeometry(12.5, 64), m.flash);
+  flash.position.set(col, y1 - ph * 0.66, top + 0.2);
+  g.add(flash);
+  const rim = new THREE.Mesh(new THREE.RingGeometry(12.5, 13.8, 64), m.lensRing);
+  rim.position.set(col, y1 - ph * 0.66, top + 0.22);
+  g.add(rim);
   return g;
 }
 
