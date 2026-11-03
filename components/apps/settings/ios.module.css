@@ -1,0 +1,48 @@
+/* Navigation stack: the iOS push. The incoming page slides in from the
+   trailing edge over the one below, which drifts a third of the way back
+   and dims, as UINavigationController does. */
+
+.layer {
+  position: absolute;
+  inset: 0;
+  transition:
+    transform 0.5s cubic-bezier(0.32, 0.72, 0, 1),
+    filter 0.5s cubic-bezier(0.32, 0.72, 0, 1);
+}
+
+.under {
+  transform: translateX(-30%);
+  filter: brightness(0.92);
+}
+
+.pushIn {
+  animation: push-in 0.5s cubic-bezier(0.32, 0.72, 0, 1) both;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08);
+}
+
+.popOut {
+  animation: pop-out 0.42s cubic-bezier(0.32, 0.72, 0, 1) both;
+  box-shadow: -10px 0 30px rgba(0, 0, 0, 0.08);
+  pointer-events: none;
+}
+
+@keyframes push-in {
+  from {
+    transform: translateX(100%);
+  }
+}
+
+@keyframes pop-out {
+  to {
+    transform: translateX(100%);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .layer,
+  .pushIn,
+  .popOut {
+    animation: none;
+    transition: none;
+  }
+}

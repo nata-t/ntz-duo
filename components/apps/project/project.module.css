@@ -1,0 +1,29 @@
+/* apple.com's scroll reveal: rise 30 px and fade in, once, as the element
+   enters the view. The delay is set per element for the stagger. */
+
+.reveal {
+  opacity: 0;
+  transform: translateY(30px);
+  transition:
+    opacity 0.8s cubic-bezier(0.4, 0, 0.6, 1),
+    transform 0.8s cubic-bezier(0.4, 0, 0.6, 1);
+  transition-delay: var(--delay, 0s);
+}
+
+.reveal[data-shown],
+.still .reveal {
+  opacity: 1;
+  transform: none;
+}
+
+.still .reveal {
+  transition: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .reveal {
+    opacity: 1;
+    transform: none;
+    transition: none;
+  }
+}
