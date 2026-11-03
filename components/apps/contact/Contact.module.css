@@ -1,0 +1,36 @@
+.press {
+  transition: transform 0.25s cubic-bezier(0.3, 2, 0.5, 1);
+}
+
+.press:active {
+  transform: scale(0.9);
+}
+
+/* Messages' typing indicator. */
+.typing span {
+  animation: typing 1.2s ease-in-out infinite;
+  animation-delay: calc(var(--i) * 0.16s);
+}
+
+@keyframes typing {
+  0%,
+  60%,
+  100% {
+    opacity: 0.35;
+    transform: translateY(0);
+  }
+  30% {
+    opacity: 0.9;
+    transform: translateY(-2px);
+  }
+}
+
+.still .typing span {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .typing span {
+    animation: none;
+  }
+}

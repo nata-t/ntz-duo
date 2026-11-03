@@ -1,0 +1,50 @@
+/* The voice-guidance tile's waveform: bars breathing out of phase. */
+.wave span {
+  transform-origin: 50% 50%;
+  animation: wave 1.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
+  animation-delay: calc(var(--i) * -0.13s);
+}
+
+@keyframes wave {
+  0%,
+  100% {
+    transform: scaleY(0.32);
+  }
+  50% {
+    transform: scaleY(1);
+  }
+}
+
+/* The "now" dot on the timeline. */
+.pulse::after {
+  content: "";
+  position: absolute;
+  inset: -5px;
+  border-radius: 999px;
+  border: 1.5px solid var(--blue);
+  animation: pulse 2.4s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+}
+
+@keyframes pulse {
+  0% {
+    opacity: 0.7;
+    transform: scale(0.6);
+  }
+  80%,
+  100% {
+    opacity: 0;
+    transform: scale(1.5);
+  }
+}
+
+.still .wave span,
+.still .pulse::after {
+  animation: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .wave span,
+  .pulse::after {
+    animation: none;
+  }
+}
