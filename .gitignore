@@ -1,0 +1,13 @@
+node_modules/
+.next/
+out/
+.env*
+*.log
+.DS_Store
+next-env.d.ts
+*.tsbuildinfo
+# Raw design exports and reference captures stay local; only the
+# written specs and processed assets in public/ ship.
+docs/figma/assets/
+docs/figma/*.png
+docs/research/img/
