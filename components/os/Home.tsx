@@ -224,10 +224,13 @@ export default function Home({ region, mirror = false }: { region: Slot; mirror?
       onPointerUp={onUp}
       onPointerCancel={onUp}
     >
-      <div ref={strip} className="absolute inset-y-0 left-0" style={{ width: inner }}>
-        {Array.from({ length: pages }, (_, i) => (
-          <Page key={i} page={i} width={inner} height={height} layout={layout} rail={rail || portrait} mirror={mirror} />
-        ))}
+      {/* Pages stop at the rail: the next one waits off to the side. */}
+      <div className="absolute inset-y-0 left-0 overflow-hidden" style={{ width: inner }}>
+        <div ref={strip} className="absolute inset-y-0 left-0" style={{ width: inner }}>
+          {Array.from({ length: pages }, (_, i) => (
+            <Page key={i} page={i} width={inner} height={height} layout={layout} rail={rail || portrait} mirror={mirror} />
+          ))}
+        </div>
       </div>
 
       {pages > 1 ? (
