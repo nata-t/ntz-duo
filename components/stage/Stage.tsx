@@ -5,8 +5,9 @@ import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { lenisRef, scrollToTarget } from "@/lib/lenis";
 import { openApp, os, useOS } from "@/lib/os";
 import { APPS } from "@/components/apps/registry";
-import { finePointer, reducedMotion } from "@/lib/env";
+import { finePointer, reducedMotion, webglAvailable } from "@/lib/env";
 import Device, { type DeviceHandle } from "@/components/device/Device";
+import DeviceGL from "@/components/device/gl/DeviceGL";
 import { BODY } from "@/components/device/geometry";
 import { clonePose } from "@/components/device/pose";
 import InnerDisplay from "@/components/os/InnerDisplay";
@@ -43,6 +44,8 @@ export default function Stage() {
   // renders on the client.
   const [k, setK] = useState<number | null>(null);
   const [portrait, setPortrait] = useState(false);
+  // The real-3D device where WebGL runs; the CSS build everywhere else.
+  const [gl, setGl] = useState(false);
   const dark = useOS((s) => s.dark);
 
   useEffect(() => {
@@ -51,6 +54,7 @@ export default function Stage() {
       cancelAnimationFrame(raf);
       raf = requestAnimationFrame(() => {
         const p = isPortrait();
+        setGl(webglAvailable());
         os.set({ portrait: p });
         setPortrait(p);
         setK(fitZoom(p));
@@ -192,11 +196,11 @@ export default function Stage() {
       window.clearTimeout(settle);
       window.clearTimeout(deep);
     };
-  }, [k, portrait]);
+  }, [k, portrait, gl]);
 
   return (
     <section ref={track} aria-label="ntz duo" className="relative" style={{ height: `${(LENGTH + 1) * 100}svh` }}>
-      <div className="sticky top-0 h-svh w-full overflow-hidden" style={{ perspective: "2800px", perspectiveOrigin: "50% 45%" }}>
+      <div className="sticky top-0 h-svh w-full overflow-hidden" style={gl ? undefined : { perspective: "2800px", perspectiveOrigin: "50% 45%" }}>
         <Nav ref={nav} />
         <HeroCopy ref={hero} />
         <div
@@ -210,17 +214,29 @@ export default function Stage() {
             filter: "blur(10px)",
           }}
         />
-        <div className="absolute inset-0" style={{ transformStyle: "preserve-3d" }}>
+        <div className="absolute inset-0" style={gl ? undefined : { transformStyle: "preserve-3d" }}>
           {k === null ? null : (
-          <Device
-            ref={device}
-            k={k}
-            inner={(half) => <InnerDisplay mirror half={half} />}
-            live={<InnerDisplay />}
-            outer={<OuterDisplay />}
-            portrait={portrait}
-            finish={dark ? "night" : "star"}
-          />
+          gl ? (
+            <DeviceGL
+              ref={device}
+              k={k}
+              inner={(half) => <InnerDisplay mirror half={half} />}
+              live={<InnerDisplay />}
+              outer={<OuterDisplay />}
+              portrait={portrait}
+              finish={dark ? "night" : "star"}
+            />
+          ) : (
+            <Device
+              ref={device}
+              k={k}
+              inner={(half) => <InnerDisplay mirror half={half} />}
+              live={<InnerDisplay />}
+              outer={<OuterDisplay />}
+              portrait={portrait}
+              finish={dark ? "night" : "star"}
+            />
+          )
           )}
         </div>
         <Footer ref={footer} />
