@@ -5,7 +5,7 @@ const shape = "grid shrink-0 place-items-center rounded-[22.5%] shadow-[inset_0_
 
 export function MailIcon({ size = 44 }: { size?: number }) {
   return (
-    <span className={shape} style={{ width: size, height: size, background: "linear-gradient(180deg,#1ea1ff,#0a6cf0)" }}>
+    <span className={`${shape} bg-[linear-gradient(180deg,#1ea1ff,#0a6cf0)]`} style={{ width: size, height: size }}>
       <svg width={size * 0.62} height={size * 0.62} viewBox="0 0 24 24" aria-hidden="true">
         <rect x="2.5" y="5" width="19" height="14" rx="2.6" fill="#fff" />
         <path d="m3.2 6.4 7.6 6a2 2 0 0 0 2.4 0l7.6-6" fill="none" stroke="#1584f7" strokeWidth="1.4" strokeLinecap="round" />
@@ -16,7 +16,7 @@ export function MailIcon({ size = 44 }: { size?: number }) {
 
 export function LinkedInIcon({ size = 44 }: { size?: number }) {
   return (
-    <span className={shape} style={{ width: size, height: size, background: "#0a66c2" }}>
+    <span className={`${shape} bg-[#0a66c2]`} style={{ width: size, height: size }}>
       <svg width={size * 0.56} height={size * 0.56} viewBox="0 0 24 24" aria-hidden="true" fill="#fff">
         <circle cx="5.6" cy="5.4" r="2" />
         <rect x="3.9" y="8.6" width="3.4" height="11.4" rx="0.4" />
@@ -38,7 +38,7 @@ export function GitHubIcon({ size = 44 }: { size?: number }) {
 
 export function TelegramIcon({ size = 44 }: { size?: number }) {
   return (
-    <span className={shape} style={{ width: size, height: size, background: "linear-gradient(180deg,#38b0e3,#1d93d2)" }}>
+    <span className={`${shape} bg-[linear-gradient(180deg,#38b0e3,#1d93d2)]`} style={{ width: size, height: size }}>
       <svg width={size * 0.6} height={size * 0.6} viewBox="0 0 24 24" aria-hidden="true">
         <path
           d="M4.4 11.6 18.3 6.3c.7-.25 1.3.17 1.07 1.2l-2.37 11.1c-.17.8-.65 1-1.32.62l-3.65-2.69-1.76 1.7c-.2.2-.36.36-.74.36l.26-3.73 6.78-6.13c.3-.26-.06-.4-.46-.15l-8.38 5.28-3.6-1.13c-.79-.25-.8-.79.17-1.17"
@@ -51,7 +51,7 @@ export function TelegramIcon({ size = 44 }: { size?: number }) {
 
 export function DocIcon({ size = 44 }: { size?: number }) {
   return (
-    <span className={shape} style={{ width: size, height: size, background: "linear-gradient(180deg,#ff9f2e,#ff7a1a)" }}>
+    <span className={`${shape} bg-[linear-gradient(180deg,#ff9f2e,#ff7a1a)]`} style={{ width: size, height: size }}>
       <svg width={size * 0.56} height={size * 0.56} viewBox="0 0 24 24" aria-hidden="true">
         <path d="M6.5 2.5h7.2l4.8 4.8v12.2a2 2 0 0 1-2 2h-10a2 2 0 0 1-2-2v-15a2 2 0 0 1 2-2" fill="#fff" />
         <path d="M13.7 2.5v3.8a1 1 0 0 0 1 1h3.8" fill="#ffd2a6" />

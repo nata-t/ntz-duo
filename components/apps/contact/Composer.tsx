@@ -3,7 +3,6 @@
 import { useId, useState, type RefObject } from "react";
 import { contact, profile } from "@/content/site";
 import { usePage } from "../about/kit";
-import css from "./Contact.module.css";
 
 // A Mail compose sheet in Liquid Glass. Send hands everything to the
 // visitor's own mail app through a mailto: link; nothing leaves the page.
@@ -11,6 +10,9 @@ import css from "./Contact.module.css";
 type Form = { name: string; email: string; subject: string; message: string };
 const EMPTY: Form = { name: "", email: "", subject: "", message: "" };
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
+
+/** A springy press for Contact's buttons. */
+export const PRESS = "transition-[scale] duration-[0.25s] ease-[cubic-bezier(0.3,2,0.5,1)] active:scale-90";
 
 export function mailto(f: Form) {
   const name = f.name.trim();
@@ -52,11 +54,7 @@ export default function Composer({ bodyRef }: { bodyRef: RefObject<HTMLTextAreaE
 
   return (
     <div
-      className="relative overflow-hidden rounded-[26px] text-label"
-      style={{
-        background: "var(--glass-strong)",
-        boxShadow: "inset 0 0.5px 0 0.5px var(--glass-edge), 0 24px 60px -12px rgba(0,0,0,0.18), 0 0 0 0.5px rgba(0,0,0,0.05)",
-      }}
+      className="relative overflow-hidden rounded-[26px] bg-(--glass-strong) text-label shadow-[inset_0_0.5px_0_0.5px_var(--glass-edge),0_24px_60px_-12px_rgba(0,0,0,0.18),0_0_0_0.5px_rgba(0,0,0,0.05)]"
     >
       {/* Sheet header: Clear · New Message · Send */}
       <div className="grid h-[52px] grid-cols-[1fr_auto_1fr] items-center px-[14px]">
@@ -77,7 +75,7 @@ export default function Composer({ bodyRef }: { bodyRef: RefObject<HTMLTextAreaE
           onClick={send}
           aria-label="Send"
           title="Send"
-          className={`grid size-[32px] place-items-center justify-self-end rounded-full bg-blue text-white shadow-[0_4px_14px_rgba(0,120,255,0.35)] ${css.press}`}
+          className={`grid size-[32px] place-items-center justify-self-end rounded-full bg-blue text-white shadow-[0_4px_14px_rgba(0,120,255,0.35)] ${PRESS}`}
         >
           <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
             <path d="M12 19V5m-6.5 6.5L12 5l6.5 6.5" />
@@ -143,10 +141,9 @@ export default function Composer({ bodyRef }: { bodyRef: RefObject<HTMLTextAreaE
       {sent ? (
         <div
           role="status"
-          className="absolute inset-0 flex flex-col items-center justify-center px-[32px] text-center"
-          style={{ background: "var(--glass-strong)", animation: "duo-fade 0.35s ease-out both" }}
+          className="absolute inset-0 flex animate-[duo-fade_0.35s_ease-out_both] flex-col items-center justify-center bg-(--glass-strong) px-[32px] text-center"
         >
-          <span className="grid size-[52px] place-items-center rounded-full bg-green text-white" style={{ animation: "duo-rise 0.5s var(--ease-ios) both" }}>
+          <span className="grid size-[52px] animate-[duo-rise_0.5s_var(--ease-ios)_both] place-items-center rounded-full bg-green text-white">
             <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
               <path d="m5 12.5 4.5 4.5L19 7.5" />
             </svg>

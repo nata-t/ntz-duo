@@ -19,9 +19,8 @@ import {
   scrollToEl,
   usePage,
 } from "../about/kit";
-import Composer from "./Composer";
+import Composer, { PRESS } from "./Composer";
 import { DocIcon, GitHubIcon, LinkedInIcon, MailIcon, TelegramIcon } from "./icons";
-import css from "./Contact.module.css";
 
 // Contact: the same apple.com detail page as About. A short hero with a
 // Messages exchange, a tile for every channel (with Addis Ababa's time), and
@@ -51,7 +50,7 @@ export default function Contact(props: AppProps) {
         { label: profile.cv.label, icon: <DocDown />, href: profile.cv.href, external: true },
       ]}
     >
-      <div className={props.mirror ? css.still : undefined}>
+      <div data-still={props.mirror || undefined}>
         <Hero onWrite={write} />
         <Channels live={!props.mirror} />
         <Write sref={composer} body={body} />
@@ -92,7 +91,7 @@ function Hero({ onWrite }: { onWrite: (page: HTMLElement | null) => void }) {
 
   if (compact)
     return (
-      <header className="bg-page text-center" style={{ paddingLeft: padL, paddingRight: padR, paddingTop: 78, paddingBottom: 56 }}>
+      <header className="bg-page pt-[78px] pb-[56px] text-center" style={{ paddingLeft: padL, paddingRight: padR }}>
         {copy}
         <Thread className="mx-auto mt-[40px] max-w-[320px]" />
       </header>
@@ -135,9 +134,9 @@ function Thread({ className = "" }: { className?: string }) {
         <p {...reveal(5)} className={`${bubble} self-start rounded-bl-[6px] bg-[#e9e9eb] text-black dark:bg-[#26252a] dark:text-white`}>
           What are we building?
         </p>
-        <div {...reveal(6)} className={`${css.typing} mt-[2px] flex h-[34px] w-[58px] items-center justify-center gap-[4px] self-start rounded-[17px] bg-[#e9e9eb] dark:bg-[#26252a]`}>
+        <div {...reveal(6)} className={`mt-[2px] flex h-[34px] w-[58px] items-center justify-center gap-[4px] self-start rounded-[17px] bg-[#e9e9eb] dark:bg-[#26252a]`}>
           {[0, 1, 2].map((i) => (
-            <span key={i} className="size-[7px] rounded-full bg-[#8e8e93]" style={{ "--i": i } as React.CSSProperties} />
+            <span key={i} className="size-[7px] animate-typing rounded-full bg-[#8e8e93] [animation-delay:calc(var(--i)*0.16s)] in-data-still:animate-none motion-reduce:animate-none" style={{ "--i": i } as React.CSSProperties} />
           ))}
         </div>
       </div>
@@ -173,7 +172,7 @@ function Channels({ live }: { live: boolean }) {
               onClick={() => {
                 navigator.clipboard?.writeText(contact.email.label).then(() => setCopied(true), () => {});
               }}
-              className={`h-[30px] rounded-full bg-page-alt px-[14px] text-[13px] text-ink transition-colors hover:bg-rule ${css.press}`}
+              className={`h-[30px] rounded-full bg-page-alt px-[14px] text-[13px] text-ink hover:bg-rule ${PRESS}`}
               aria-live="polite"
             >
               {copied ? "Copied" : "Copy address"}
@@ -334,8 +333,7 @@ function Dial({ h, m, s, size }: { h: number; m: number; s: number; size: number
             y={50 - Math.cos(a) * 34}
             textAnchor="middle"
             dominantBaseline="central"
-            className="fill-ink font-display"
-            style={{ fontSize: 9.5, fontWeight: 500 }}
+            className="fill-ink font-display text-[9.5px] font-medium"
           >
             {i + 1}
           </text>
@@ -379,11 +377,7 @@ function Write({ sref, body }: { sref: RefObject<HTMLElement | null>; body: RefO
           {/* Colour for the glass to sit on. */}
           <div
             aria-hidden="true"
-            className="absolute -inset-x-[56px] -inset-y-[64px] opacity-80 dark:opacity-60"
-            style={{
-              background:
-                "radial-gradient(28% 34% at 30% 32%, rgba(10,132,255,0.3), transparent), radial-gradient(28% 34% at 72% 36%, rgba(191,90,242,0.24), transparent), radial-gradient(30% 30% at 54% 72%, rgba(255,55,95,0.18), transparent)",
-            }}
+            className="absolute -inset-x-[56px] -inset-y-[64px] bg-[radial-gradient(28%_34%_at_30%_32%,rgba(10,132,255,0.3),transparent),radial-gradient(28%_34%_at_72%_36%,rgba(191,90,242,0.24),transparent),radial-gradient(30%_30%_at_54%_72%,rgba(255,55,95,0.18),transparent)] opacity-80 dark:opacity-60"
           />
           <div className="relative">
             <Composer bodyRef={body} />
