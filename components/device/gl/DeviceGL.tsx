@@ -296,8 +296,7 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       {side === "R" ? (
         <div
           ref={crease}
-          className="pointer-events-none absolute inset-y-0 left-0 w-[18px] opacity-0"
-          style={{ background: "linear-gradient(90deg, rgba(0,0,0,0.18), rgba(255,255,255,0.06) 40%, rgba(0,0,0,0))" }}
+          className="pointer-events-none absolute inset-y-0 left-0 w-[18px] bg-[linear-gradient(90deg,rgba(0,0,0,0.18),rgba(255,255,255,0.06)_40%,rgba(0,0,0,0))] opacity-0"
         />
       ) : null}
     </>
@@ -352,8 +351,8 @@ function Upright({ portrait, children }: { portrait: boolean; children: React.Re
   if (!portrait) return <>{children}</>;
   return (
     <div
-      className="absolute"
-      style={{ width: INNER.h, height: INNER.w, left: (INNER.w - INNER.h) / 2, top: (INNER.h - INNER.w) / 2, transform: "rotate(-90deg)" }}
+      className="absolute -rotate-90"
+      style={{ width: INNER.h, height: INNER.w, left: (INNER.w - INNER.h) / 2, top: (INNER.h - INNER.w) / 2 }}
     >
       {children}
     </div>
