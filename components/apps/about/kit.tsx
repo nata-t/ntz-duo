@@ -3,7 +3,6 @@
 import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { useOS } from "@/lib/os";
 import type { AppProps } from "../types";
-import css from "./kit.module.css";
 
 // The apple.com "detail page" kit shared by About and Contact: a scroll view
 // with Apple's staggered reveals, a floating glass local nav, the iPhone Duo
@@ -15,6 +14,26 @@ export const RAIL = 84;
 const BTN = 48;
 const RAIL_INSET = 24; // button to screen edge
 const PITCH = 60;
+
+// apple.com's "StaggeredFadeIn": [data-reveal] blocks rise 30 and fade,
+// staggered by --i. Only armed in the live window, so the folding mirrors
+// draw the finished page.
+const ARMED = [
+  "**:data-reveal:transform-[translate3d(0,30px,0)] **:data-reveal:opacity-0",
+  "**:data-reveal:transition-[transform,opacity] **:data-reveal:duration-[0.7s,0.9s] **:data-reveal:ease-[cubic-bezier(0.4,0,0.6,1)] **:data-reveal:delay-[calc(var(--i,0)*0.15s)]",
+  "**:data-reveal:data-in:transform-none **:data-reveal:data-in:opacity-100",
+  "motion-reduce:**:data-reveal:transform-none motion-reduce:**:data-reveal:opacity-100 motion-reduce:**:data-reveal:transition-none",
+].join(" ");
+
+/** The local nav slides away while [data-hidden]. */
+const NAV = [
+  "transition-[opacity,transform] duration-400 ease-[ease-out,cubic-bezier(0.4,0,0.6,1)]",
+  "data-hidden:pointer-events-none data-hidden:transform-[translate3d(0,-10px,0)] data-hidden:opacity-0",
+  "motion-reduce:transition-opacity motion-reduce:duration-200 motion-reduce:ease-linear motion-reduce:data-hidden:transform-none",
+].join(" ");
+
+/** Rail and pill buttons: a springy press and a quick colour change. */
+const PRESS = "transition-[scale,background-color] duration-[0.25s,0.2s] ease-[cubic-bezier(0.3,2,0.5,1),linear] active:scale-[0.92]";
 
 type Page = {
   compact: boolean;
@@ -160,7 +179,7 @@ export function DetailPage({ app, title, cta, primary, group, navAfter, children
 
   return (
     <PageCtx.Provider value={ctx}>
-      <div className={`relative h-full bg-page font-sans text-ink ${mirror ? "" : css.armed}`} style={{ width }}>
+      <div className={`relative h-full bg-page font-sans text-ink ${mirror ? "" : ARMED}`} style={{ width }}>
         <div ref={scroller} className="no-scrollbar h-full overflow-y-auto overscroll-contain">
           {children}
         </div>
@@ -173,12 +192,11 @@ export function DetailPage({ app, title, cta, primary, group, navAfter, children
 
         {/* Local nav: Apple's floating capsule, over the content area only. */}
         <div
-          className={`glass absolute z-20 flex h-[44px] items-center justify-between rounded-[16px] pr-[7px] pl-[18px] ${css.nav}`}
+          className={`glass absolute z-20 flex h-[44px] items-center justify-between rounded-[16px] bg-(--glass-strong) pr-[7px] pl-[18px] ${NAV}`}
           style={{
             top: bars ? top + 2 : 38,
             left: bars ? 16 + BTN + 10 : padL - navInset,
             right: bars ? 16 : padR - navInset,
-            background: "var(--glass-strong)",
           }}
           data-hidden={nav ? undefined : ""}
           aria-hidden={!nav}
@@ -188,7 +206,7 @@ export function DetailPage({ app, title, cta, primary, group, navAfter, children
             type="button"
             tabIndex={nav ? 0 : -1}
             onClick={() => cta.onClick(scroller.current)}
-            className={`h-[28px] shrink-0 rounded-full bg-cta px-[13px] text-[12px] leading-none text-white hover:bg-cta-hover ${css.press}`}
+            className={`h-[28px] shrink-0 rounded-full bg-cta px-[13px] text-[12px] leading-none text-white hover:bg-cta-hover ${PRESS}`}
           >
             {cta.label}
           </button>
@@ -245,7 +263,7 @@ function RailButton({
   /** Laid out by its parent rather than placed. */
   flow?: boolean;
 }) {
-  const cls = `pointer-events-auto grid place-items-center rounded-full ${css.press} ${
+  const cls = `pointer-events-auto grid place-items-center rounded-full ${PRESS} ${
     bare ? "size-[40px] text-label hover:bg-fill-3" : `size-[48px] ${tint ? "bg-blue text-white shadow-[0_6px_20px_rgba(0,110,255,0.32)]" : "glass text-label"}`
   } ${bare || flow ? "" : "absolute"}`;
   if (item.href)
@@ -402,7 +420,7 @@ export function Pill({
   ghost?: boolean;
   small?: boolean;
 }) {
-  const cls = `inline-flex items-center justify-center rounded-full whitespace-nowrap ${css.press} ${
+  const cls = `inline-flex items-center justify-center rounded-full whitespace-nowrap ${PRESS} ${
     small ? "h-[32px] px-[16px] text-[14px]" : "h-[38px] px-[20px] text-[15px]"
   } ${ghost ? "text-link shadow-[inset_0_0_0_1px_currentColor] hover:bg-link hover:text-page" : "bg-cta text-white hover:bg-cta-hover"}`;
   if (href)
