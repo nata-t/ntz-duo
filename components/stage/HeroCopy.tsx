@@ -57,10 +57,10 @@ const HeroCopy = forwardRef<HeroCopyHandle>(function HeroCopy(_, ref) {
         ref={title}
         className="pointer-events-none absolute inset-x-0 top-[clamp(64px,10vh,120px)] z-10 text-center will-change-transform"
       >
-        <p className="intro font-display text-[clamp(19px,1.9vw,24px)] leading-[1.17] font-semibold tracking-[0.009em]" style={{ animationDelay: "0.15s" }}>
+        <p className="animate-intro font-display text-[clamp(19px,1.9vw,24px)] leading-[1.17] font-semibold tracking-[0.009em] [animation-delay:0.15s] motion-reduce:animate-none">
           ntz duo
         </p>
-        <h1 className="intro mt-[0.15em] font-display text-[clamp(56px,8.4vw,128px)] leading-[1.05] font-semibold tracking-[-0.015em]" style={{ animationDelay: "0.3s" }}>
+        <h1 className="mt-[0.15em] animate-intro font-display text-[clamp(56px,8.4vw,128px)] leading-[1.05] font-semibold tracking-[-0.015em] [animation-delay:0.3s] motion-reduce:animate-none">
           Hello, hello.
         </h1>
       </div>
@@ -89,10 +89,9 @@ const HeroCopy = forwardRef<HeroCopyHandle>(function HeroCopy(_, ref) {
 
       <div
         ref={bar}
-        className="absolute bottom-[clamp(20px,5vh,56px)] left-1/2 z-20 flex w-[min(640px,calc(100vw-32px))] items-center justify-between gap-4 rounded-full bg-[color-mix(in_srgb,var(--page-alt)_82%,transparent)] py-3 pr-3 pl-7 backdrop-blur-xl backdrop-saturate-150"
-        style={{ transform: "translate3d(-50%,0,0)" }}
+        className="absolute bottom-[clamp(20px,5vh,56px)] left-1/2 z-20 flex w-[min(640px,calc(100vw-32px))] items-center justify-between gap-4 rounded-full bg-[color-mix(in_srgb,var(--page-alt)_82%,transparent)] py-3 pr-3 pl-7 backdrop-blur-xl backdrop-saturate-150 transform-[translate3d(-50%,0,0)]"
       >
-        <div className="intro min-w-0 text-[14px] leading-[1.43] tracking-[-0.016em] text-ink" style={{ animationDelay: "1.1s" }}>
+        <div className="min-w-0 animate-intro text-[14px] leading-[1.43] tracking-[-0.016em] text-ink [animation-delay:1.1s] motion-reduce:animate-none">
           <p className="truncate">
             {profile.name}, {profile.title.toLowerCase()} in Addis Ababa.
           </p>

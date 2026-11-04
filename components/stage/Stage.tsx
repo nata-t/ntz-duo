@@ -200,21 +200,19 @@ export default function Stage() {
 
   return (
     <section ref={track} aria-label="ntz duo" className="relative" style={{ height: `${(LENGTH + 1) * 100}svh` }}>
-      <div className="sticky top-0 h-svh w-full overflow-hidden" style={gl ? undefined : { perspective: "2800px", perspectiveOrigin: "50% 45%" }}>
+      <div className={`sticky top-0 h-svh w-full overflow-hidden ${gl ? "" : "perspective-[2800px] perspective-origin-[50%_45%]"}`}>
         <Nav ref={nav} />
         <HeroCopy ref={hero} />
         <div
           ref={shadow}
           aria-hidden="true"
-          className="pointer-events-none absolute top-1/2 left-1/2 rounded-[50%] opacity-0"
+          className="pointer-events-none absolute top-1/2 left-1/2 rounded-[50%] bg-[radial-gradient(closest-side,rgba(0,0,0,0.3),rgba(0,0,0,0))] opacity-0 blur-[10px]"
           style={{
             width: k ? BODY.w * k * 0.5 : 0,
             height: k ? BODY.w * k * 0.08 : 0,
-            background: "radial-gradient(closest-side, rgba(0,0,0,0.3), rgba(0,0,0,0))",
-            filter: "blur(10px)",
           }}
         />
-        <div className="absolute inset-0" style={gl ? undefined : { transformStyle: "preserve-3d" }}>
+        <div className={`absolute inset-0 ${gl ? "" : "transform-3d"}`}>
           {k === null ? null : (
           gl ? (
             <DeviceGL

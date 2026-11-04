@@ -37,13 +37,7 @@ const Nav = forwardRef<NavHandle>(function Nav(_, ref) {
     <nav
       ref={root}
       aria-label="Site"
-      className="fixed top-[10px] left-1/2 z-50 flex h-[52px] w-[min(1024px,calc(100vw-20px))] items-center justify-between rounded-[18px] pr-[10px] pl-[20px] backdrop-blur-[20px] backdrop-saturate-[1.8]"
-      style={{
-        transform: "translate3d(-50%,0,0)",
-        background: "color-mix(in srgb, var(--page) 80%, transparent)",
-        boxShadow: "0 0 0 1px color-mix(in srgb, var(--rule) 55%, transparent)",
-        animation: "duo-nav 1s 0.9s var(--ease-out) backwards",
-      }}
+      className="fixed top-[10px] left-1/2 z-50 flex h-[52px] w-[min(1024px,calc(100vw-20px))] items-center justify-between rounded-[18px] pr-[10px] pl-[20px] backdrop-blur-[20px] backdrop-saturate-[1.8] transform-[translate3d(-50%,0,0)] animate-[duo-nav_1s_0.9s_var(--ease-out)_backwards] bg-[color-mix(in_srgb,var(--page)_80%,transparent)] shadow-[0_0_0_1px_color-mix(in_srgb,var(--rule)_55%,transparent)]"
     >
       <button type="button" onClick={() => scrollToStory(0)} className="font-display text-[19px] leading-none font-semibold tracking-[0.012em]">
         ntz duo

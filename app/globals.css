@@ -38,6 +38,9 @@
   --ease-out: cubic-bezier(0.16, 1, 0.3, 1);
   --ease-ios: cubic-bezier(0.32, 0.72, 0, 1);
 
+  /* The page's intro: copy rises 30 and fades in. */
+  --animate-intro: duo-in 1.1s var(--ease-out) backwards;
+
   /* About: the voice-guidance waveform, bars breathing out of phase, and
      the ring around the timeline's "now" dot. */
   --animate-wave: wave 1.5s cubic-bezier(0.45, 0, 0.55, 1) infinite;
@@ -421,20 +424,11 @@
     }
   }
 
-  .intro {
-    animation: duo-in 1.1s var(--ease-out) backwards;
-  }
+}
 
-  @media (prefers-reduced-motion: reduce) {
-    .intro {
-      animation: none;
-    }
-  }
-
-  .no-scrollbar {
-    scrollbar-width: none;
-  }
-  .no-scrollbar::-webkit-scrollbar {
+@utility no-scrollbar {
+  scrollbar-width: none;
+  &::-webkit-scrollbar {
     display: none;
   }
 }

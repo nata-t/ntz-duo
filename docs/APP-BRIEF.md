@@ -6,7 +6,10 @@ in windows: full screen (951 × 669) or Split View halves (≈ 472 × 669 each, 
 
 ## Where your code goes
 - Only edit files inside your app's folder: `components/apps/<app>/`. Add as many files as
-  you like there (components, a `*.module.css` for keyframes or anything Tailwind can't do).
+  you like there. Style with Tailwind utilities only: arbitrary values (`bg-[…]`,
+  `shadow-[…]`, `animate-[…]`) and variants (`data-*:`, `in-data-still:`, `motion-reduce:`)
+  cover nearly everything. Keep `style={{…}}` for values computed in JS. A new keyframe
+  animation is a `--animate-*` token in `globals.css`'s `@theme`: ask for it in your report.
 - Do not edit `lib/`, `components/os/`, `components/device/`, `components/stage/`, `app/`,
   `content/` or `globals.css`. If you need something there, say so in your final report.
 - No new npm dependencies. Available: react 19, next 16, gsap 3.15 (`import { gsap } from "@/lib/gsap"`).
