@@ -2,7 +2,6 @@
 
 import { useState, useSyncExternalStore, type ReactNode } from "react";
 import type { Slot } from "@/lib/os";
-import s from "./ios.module.css";
 
 // Shared iOS 27 pieces for Settings, Notes, Résumé and the project pages:
 // the iPhone Duo side rail, its glass buttons, the switch and the
@@ -177,12 +176,10 @@ export function Toggle({
         e.stopPropagation();
         if (!disabled) onChange?.(!on);
       }}
-      className="relative h-[28px] w-[64px] shrink-0 rounded-full transition-colors duration-300"
-      style={{ background: on ? "var(--green)" : "var(--fill)", cursor: disabled ? "default" : undefined }}
+      className={`relative h-[28px] w-[64px] shrink-0 rounded-full transition-colors duration-300 ${on ? "bg-green" : "bg-fill"} ${disabled ? "cursor-default" : ""}`}
     >
       <span
-        className="absolute top-[2px] left-[2px] h-[24px] w-[38px] rounded-full bg-white shadow-[0_2px_6px_rgba(0,0,0,0.16),0_0_0_0.5px_rgba(0,0,0,0.04)] transition-transform duration-300"
-        style={{ transform: on ? "translateX(22px)" : "none", transitionTimingFunction: "var(--ease-ios)" }}
+        className={`absolute top-[2px] left-[2px] h-[24px] w-[38px] rounded-full bg-white shadow-[0_2px_6px_rgba(0,0,0,0.16),0_0_0_0.5px_rgba(0,0,0,0.04)] transition-transform duration-300 ease-ios ${on ? "translate-x-[22px]" : ""}`}
       />
     </button>
   );
@@ -235,6 +232,14 @@ export function useMinute(live: boolean) {
 }
 
 type Change = { from: string[]; to: string[] };
+
+// The iOS push: the incoming page slides in from the trailing edge over the
+// one below, which drifts a third of the way back and dims, as
+// UINavigationController does.
+const LAYER = "absolute inset-0 transition-[transform,filter] duration-500 ease-ios motion-reduce:animate-none motion-reduce:transition-none";
+const UNDER = "transform-[translateX(-30%)] brightness-[0.92]";
+const PUSH_IN = "animate-push-in shadow-[-10px_0_30px_rgba(0,0,0,0.08)]";
+const POP_OUT = "pointer-events-none animate-pop-out shadow-[-10px_0_30px_rgba(0,0,0,0.08)]";
 
 /**
  * A navigation stack. `keys` is the path from the root page to the one on
@@ -289,8 +294,7 @@ export function Stack({
         return (
           <div
             key={lid}
-            className={`${s.layer} ${i < top ? s.under : ""} ${lid === pushed ? s.pushIn : ""} ${layer}`}
-            style={{ visibility: i < top - 1 ? "hidden" : undefined }}
+            className={`${LAYER} ${i < top ? UNDER : ""} ${i < top - 1 ? "invisible" : ""} ${lid === pushed ? PUSH_IN : ""} ${layer}`}
             inert={i < top || undefined}
             aria-hidden={i < top || undefined}
             onAnimationEnd={(e) => e.target === e.currentTarget && lid === pushed && setPushed(null)}
@@ -302,7 +306,7 @@ export function Stack({
       {leaving ? (
         <div
           key={`leaving:${leaving.id}`}
-          className={`${s.layer} ${s.popOut} ${layer}`}
+          className={`${LAYER} ${POP_OUT} ${layer}`}
           onAnimationEnd={(e) => e.target === e.currentTarget && setLeaving(null)}
         >
           {render(leaving.key, leaving.depth)}

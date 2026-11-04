@@ -155,13 +155,12 @@ export function SettingsIcon({ name, size = 30 }: { name: IconName; size?: numbe
   const bg = ICON_COLORS[name];
   return (
     <span
-      className="grid shrink-0 place-items-center"
+      className={`grid shrink-0 place-items-center ${name === "apps" ? "bg-[linear-gradient(180deg,#fff,#e9e9ee)] shadow-[inset_0_0_0_0.5px_rgba(0,0,0,0.12)]" : ""}`}
       style={{
         width: size,
         height: size,
         borderRadius: size * 0.27,
-        background: name === "apps" ? "linear-gradient(180deg,#fff,#e9e9ee)" : bg,
-        boxShadow: name === "apps" ? "inset 0 0 0 0.5px rgba(0,0,0,0.12)" : undefined,
+        background: name === "apps" ? undefined : bg,
       }}
     >
       <svg width={size * 0.74} height={size * 0.74} viewBox="0 0 24 24" aria-hidden="true">

@@ -92,8 +92,7 @@ function Pane({ id }: { id: string }) {
         <Body />
       </div>
       <div
-        className="pointer-events-none absolute inset-x-0 top-0 h-[92px]"
-        style={{ background: "linear-gradient(var(--grouped) 52%, transparent)" }}
+        className="pointer-events-none absolute inset-x-0 top-0 h-[92px] bg-[linear-gradient(var(--grouped)_52%,transparent)]"
       />
       <h2 className="pointer-events-none absolute inset-x-[64px] top-[24px] grid h-[54px] place-items-center truncate text-[17px] leading-[22px] font-semibold">
         {page.title}

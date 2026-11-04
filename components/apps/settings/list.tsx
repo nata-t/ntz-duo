@@ -80,8 +80,8 @@ export function Row({ icon, title, sub, value, chevron, accessory, onClick, sele
 export function Avatar({ size }: { size: number }) {
   return (
     <span
-      className="relative block shrink-0 overflow-hidden rounded-full"
-      style={{ width: size, height: size, background: "linear-gradient(180deg,#dfe3ec 0%,#aab3c5 100%)" }}
+      className="relative block shrink-0 overflow-hidden rounded-full bg-[linear-gradient(180deg,#dfe3ec_0%,#aab3c5_100%)]"
+      style={{ width: size, height: size }}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- static, pre-sized assets */}
       <img

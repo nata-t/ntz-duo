@@ -394,8 +394,9 @@ function WallpaperPage() {
           {[false, true].map((d) => (
             <div key={String(d)} className="flex flex-col items-center gap-[10px]">
               <span
-                className="relative block h-[200px] w-[98px] overflow-hidden rounded-[16px] transition-shadow duration-300"
-                style={{ boxShadow: d === dark ? "0 0 0 2.5px var(--blue), 0 4px 14px rgba(0,0,0,0.16)" : "0 2px 8px rgba(0,0,0,0.14)" }}
+                className={`relative block h-[200px] w-[98px] overflow-hidden rounded-[16px] transition-shadow duration-300 ${
+                  d === dark ? "shadow-[0_0_0_2.5px_var(--blue),0_4px_14px_rgba(0,0,0,0.16)]" : "shadow-[0_2px_8px_rgba(0,0,0,0.14)]"
+                }`}
               >
                 {/* eslint-disable-next-line @next/next/no-img-element -- static, pre-sized assets */}
                 <img
