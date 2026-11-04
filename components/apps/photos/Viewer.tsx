@@ -293,8 +293,8 @@ export default function Viewer({ list, start, origin, width, height, slot, focus
 
       {/* The strip of photos. Only the neighbours are in the DOM. */}
       <div
-        className="absolute inset-y-0 touch-none overflow-hidden select-none"
-        style={{ left: x0, width: sw, cursor: "grab" }}
+        className="absolute inset-y-0 cursor-grab touch-none overflow-hidden select-none"
+        style={{ left: x0, width: sw }}
         onPointerDown={onDown}
         onPointerMove={onMove}
         onPointerUp={onUp}

@@ -48,26 +48,15 @@ export function LargeTitle({
       {/* A scroll-edge effect rather than a bar: the background fades in
           behind the title so the grid can pass under it. */}
       <div
-        className="absolute inset-0"
-        style={{
-          WebkitBackdropFilter: "blur(14px)",
-          backdropFilter: "blur(14px)",
-          maskImage: "linear-gradient(to bottom, #000 60%, transparent)",
-          WebkitMaskImage: "linear-gradient(to bottom, #000 60%, transparent)",
-        }}
+        className="absolute inset-0 mask-[linear-gradient(to_bottom,#000_60%,transparent)] backdrop-blur-[14px]"
       />
       <div
-        className="absolute inset-0"
-        style={{
-          background:
-            "linear-gradient(to bottom, color-mix(in srgb, var(--bg) 96%, transparent) 0%, color-mix(in srgb, var(--bg) 92%, transparent) 58%, color-mix(in srgb, var(--bg) 45%, transparent) 84%, transparent 100%)",
-        }}
+        className="absolute inset-0 bg-[linear-gradient(to_bottom,color-mix(in_srgb,var(--bg)_96%,transparent)_0%,color-mix(in_srgb,var(--bg)_92%,transparent)_58%,color-mix(in_srgb,var(--bg)_45%,transparent)_84%,transparent_100%)]"
       />
       <div className="relative flex items-start justify-between gap-[12px] px-[18px] pt-[24px]">
         <div className="min-w-0">
           <h1
-            className="truncate font-display leading-[40px] font-bold tracking-[0.01em] text-label"
-            style={{ fontSize: width < 600 && title.length > 14 ? 28 : 34 }}
+            className={`truncate font-display leading-[40px] font-bold tracking-[0.01em] text-label ${width < 600 && title.length > 14 ? "text-[28px]" : "text-[34px]"}`}
           >
             {title}
           </h1>

@@ -5,7 +5,6 @@ import { search, suggestions, type Photo } from "./data";
 import Grid from "./Grid";
 import { ChevronRight, SearchIcon, XIcon } from "./icons";
 import { HEADER, LargeTitle, SectionHeader, plural } from "./ui";
-import css from "./photos.module.css";
 
 type Props = {
   width: number;
@@ -57,7 +56,7 @@ export default function Search({ width, left, mirror, active, hiddenId, onOpen, 
               <p className="mt-[4px] text-[15px] text-label-2">Nothing matches “{q.trim()}”. Try a project, a client or a technology.</p>
             </div>
           ) : (
-            <div key={q} className={css.fade}>
+            <div key={q} className="animate-fade-in motion-reduce:animate-none">
               {res.albums.length ? (
                 <>
                   <SectionHeader title="Albums" />

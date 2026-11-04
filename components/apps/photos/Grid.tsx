@@ -50,8 +50,7 @@ function Grid({ photos, cols, fit, hiddenId, selecting, selected, onOpen, onTogg
                   <>
                     <span className="absolute inset-0 bg-white/25" />
                     <span
-                      className="absolute right-[5px] bottom-[5px] grid size-[22px] place-items-center rounded-full bg-blue text-white"
-                      style={{ boxShadow: "0 0 0 1.5px #fff, 0 1px 3px rgba(0,0,0,0.3)" }}
+                      className="absolute right-[5px] bottom-[5px] grid size-[22px] place-items-center rounded-full bg-blue text-white shadow-[0_0_0_1.5px_#fff,0_1px_3px_rgba(0,0,0,0.3)]"
                     >
                       <CheckIcon size={15} />
                     </span>

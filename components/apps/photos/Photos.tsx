@@ -14,7 +14,6 @@ import Album from "./Album";
 import Viewer from "./Viewer";
 import { ChevronLeft, CollectionsIcon, LibraryIcon, SearchIcon } from "./icons";
 import { GlassButton, RAIL } from "./ui";
-import css from "./photos.module.css";
 
 type Tab = "library" | "collections" | "search";
 type Open = { list: Photo[]; start: number; origin: HTMLElement };
@@ -114,7 +113,7 @@ export default function Photos({ id, width, height, slot, mirror }: AppProps) {
   }, [mirror, focused, viewer, shownAlbum, back]);
 
   // Panes stay mounted (each keeps its scroll); the shown one fades in.
-  const pane = (t: Tab) => (tab === t ? css.fade : "hidden");
+  const pane = (t: Tab) => (tab === t ? "animate-fade-in motion-reduce:animate-none" : "hidden");
   // The control column sits 24 pt from the screen edge (Duo UI kit).
   const col = leftRail ? 24 : 12;
 
@@ -135,7 +134,7 @@ export default function Photos({ id, width, height, slot, mirror }: AppProps) {
       ) : null}
 
       {shownAlbum ? (
-        <div key={shownAlbum} ref={albumEl} className="absolute inset-0 z-[15]" style={{ boxShadow: "-12px 0 32px rgba(0,0,0,0.12)" }}>
+        <div key={shownAlbum} ref={albumEl} className="absolute inset-0 z-[15] shadow-[-12px_0_32px_rgba(0,0,0,0.12)]">
           <Album id={shownAlbum} width={cw} left={cx} mirror={mirror} hiddenId={current} onOpen={openPhoto} />
         </div>
       ) : null}

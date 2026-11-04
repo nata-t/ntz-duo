@@ -5,7 +5,6 @@ import { findAlbum, HIDDEN_ID, hiddenAlbums, type Photo } from "./data";
 import Grid from "./Grid";
 import { FaceIdIcon, LockIcon } from "./icons";
 import { HEADER, LargeTitle, plural } from "./ui";
-import css from "./photos.module.css";
 
 type Props = {
   id: string;
@@ -41,7 +40,7 @@ export default function Album({ id, width, left, mirror, hiddenId, onOpen }: Pro
       {hidden && !unlocked ? (
         <div className="grid h-full place-items-center px-[32px] text-center">
           <div className="flex max-w-[320px] flex-col items-center">
-            <span className={`grid size-[64px] place-items-center text-label-2 ${scanning ? css.scan : ""}`}>
+            <span className={`grid size-[64px] place-items-center text-label-2 ${scanning ? "animate-scan motion-reduce:animate-none" : ""}`}>
               {scanning ? <FaceIdIcon size={58} className="text-blue" /> : <LockIcon size={50} />}
             </span>
             <h2 className="mt-[14px] text-[22px] leading-[28px] font-bold tracking-[-0.01em] text-label">Hidden Album Locked</h2>
@@ -59,7 +58,7 @@ export default function Album({ id, width, left, mirror, hiddenId, onOpen }: Pro
         </div>
       ) : (
         <div data-scroll className="h-full overflow-y-auto overscroll-contain no-scrollbar">
-          <div className={css.fade} style={{ paddingTop: HEADER + 4 }}>
+          <div className="animate-fade-in motion-reduce:animate-none" style={{ paddingTop: HEADER + 4 }}>
             {hidden ? (
               hiddenAlbums.map((a) => (
                 <section key={a.id} className="mb-[8px]">

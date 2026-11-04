@@ -5,7 +5,6 @@ import { library, sections, type Photo } from "./data";
 import Grid from "./Grid";
 import { CheckIcon, EllipsisIcon } from "./icons";
 import { GlassButton, HEADER, LargeTitle, plural } from "./ui";
-import css from "./photos.module.css";
 
 type Props = {
   width: number;
@@ -159,8 +158,7 @@ export default function Library({ width, left, mirror, hiddenId, onOpen }: Props
           <button type="button" aria-label="Close menu" className="absolute inset-0 z-20 cursor-default" onClick={() => setMenu(false)} />
           <div
             role="menu"
-            className={`glass absolute top-[70px] right-[16px] z-30 w-[236px] overflow-hidden rounded-[24px] py-[6px] text-label ${css.menu}`}
-            style={{ background: "var(--glass-strong)" }}
+            className={`glass absolute top-[70px] right-[16px] z-30 w-[236px] overflow-hidden rounded-[24px] py-[6px] text-label origin-[calc(100%-20px)_0] animate-bloom bg-(--glass-strong) motion-reduce:animate-none`}
           >
             <MenuItem label="Zoom In" disabled={level === 0} onClick={() => {
                 zoomBy(-1);
