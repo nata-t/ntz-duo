@@ -15,10 +15,10 @@ export default function OuterDisplay() {
   const mode = stage.use((s) => s.outer);
   return (
     <div className="relative h-full w-full overflow-hidden bg-black font-sans text-white select-none">
-      <div className="absolute inset-0 transition-opacity duration-700" style={{ opacity: mode === "lock" ? 1 : 0 }}>
+      <div className={`absolute inset-0 transition-opacity duration-700 ${mode === "lock" ? "opacity-100" : "opacity-0"}`}>
         <LockScreen />
       </div>
-      <div className="absolute inset-0 transition-opacity duration-700" style={{ opacity: mode === "standby" ? 1 : 0 }}>
+      <div className={`absolute inset-0 transition-opacity duration-700 ${mode === "standby" ? "opacity-100" : "opacity-0"}`}>
         <StandBy />
       </div>
     </div>
@@ -51,13 +51,7 @@ function LockScreen() {
       <div className="absolute top-[64px] left-[30px] right-[90px]">
         <p className="text-[20px] leading-[1.2] font-semibold tracking-[-0.01em] opacity-90">{date}</p>
         <p
-          className="font-display leading-[0.9] font-bold tracking-[-0.03em]"
-          style={{
-            fontSize: 132,
-            color: "rgba(255,255,255,0.86)",
-            textShadow: "0 1px 0 rgba(255,255,255,0.5), 0 10px 30px rgba(0,0,0,0.12)",
-            mixBlendMode: "plus-lighter",
-          }}
+          className="font-display text-[132px] leading-[0.9] font-bold tracking-[-0.03em] text-[rgba(255,255,255,0.86)] mix-blend-plus-lighter text-shadow-[0_1px_0_rgba(255,255,255,0.5),0_10px_30px_rgba(0,0,0,0.12)]"
         >
           {time}
         </p>
@@ -107,13 +101,12 @@ function StandBy() {
   // Laid out landscape, then turned to sit upright on the standing device.
   return (
     <div
-      className="absolute bg-black"
+      className="absolute -rotate-90 bg-black"
       style={{
         width: OUTER.h,
         height: OUTER.w,
         left: (OUTER.w - OUTER.h) / 2,
         top: (OUTER.h - OUTER.w) / 2,
-        transform: "rotate(-90deg)",
       }}
     >
       <svg className="absolute top-1/2 left-[34px] -translate-y-1/2" width="300" height="300" viewBox="-50 -50 100 100" aria-hidden="true">
@@ -148,8 +141,9 @@ function StandBy() {
             <span key={i} className="grid place-items-center">
               {n === null ? null : (
                 <span
-                  className="grid size-[26px] place-items-center rounded-full"
-                  style={{ background: n === today ? "#ff453a" : undefined, color: n !== today && (i % 7 === 0 || i % 7 === 6) ? "rgba(255,255,255,0.5)" : "#fff" }}
+                  className={`grid size-[26px] place-items-center rounded-full ${n === today ? "bg-[#ff453a]" : ""} ${
+                    n !== today && (i % 7 === 0 || i % 7 === 6) ? "text-[rgba(255,255,255,0.5)]" : "text-white"
+                  }`}
                 >
                   {n}
                 </span>
