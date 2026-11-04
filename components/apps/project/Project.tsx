@@ -5,7 +5,6 @@ import { nextProject, projectBySlug, type Project as P } from "@/content/site";
 import { openApp, useOS } from "@/lib/os";
 import type { AppProps } from "../types";
 import { Glyph, Rail, RailButton, contentBox } from "../settings/ios";
-import s from "./project.module.css";
 
 // A project's page, for now a preview of the case study to come. It reads
 // like an apple.com product page: an eyebrow, a big name, one strong image,
@@ -75,9 +74,19 @@ function useReveal(root: React.RefObject<HTMLDivElement | null>, live: boolean) 
   }, [root, live]);
 }
 
+// apple.com's scroll reveal: rise 30 px and fade in, once, as the element
+// enters the view. --delay staggers it; the folding mirrors (data-still)
+// draw everything already in place.
+const REVEAL = [
+  "transform-[translateY(30px)] opacity-0 transition-[opacity,transform] duration-800 ease-[cubic-bezier(0.4,0,0.6,1)] delay-(--delay)",
+  "data-shown:transform-none data-shown:opacity-100",
+  "in-data-still:transform-none in-data-still:opacity-100 in-data-still:transition-none",
+  "motion-reduce:transform-none motion-reduce:opacity-100 motion-reduce:transition-none",
+].join(" ");
+
 function Reveal({ children, delay = 0, className = "", as: Tag = "div" }: { children: ReactNode; delay?: number; className?: string; as?: "div" | "section" | "figure" | "li" }) {
   return (
-    <Tag data-reveal className={`${s.reveal} ${className}`} style={{ "--delay": `${delay}s` } as CSSProperties}>
+    <Tag data-reveal className={`${REVEAL} ${className}`} style={{ "--delay": `${delay}s` } as CSSProperties}>
       {children}
     </Tag>
   );
@@ -102,13 +111,14 @@ export default function Project({ width, slot, mirror, close, slug }: AppProps &
     openApp(next.slug, null);
   };
 
-  const pad = wide ? 64 : 28;
+  const px = wide ? "px-[64px]" : "px-[28px]";
 
   return (
     <div className="relative h-full bg-page text-ink">
       <div
         ref={scroller}
-        className={`no-scrollbar absolute inset-0 overflow-y-auto overscroll-contain ${mirror ? s.still : ""}`}
+        data-still={mirror || undefined}
+        className="no-scrollbar absolute inset-0 overflow-y-auto overscroll-contain"
         style={{ paddingLeft: box.left, paddingRight: width - box.width - box.left }}
       >
         {/* A wash of the brand colour behind the hero, as Apple tints a page. */}
@@ -120,7 +130,7 @@ export default function Project({ width, slot, mirror, close, slug }: AppProps &
           }}
         />
 
-        <header className="relative text-center" style={{ padding: `${wide ? 92 : 84}px ${pad}px 0` }}>
+        <header className={`relative text-center ${px} ${wide ? "pt-[92px]" : "pt-[84px]"}`}>
           <Reveal>
             <p className="text-[15px] leading-[1] font-semibold tracking-[0.011em]" style={{ color: accent }}>
               {p.category} · {p.year}
@@ -128,14 +138,13 @@ export default function Project({ width, slot, mirror, close, slug }: AppProps &
           </Reveal>
           <Reveal delay={0.08}>
             <h1
-              className="mx-auto mt-[12px] max-w-[720px] font-display font-semibold text-balance"
-              style={{ fontSize: wide ? 54 : 36, lineHeight: 1.06, letterSpacing: "-0.015em" }}
+              className={`mx-auto mt-[12px] max-w-[720px] font-display leading-[1.06] font-semibold tracking-[-0.015em] text-balance ${wide ? "text-[54px]" : "text-[36px]"}`}
             >
               {p.name}
             </h1>
           </Reveal>
           <Reveal delay={0.16}>
-            <p className="mx-auto mt-[12px] max-w-[560px] text-ink-2 text-balance" style={{ fontSize: wide ? 21 : 18, lineHeight: 1.3 }}>
+            <p className={`mx-auto mt-[12px] max-w-[560px] leading-[1.3] text-ink-2 text-balance ${wide ? "text-[21px]" : "text-[18px]"}`}>
               {p.tagline}
             </p>
             {p.url ? (
@@ -152,17 +161,17 @@ export default function Project({ width, slot, mirror, close, slug }: AppProps &
         </header>
 
         <Reveal as="figure" delay={0.24} className="relative">
-          <div className="mx-auto" style={{ padding: `${wide ? 40 : 28}px ${pad}px 0`, maxWidth: 900 }}>
+          <div className={`mx-auto max-w-[900px] ${px} ${wide ? "pt-[40px]" : "pt-[28px]"}`}>
             {p.confidential ? <NdaTile p={p} wide={wide} /> : <Screen p={p} dark={dark} mirror={mirror} />}
           </div>
         </Reveal>
 
         {/* Facts, the way a product page lists its highlights. */}
-        <section className="mx-auto" style={{ padding: `${wide ? 64 : 48}px ${pad}px 0`, maxWidth: 900 }}>
+        <section className={`mx-auto max-w-[900px] ${px} ${wide ? "pt-[64px]" : "pt-[48px]"}`}>
           <div className="grid gap-[12px]" style={{ gridTemplateColumns: `repeat(${wide ? Math.min(3, p.facts.length + 1) : 2}, minmax(0, 1fr))` }}>
             {p.facts.map((f, i) => (
               <Reveal key={f.label} delay={i * 0.12} className="rounded-[22px] bg-page-alt px-[20px] pt-[18px] pb-[18px]">
-                <p className="font-display font-semibold tracking-[-0.015em]" style={{ fontSize: wide ? 44 : 36, lineHeight: 1.05 }}>
+                <p className={`font-display leading-[1.05] font-semibold tracking-[-0.015em] ${wide ? "text-[44px]" : "text-[36px]"}`}>
                   {f.value}
                 </p>
                 <p className="mt-[6px] text-[14px] leading-[1.35] text-ink-2">{f.label}</p>
@@ -180,10 +189,10 @@ export default function Project({ width, slot, mirror, close, slug }: AppProps &
           </div>
         </section>
 
-        <section className="mx-auto" style={{ padding: `${wide ? 72 : 52}px ${pad}px 0`, maxWidth: 900 }}>
+        <section className={`mx-auto max-w-[900px] ${px} ${wide ? "pt-[72px]" : "pt-[52px]"}`}>
           <div className={wide ? "grid grid-cols-[1fr_1.6fr] gap-[40px]" : ""}>
             <Reveal>
-              <h2 className="font-display font-semibold" style={{ fontSize: wide ? 34 : 28, lineHeight: 1.1, letterSpacing: "-0.005em" }}>
+              <h2 className={`font-display leading-[1.1] font-semibold tracking-[-0.005em] ${wide ? "text-[34px]" : "text-[28px]"}`}>
                 What I built.
               </h2>
             </Reveal>
@@ -200,7 +209,7 @@ export default function Project({ width, slot, mirror, close, slug }: AppProps &
           </div>
         </section>
 
-        <section className="mx-auto" style={{ padding: `${wide ? 56 : 44}px ${pad}px 0`, maxWidth: 900 }}>
+        <section className={`mx-auto max-w-[900px] ${px} ${wide ? "pt-[56px]" : "pt-[44px]"}`}>
           <Reveal>
             <h3 className="text-[12px] leading-[1.33] font-semibold tracking-[0.02em] text-ink-3 uppercase">Built with</h3>
             <ul className="mt-[12px] flex flex-wrap gap-[8px]">
@@ -213,13 +222,13 @@ export default function Project({ width, slot, mirror, close, slug }: AppProps &
           </Reveal>
         </section>
 
-        <section className="mx-auto" style={{ padding: `${wide ? 72 : 52}px ${pad}px 0`, maxWidth: 900 }}>
+        <section className={`mx-auto max-w-[900px] ${px} ${wide ? "pt-[72px]" : "pt-[52px]"}`}>
           <Reveal className="rounded-[28px] bg-page-alt text-center">
-            <div style={{ padding: wide ? "48px 56px" : "36px 24px" }}>
-              <p className="mx-auto max-w-[560px] text-ink-2" style={{ fontSize: wide ? 21 : 17, lineHeight: 1.38, letterSpacing: "0.011em" }}>
+            <div className={wide ? "px-[56px] py-[48px]" : "px-[24px] py-[36px]"}>
+              <p className={`mx-auto max-w-[560px] leading-[1.38] tracking-[0.011em] text-ink-2 ${wide ? "text-[21px]" : "text-[17px]"}`}>
                 <strong className="font-semibold text-ink">{p.name}.</strong> {p.summary}
               </p>
-              <p className="mt-[22px] font-display font-semibold tracking-[-0.01em]" style={{ fontSize: wide ? 28 : 22, lineHeight: 1.15 }}>
+              <p className={`mt-[22px] font-display leading-[1.15] font-semibold tracking-[-0.01em] ${wide ? "text-[28px]" : "text-[22px]"}`}>
                 Full case study coming soon.
               </p>
               {p.url ? (
@@ -236,7 +245,7 @@ export default function Project({ width, slot, mirror, close, slug }: AppProps &
           </Reveal>
         </section>
 
-        <footer className="mx-auto" style={{ padding: `${wide ? 56 : 44}px ${pad}px ${wide ? 72 : 64}px`, maxWidth: 900 }}>
+        <footer className={`mx-auto max-w-[900px] ${px} ${wide ? "pt-[56px] pb-[72px]" : "pt-[44px] pb-[64px]"}`}>
           <Reveal>
             <button type="button" onClick={goNext} className="group flex w-full items-center gap-[16px] border-t border-rule pt-[22px] text-left">
               <span className="min-w-0 flex-1">
@@ -273,13 +282,11 @@ export default function Project({ width, slot, mirror, close, slug }: AppProps &
 function Screen({ p, dark, mirror }: { p: P; dark: boolean; mirror: boolean }) {
   return (
     <div
-      className="relative overflow-hidden rounded-[16px] bg-page-alt"
-      style={{
-        aspectRatio: "16 / 10",
-        boxShadow: dark
-          ? "0 0 0 0.5px rgba(255,255,255,0.12), 0 24px 60px rgba(0,0,0,0.6)"
-          : "0 0 0 0.5px rgba(0,0,0,0.06), 0 24px 60px rgba(0,0,0,0.16), 0 6px 18px rgba(0,0,0,0.06)",
-      }}
+      className={`relative aspect-[16/10] overflow-hidden rounded-[16px] bg-page-alt ${
+        dark
+          ? "shadow-[0_0_0_0.5px_rgba(255,255,255,0.12),0_24px_60px_rgba(0,0,0,0.6)]"
+          : "shadow-[0_0_0_0.5px_rgba(0,0,0,0.06),0_24px_60px_rgba(0,0,0,0.16),0_6px_18px_rgba(0,0,0,0.06)]"
+      }`}
     >
       {/* eslint-disable-next-line @next/next/no-img-element -- static, pre-sized assets */}
       <img
@@ -298,32 +305,29 @@ function Screen({ p, dark, mirror }: { p: P; dark: boolean; mirror: boolean }) {
 function NdaTile({ p, wide }: { p: P; wide: boolean }) {
   return (
     <div
-      className="relative grid place-items-center overflow-hidden rounded-[22px] text-center"
+      className="relative grid aspect-[16/10] place-items-center overflow-hidden rounded-[22px] text-center"
       style={{
-        aspectRatio: "16 / 10",
         color: p.ink,
         background: `radial-gradient(90% 120% at 30% 0%, color-mix(in srgb, ${p.color} 72%, #fff) 0%, ${p.color} 46%, color-mix(in srgb, ${p.color} 70%, #000) 100%)`,
       }}
     >
       <span
         aria-hidden="true"
-        className="absolute inset-0 opacity-[0.16]"
-        style={{ backgroundImage: `radial-gradient(currentColor 1px, transparent 1.4px)`, backgroundSize: "22px 22px" }}
+        className="absolute inset-0 bg-[radial-gradient(currentColor_1px,transparent_1.4px)] bg-size-[22px_22px] opacity-[0.16]"
       />
       <div className="relative flex flex-col items-center px-[24px]">
         <span
-          className="grid place-items-center rounded-full"
-          style={{ width: wide ? 76 : 60, height: wide ? 76 : 60, background: "color-mix(in srgb, currentColor 14%, transparent)" }}
+          className={`grid place-items-center rounded-full bg-[color-mix(in_srgb,currentColor_14%,transparent)] ${wide ? "size-[76px]" : "size-[60px]"}`}
         >
           <svg width={wide ? 30 : 24} height={wide ? 36 : 29} viewBox="0 0 30 36" aria-hidden="true">
             <rect x="2" y="15" width="26" height="19" rx="5" fill="currentColor" />
             <path d="M8 15v-4a7 7 0 0 1 14 0v4" fill="none" stroke="currentColor" strokeWidth="3.2" />
           </svg>
         </span>
-        <p className="mt-[16px] font-display font-semibold tracking-[-0.01em]" style={{ fontSize: wide ? 30 : 24, lineHeight: 1.1 }}>
+        <p className={`mt-[16px] font-display leading-[1.1] font-semibold tracking-[-0.01em] ${wide ? "text-[30px]" : "text-[24px]"}`}>
           Under NDA
         </p>
-        <p className="mt-[8px] max-w-[380px] opacity-80" style={{ fontSize: wide ? 16 : 14, lineHeight: 1.4 }}>
+        <p className={`mt-[8px] max-w-[380px] leading-[1.4] opacity-80 ${wide ? "text-[16px]" : "text-[14px]"}`}>
           Built inside {p.client}
           {p.client.endsWith("s") ? "’" : "’s"} systems, so the screens stay private.
         </p>
