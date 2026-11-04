@@ -22,7 +22,6 @@ import {
   usePage,
   useScroll,
 } from "./kit";
-import css from "./About.module.css";
 
 // About: an apple.com product page where the product is Natnael. Hero with
 // the portrait as the product shot, the highlights bento, the story, a
@@ -48,7 +47,7 @@ export default function About(props: AppProps) {
         },
       ]}
     >
-      <div className={props.mirror ? css.still : undefined}>
+      <div data-still={props.mirror || undefined}>
         <Hero height={props.height} />
         <Highlights />
         <Story />
@@ -85,8 +84,7 @@ function Hero({ height }: { height: number }) {
       <div {...reveal(compact ? 2 : 1)} className="absolute inset-0">
         {/* A soft studio light behind the subject. */}
         <div
-          className="absolute left-1/2 aspect-square -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,#d6dff0_0%,#e8edf6_45%,rgba(245,247,251,0)_100%)] dark:bg-[radial-gradient(closest-side,#232c3f_0%,#141925_50%,rgba(0,0,0,0)_100%)]"
-          style={{ width: "125%", top: "-8%" }}
+          className="absolute left-1/2 aspect-square -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,#d6dff0_0%,#e8edf6_45%,rgba(245,247,251,0)_100%)] top-[-8%] w-[125%] dark:bg-[radial-gradient(closest-side,#232c3f_0%,#141925_50%,rgba(0,0,0,0)_100%)]"
         />
         {/* The cut-out ends at the chest and shoulders: dissolve those edges
             so he stands in the light rather than on a card. */}
@@ -95,12 +93,7 @@ function Hero({ height }: { height: number }) {
           src={profile.portrait.source}
           alt={`Portrait of ${profile.name}`}
           draggable={false}
-          className="absolute bottom-0 left-1/2 h-full w-auto max-w-none -translate-x-1/2 select-none"
-          style={{
-            maskImage: "linear-gradient(90deg, transparent 0%, #000 16%, #000 84%, transparent 100%), linear-gradient(180deg, #000 62%, transparent 98%)",
-            maskComposite: "intersect",
-            WebkitMaskComposite: "source-in",
-          }}
+          className="absolute bottom-0 left-1/2 h-full w-auto max-w-none -translate-x-1/2 mask-[linear-gradient(90deg,transparent_0%,#000_16%,#000_84%,transparent_100%),linear-gradient(180deg,#000_62%,transparent_98%)] mask-intersect select-none"
         />
       </div>
     </div>
@@ -289,11 +282,11 @@ const WAVE = [0.35, 0.6, 0.45, 0.8, 1, 0.7, 0.9, 0.55, 0.75, 0.4, 0.65, 0.95, 0.
 
 function Wave({ className = "" }: { className?: string }) {
   return (
-    <div aria-hidden="true" className={`${css.wave} flex h-[64px] w-full items-center justify-between ${className}`}>
+    <div aria-hidden="true" className={`flex h-[64px] w-full items-center justify-between ${className}`}>
       {WAVE.map((h, i) => (
         <span
           key={i}
-          className="w-[5px] rounded-full bg-[linear-gradient(180deg,#0071e3,#6e5bff)] dark:bg-[linear-gradient(180deg,#2997ff,#8f7dff)]"
+          className="w-[5px] origin-center animate-wave rounded-full bg-[linear-gradient(180deg,#0071e3,#6e5bff)] [animation-delay:calc(var(--i)*-0.13s)] in-data-still:animate-none motion-reduce:animate-none dark:bg-[linear-gradient(180deg,#2997ff,#8f7dff)]"
           style={{ height: `${h * 100}%`, "--i": i } as React.CSSProperties}
         />
       ))}
@@ -383,7 +376,7 @@ function Experience() {
               <li key={r.company} {...reveal(i + 1)} className={`relative pl-[30px] ${last ? "" : "pb-[34px]"}`}>
                 {last ? null : <span className="absolute top-[18px] bottom-[-2px] left-[5px] w-px bg-rule" />}
                 <span
-                  className={`absolute top-[5px] left-0 size-[11px] rounded-full ${current ? `bg-blue ${css.pulse}` : "border-[1.5px] border-ink-3 bg-page-alt"}`}
+                  className={`absolute top-[5px] left-0 size-[11px] rounded-full ${current ? "bg-blue after:absolute after:-inset-[5px] after:animate-beacon after:rounded-[999px] after:border-[1.5px] after:border-blue in-data-still:after:animate-none motion-reduce:after:animate-none" : "border-[1.5px] border-ink-3 bg-page-alt"}`}
                 />
                 <p className="text-[12px] leading-[1.33] text-ink-2">
                   {month(r.start)} – {r.end ? month(r.end) : "Present"}
