@@ -19,8 +19,8 @@ function Toggle({ on, onClick, label, children, tint = "var(--blue)" }: { on: bo
       aria-label={label}
       aria-pressed={on}
       onClick={onClick}
-      className="grid size-[52px] place-items-center rounded-full transition-[background-color,transform] duration-200 active:scale-90"
-      style={{ background: on ? tint : "rgba(255,255,255,0.14)", color: "#fff" }}
+      className="grid size-[52px] place-items-center rounded-full transition-[background-color,transform] duration-200 text-white active:scale-90"
+      style={{ background: on ? tint : "rgba(255,255,255,0.14)" }}
     >
       <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
         {children}
@@ -84,10 +84,10 @@ export default function ControlCenter() {
     <div className="absolute inset-0 z-[44] text-white" onClick={close}>
       {/* Only the layers animate, never their parent: an ancestor fading
           in would cut the blur off from what's behind it. */}
-      <div className="absolute inset-0 bg-black/35 backdrop-blur-[30px] backdrop-saturate-150" style={{ animation: "duo-fade 0.3s ease-out backwards" }} />
+      <div className="absolute inset-0 animate-[duo-fade_0.3s_ease-out_backwards] bg-black/35 backdrop-blur-[30px] backdrop-saturate-150" />
       <div
-        className={`absolute grid ${portrait ? "top-[70px] left-1/2 -translate-x-1/2" : "top-[24px] right-[108px]"}`}
-        style={{ gap: GAP, gridTemplateColumns: `repeat(4, ${CELL}px)`, gridAutoRows: `${CELL}px`, animation: "duo-cc 0.46s var(--ease-ios) backwards" }}
+        className={`absolute grid animate-[duo-cc_0.46s_var(--ease-ios)_backwards] ${portrait ? "top-[70px] left-1/2 -translate-x-1/2" : "top-[24px] right-[108px]"}`}
+        style={{ gap: GAP, gridTemplateColumns: `repeat(4, ${CELL}px)`, gridAutoRows: `${CELL}px` }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Connectivity, 2 × 2 */}
@@ -109,7 +109,7 @@ export default function ControlCenter() {
         {/* Now Playing, 2 × 2 */}
         <div className="col-span-2 row-span-2 flex flex-col justify-between rounded-[32px] bg-white/12 p-[16px]">
           <div className="flex items-center gap-[10px]">
-            <span className="size-[44px] rounded-[10px]" style={{ background: "linear-gradient(135deg,#ff8a00,#e52e71)" }} />
+            <span className="size-[44px] rounded-[10px] bg-[linear-gradient(135deg,#ff8a00,#e52e71)]" />
             <span className="min-w-0 text-[13px] leading-[1.25]">
               <span className="block truncate font-semibold">Not Playing</span>
               <span className="block truncate text-white/60">ntz duo</span>
@@ -125,7 +125,7 @@ export default function ControlCenter() {
         </div>
 
         {/* Brightness and volume: tall sliders. */}
-        <div className="row-span-2" style={{ gridRow: "4 / span 2", gridColumn: 1 }}>
+        <div className="col-1 row-[4/span_2]">
           <Slider
             value={brightness}
             onChange={(v) => os.set({ brightness: v })}
@@ -140,7 +140,7 @@ export default function ControlCenter() {
             }
           />
         </div>
-        <div className="row-span-2" style={{ gridRow: "4 / span 2", gridColumn: 2 }}>
+        <div className="col-2 row-[4/span_2]">
           <Slider
             value={volume}
             onChange={setVolume}
@@ -154,10 +154,9 @@ export default function ControlCenter() {
           type="button"
           aria-pressed={dark}
           onClick={() => setAppearance(dark ? "light" : "dark")}
-          className="col-span-2 flex items-center gap-[10px] rounded-full bg-white/12 px-[5px] text-left transition-colors hover:bg-white/18"
-          style={{ gridRow: 3 }}
+          className="col-span-2 flex items-center gap-[10px] rounded-full bg-white/12 px-[5px] text-left row-3 transition-colors hover:bg-white/18"
         >
-          <span className="grid size-[52px] shrink-0 place-items-center rounded-full" style={{ background: dark ? "#fff" : "rgba(255,255,255,0.16)", color: dark ? "#000" : "#fff" }}>
+          <span className={`grid size-[52px] shrink-0 place-items-center rounded-full ${dark ? "bg-white text-black" : "bg-[rgba(255,255,255,0.16)] text-white"}`}>
             <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="2" />
               <path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" />
@@ -174,10 +173,9 @@ export default function ControlCenter() {
           type="button"
           aria-pressed={focus}
           onClick={() => setFocus(!focus)}
-          className="col-span-2 flex items-center gap-[10px] rounded-full bg-white/12 px-[5px] text-left transition-colors hover:bg-white/18"
-          style={{ gridRow: 3 }}
+          className="col-span-2 flex items-center gap-[10px] rounded-full bg-white/12 px-[5px] text-left row-3 transition-colors hover:bg-white/18"
         >
-          <span className="grid size-[52px] shrink-0 place-items-center rounded-full" style={{ background: focus ? "#5e5ce6" : "rgba(255,255,255,0.16)" }}>
+          <span className={`grid size-[52px] shrink-0 place-items-center rounded-full ${focus ? "bg-[#5e5ce6]" : "bg-[rgba(255,255,255,0.16)]"}`}>
             <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5" fill="currentColor" />
             </svg>
@@ -211,7 +209,7 @@ export default function ControlCenter() {
           </div>
         ))}
       </div>
-      <p className="absolute bottom-[22px] left-1/2 -translate-x-1/2 text-[12px] text-white/60" style={{ animation: "duo-fade 0.4s 0.2s ease-out backwards" }}>
+      <p className="absolute bottom-[22px] left-1/2 -translate-x-1/2 animate-[duo-fade_0.4s_0.2s_ease-out_backwards] text-[12px] text-white/60">
         Tap anywhere to close
       </p>
     </div>

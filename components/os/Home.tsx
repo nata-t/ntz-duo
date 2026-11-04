@@ -242,8 +242,7 @@ export default function Home({ region, mirror = false }: { region: Slot; mirror?
               tabIndex={mirror ? -1 : 0}
               aria-label={`Page ${i + 1}`}
               onClick={() => os.set({ page: i })}
-              className="size-[7px] rounded-full transition-colors duration-300"
-              style={{ background: i === at ? "rgba(255,255,255,0.95)" : "rgba(255,255,255,0.4)" }}
+              className={`size-[7px] rounded-full transition-colors duration-300 ${i === at ? "bg-[rgba(255,255,255,0.95)]" : "bg-[rgba(255,255,255,0.4)]"}`}
             />
           ))}
         </div>
@@ -270,7 +269,7 @@ function Dock({ vertical, width, height, mirror }: { vertical: boolean; width: n
       <div className={`glass-clear absolute flex items-center ${vertical ? "flex-col" : "flex-row"}`} style={{ ...box, padding: pad, gap, borderRadius: thick / 2 }}>
         {DOCK.map((id) => (
           <div key={id} style={{ width: size, height: size }} className="grid place-items-center">
-            <div style={{ marginLeft: -9, marginRight: -9 }}>
+            <div className="-mx-[9px]">
               <AppIcon id={id} size={size} label={false} mirror={mirror} />
             </div>
           </div>

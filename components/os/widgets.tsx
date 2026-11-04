@@ -7,8 +7,7 @@ import { launch } from "./launch";
 // Home Screen widgets. Each is a self-contained card on the wallpaper;
 // tapping one opens the app it belongs to, as on iOS.
 
-const card = "relative overflow-hidden rounded-[30px] text-left";
-const shadow = { boxShadow: "0 6px 22px rgba(0,0,0,0.12)" };
+const card = "relative overflow-hidden rounded-[30px] text-left shadow-[0_6px_22px_rgba(0,0,0,0.12)]";
 
 /** Ticks once a second (or minute), aligned to the clock. */
 export function useNow(step: "s" | "m" = "m") {
@@ -39,23 +38,20 @@ export function PortraitWidget({ w, h }: { w: number; h: number }) {
       type="button"
       onClick={() => launch("about", ref.current)}
       className={`${card} group`}
-      style={{ width: w, height: h, ...shadow }}
+      style={{ width: w, height: h }}
       aria-label="About Natnael"
     >
       <span
-        className="absolute inset-0"
-        style={{ background: "radial-gradient(120% 90% at 30% 10%, #f0c9a6 0%, #c97b5b 38%, #5b3a4a 78%, #2d2233 100%)" }}
+        className="absolute inset-0 bg-[radial-gradient(120%_90%_at_30%_10%,#f0c9a6_0%,#c97b5b_38%,#5b3a4a_78%,#2d2233_100%)]"
       />
       <span
-        className="absolute inset-0 opacity-50 mix-blend-soft-light"
-        style={{ background: "repeating-linear-gradient(115deg, rgba(255,255,255,0.25) 0 2px, rgba(255,255,255,0) 2px 9px)" }}
+        className="absolute inset-0 bg-[repeating-linear-gradient(115deg,rgba(255,255,255,0.25)_0_2px,rgba(255,255,255,0)_2px_9px)] opacity-50 mix-blend-soft-light"
       />
       <img
         src="/portrait/source.webp"
         alt=""
         draggable={false}
-        className="absolute bottom-0 left-1/2 w-[112%] max-w-none -translate-x-1/2 transition-transform duration-700 ease-out group-hover:scale-[1.03]"
-        style={{ transformOrigin: "50% 100%" }}
+        className="absolute bottom-0 left-1/2 w-[112%] max-w-none -translate-x-1/2 transition-transform duration-700 ease-out origin-[50%_100%] group-hover:scale-[1.03]"
       />
       <span className="absolute inset-x-0 bottom-0 h-[46%] bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
       <span className="absolute bottom-[22px] left-[22px] right-[70px] text-white">
@@ -152,8 +148,8 @@ export function WeatherWidget({ size }: { size: number }) {
   const [label, kind] = WMO[v.code] ?? ["Partly Cloudy", "partly"];
   return (
     <div
-      className={`${card} p-[15px] text-white`}
-      style={{ width: size, height: size, background: "linear-gradient(180deg, #3a7bd5 0%, #6aa8e8 100%)", ...shadow }}
+      className={`${card} bg-[linear-gradient(180deg,#3a7bd5_0%,#6aa8e8_100%)] p-[15px] text-white`}
+      style={{ width: size, height: size }}
     >
       <p className="text-[14px] leading-[1.2] font-semibold">Addis Ababa</p>
       <p className="mt-[1px] text-[44px] leading-[1] font-light tracking-[-0.02em]">{v.temp}°</p>
@@ -177,7 +173,7 @@ export function MapWidget({ size }: { size: number }) {
       type="button"
       onClick={() => launch("contact", ref.current)}
       className={card}
-      style={{ width: size, height: size, ...shadow }}
+      style={{ width: size, height: size }}
       aria-label="Location: Addis Ababa. Opens Contact"
     >
       <svg className="absolute inset-0" width={size} height={size} viewBox="0 0 160 160" aria-hidden="true">
@@ -219,7 +215,7 @@ export function ClockWidget({ size }: { size: number }) {
     .map(Number) as [number, number, number];
   const hourA = ((h % 12) + m / 60) * 30, minA = (m + s / 60) * 6, secA = s * 6;
   return (
-    <div className={`${card} bg-white`} style={{ width: size, height: size, borderRadius: size / 2, ...shadow }} aria-label="Clock, Addis Ababa">
+    <div className={`${card} bg-white`} style={{ width: size, height: size, borderRadius: size / 2 }} aria-label="Clock, Addis Ababa">
       <svg viewBox="-50 -50 100 100" width={size} height={size} aria-hidden="true">
         {Array.from({ length: 12 }, (_, i) => (
           <text key={i} x={Math.sin((i * Math.PI) / 6) * 36} y={-Math.cos((i * Math.PI) / 6) * 36 + 4} textAnchor="middle" fontSize="11" fontWeight="600" fill="#000">
@@ -243,7 +239,7 @@ export function CalendarWidget({ size }: { size: number }) {
   const now = useNow("m");
   const d = now ?? new Date(2026, 10, 3);
   return (
-    <div className={`${card} bg-white p-[15px] text-black`} style={{ width: size, height: size, ...shadow }}>
+    <div className={`${card} bg-white p-[15px] text-black`} style={{ width: size, height: size }}>
       <p className="text-[12px] font-semibold tracking-[0.02em] text-[#ff3b30] uppercase">
         {d.toLocaleDateString("en-US", { weekday: "long" })}
       </p>
@@ -268,7 +264,7 @@ export function ExperienceWidget({ w, h }: { w: number; h: number }) {
       type="button"
       onClick={() => launch("about", ref.current)}
       className={`${card} bg-white p-[20px] text-black`}
-      style={{ width: w, height: h, ...shadow }}
+      style={{ width: w, height: h }}
       aria-label="Experience. Opens About"
     >
       <p className="text-[12px] font-semibold tracking-[0.02em] text-[#ff3b30] uppercase">Experience</p>
@@ -276,7 +272,7 @@ export function ExperienceWidget({ w, h }: { w: number; h: number }) {
       <ol className="mt-[16px] flex flex-col gap-[14px]">
         {experience.map((r) => (
           <li key={r.company} className="flex gap-[10px]">
-            <span className="mt-[2px] w-[4px] shrink-0 rounded-full" style={{ background: r.end ? "#c7c7cc" : "#34c759" }} />
+            <span className={`mt-[2px] w-[4px] shrink-0 rounded-full ${r.end ? "bg-[#c7c7cc]" : "bg-[#34c759]"}`} />
             <span className="min-w-0">
               <span className="block text-[14px] leading-[1.2] font-semibold">{r.company}</span>
               <span className="block text-[12px] leading-[1.3] text-black/55">
@@ -297,7 +293,7 @@ export function ExperienceWidget({ w, h }: { w: number; h: number }) {
 export function StackWidget({ w, h }: { w: number; h: number }) {
   const items = skills.flatMap((g) => g.items).slice(0, 18);
   return (
-    <div className={`${card} p-[16px] text-white`} style={{ width: w, height: h, background: "linear-gradient(160deg, #2c2c2e, #111113)", ...shadow }}>
+    <div className={`${card} bg-[linear-gradient(160deg,#2c2c2e,#111113)] p-[16px] text-white`} style={{ width: w, height: h }}>
       <p className="text-[12px] font-semibold tracking-[0.02em] text-[#ff9f0a] uppercase">Stack</p>
       <div className="mt-[10px] flex flex-wrap gap-[6px]">
         {items.map((s) => (
@@ -314,7 +310,7 @@ export function StackWidget({ w, h }: { w: number; h: number }) {
 export function WorkWidget({ w, h }: { w: number; h: number }) {
   const shown = projects.filter((p) => !p.confidential).length;
   return (
-    <div className={`${card} p-[16px] text-black`} style={{ width: w, height: h, background: "#fff", ...shadow }}>
+    <div className={`${card} bg-white p-[16px] text-black`} style={{ width: w, height: h }}>
       <p className="text-[12px] font-semibold tracking-[0.02em] text-[#0a84ff] uppercase">Work</p>
       <p className="mt-[2px] text-[36px] leading-[1] font-light">{projects.length}</p>
       <p className="mt-[4px] text-[12px] leading-[1.3] text-black/55">

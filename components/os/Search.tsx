@@ -29,10 +29,9 @@ export default function Search() {
 
   return (
     <div className="absolute inset-0 z-[44]" onClick={close}>
-      <div className="absolute inset-0 bg-black/25 backdrop-blur-[30px] backdrop-saturate-150" style={{ animation: "duo-fade 0.25s ease-out backwards" }} />
+      <div className="absolute inset-0 animate-[duo-fade_0.25s_ease-out_backwards] bg-black/25 backdrop-blur-[30px] backdrop-saturate-150" />
       <div
-        className="absolute right-[96px] bottom-[22px] left-[96px] mx-auto flex max-w-[620px] flex-col gap-[14px]"
-        style={{ animation: "duo-rise 0.42s var(--ease-ios) backwards" }}
+        className="absolute right-[96px] bottom-[22px] left-[96px] mx-auto flex max-w-[620px] animate-[duo-rise_0.42s_var(--ease-ios)_backwards] flex-col gap-[14px]"
         onClick={(e) => e.stopPropagation()}
       >
         <div className="glass rounded-[30px] p-[10px] text-label">

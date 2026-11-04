@@ -99,8 +99,8 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
       data-lenis-prevent={!mirror && live ? "" : undefined}
       aria-hidden={mirror || undefined}
       inert={mirror || !live || undefined}
-      className="relative overflow-hidden bg-black font-sans text-label select-none"
-      style={{ width: W, height: H, letterSpacing: "-0.01em", touchAction: live && !mirror ? "none" : undefined }}
+      className="relative overflow-hidden bg-black font-sans tracking-[-0.01em] text-label select-none"
+      style={{ width: W, height: H, touchAction: live && !mirror ? "none" : undefined }}
     >
       <img
         src={`/wallpapers/${portrait ? "outer" : "dunes"}-${dark ? "dark" : "light"}${portrait ? "" : "-landscape"}.webp`}
@@ -122,16 +122,15 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
           tabIndex={mirror ? -1 : 0}
           aria-label="Swap apps"
           onClick={swapSides}
-          className="group absolute z-[4] grid place-items-center bg-black"
+          className="group absolute z-[4] grid animate-[duo-fade_0.3s_ease-out_both] place-items-center bg-black"
           style={
             portrait
-              ? { left: 0, top: H / 2 - 5.5, width: W, height: 11, animation: "duo-fade 0.3s ease-out both" }
-              : { top: 0, left: W / 2 - 5.5, width: 11, height: H, animation: "duo-fade 0.3s ease-out both" }
+              ? { left: 0, top: H / 2 - 5.5, width: W, height: 11 }
+              : { top: 0, left: W / 2 - 5.5, width: 11, height: H }
           }
         >
           <span
-            className="rounded-full bg-white/65 transition-[background-color,scale] duration-300 group-hover:scale-125 group-hover:bg-white/90"
-            style={portrait ? { width: 46, height: 3 } : { width: 3, height: 46 }}
+            className={`rounded-full bg-white/65 transition-[background-color,scale] duration-300 group-hover:scale-125 group-hover:bg-white/90 ${portrait ? "h-[3px] w-[46px]" : "h-[46px] w-[3px]"}`}
           />
         </button>
       ) : null}

@@ -14,12 +14,11 @@ export default function Alert() {
 
   return (
     <div className="absolute inset-0 z-[45] grid place-items-center" onClick={dismiss}>
-      <div className="absolute inset-0 bg-black/25" style={{ animation: "duo-fade 0.2s ease-out backwards" }} />
+      <div className="absolute inset-0 animate-[duo-fade_0.2s_ease-out_backwards] bg-black/25" />
       <div
         role="alertdialog"
         aria-labelledby="duo-alert-title"
-        className="glass relative w-[300px] rounded-[34px] p-[22px] pb-[16px] text-center text-label"
-        style={{ animation: "duo-alert 0.34s var(--ease-ios) backwards", background: "var(--glass-strong)" }}
+        className="glass relative w-[300px] rounded-[34px] p-[22px] pb-[16px] animate-[duo-alert_0.34s_var(--ease-ios)_backwards] bg-(--glass-strong) text-center text-label"
         onClick={(e) => e.stopPropagation()}
       >
         <p id="duo-alert-title" className="text-[17px] leading-[1.3] font-semibold">

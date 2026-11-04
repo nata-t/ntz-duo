@@ -26,12 +26,8 @@ export function IconFace({ id, size }: { id: string; size: number }) {
       {Face ? <Face /> : <span className="block h-full w-full bg-gray" />}
       {/* iOS 27's glass edge: a lit rim, a soft top sheen. */}
       <span
-        className="pointer-events-none absolute inset-0"
-        style={{
-          borderRadius: iconRadius(size),
-          background: "linear-gradient(180deg, rgba(255,255,255,0.16) 0%, rgba(255,255,255,0) 46%)",
-          boxShadow: "inset 0 0 0 0.5px rgba(255,255,255,0.32), inset 0 1px 1.2px rgba(255,255,255,0.45), inset 0 -1px 1.5px rgba(0,0,0,0.08)",
-        }}
+        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0)_46%)] shadow-[inset_0_0_0_0.5px_rgba(255,255,255,0.32),inset_0_1px_1.2px_rgba(255,255,255,0.45),inset_0_-1px_1.5px_rgba(0,0,0,0.08)]"
+        style={{ borderRadius: iconRadius(size) }}
       />
     </span>
   );
@@ -68,8 +64,7 @@ export default function AppIcon({ id, size = 62, label = true, mirror = false }:
       </span>
       {label ? (
         <span
-          className="mt-[5px] max-w-full truncate text-[11.5px] leading-[1.15] font-medium tracking-[0.005em] text-white"
-          style={{ textShadow: "0 0.5px 2px rgba(0,0,0,0.3)" }}
+          className="mt-[5px] max-w-full truncate text-[11.5px] leading-[1.15] font-medium tracking-[0.005em] text-white text-shadow-[0_0.5px_2px_rgba(0,0,0,0.3)]"
         >
           {name}
         </span>

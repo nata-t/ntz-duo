@@ -300,8 +300,7 @@ function WindowControls({
       {open ? (
         <div
           role="menu"
-          className="glass absolute top-[28px] left-1/2 w-[214px] -translate-x-1/2 overflow-hidden rounded-[22px] p-[6px] text-label"
-          style={{ animation: "duo-pop 0.28s var(--ease-ios) backwards" }}
+          className="glass absolute top-[28px] left-1/2 w-[214px] -translate-x-1/2 animate-[duo-pop_0.28s_var(--ease-ios)_backwards] overflow-hidden rounded-[22px] p-[6px] text-label"
         >
           <div className="flex justify-between px-[4px] pb-[6px]">
             {items.slice(0, 3).map((it) => (
@@ -311,10 +310,9 @@ function WindowControls({
                 role="menuitem"
                 aria-label={it.label}
                 onClick={() => onMove(it.id as Win["slot"])}
-                className="grid h-[42px] w-[60px] place-items-center rounded-[14px] transition-colors hover:bg-fill-3"
-                style={{ color: slot === it.id ? "var(--blue)" : undefined }}
+                className={`grid h-[42px] w-[60px] place-items-center rounded-[14px] transition-colors hover:bg-fill-3 ${slot === it.id ? "text-blue" : ""}`}
               >
-                <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" style={portrait ? { transform: "rotate(90deg)" } : undefined}>
+                <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" className={portrait ? "rotate-90" : undefined}>
                   {it.icon}
                 </svg>
               </button>

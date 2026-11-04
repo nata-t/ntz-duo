@@ -9,7 +9,7 @@ import { projects } from "@/content/site";
 type Face = () => React.ReactNode;
 
 const svg = (children: React.ReactNode, bg?: string) => (
-  <svg viewBox="0 0 60 60" width="100%" height="100%" aria-hidden="true" style={{ display: "block", background: bg }}>
+  <svg viewBox="0 0 60 60" width="100%" height="100%" aria-hidden="true" className="block" style={{ background: bg }}>
     {children}
   </svg>
 );
@@ -86,7 +86,7 @@ const GLYPHS: Record<string, (ink: string) => React.ReactNode> = {
 /** Artwork from the iPhone Duo UI kit, for the system apps it ships. */
 const kit = (name: string) =>
   function KitIcon() {
-    return <img src={`/icons/${name}.webp`} alt="" draggable={false} width="100%" height="100%" style={{ display: "block", width: "100%", height: "100%" }} />;
+    return <img src={`/icons/${name}.webp`} alt="" draggable={false} width="100%" height="100%" className="block size-full" />;
   };
 
 export const FACES: Record<string, Face> = {
@@ -180,7 +180,7 @@ export const FACES: Record<string, Face> = {
               </radialGradient>
             </defs>
             <rect width="60" height="60" fill={p.color} />
-            <rect width="60" height="60" fill={`url(#pg-${p.slug})`} style={{ mixBlendMode: "screen" }} />
+            <rect width="60" height="60" fill={`url(#pg-${p.slug})`} className="mix-blend-screen" />
             {GLYPHS[p.slug]?.(p.ink)}
           </>,
         ),
