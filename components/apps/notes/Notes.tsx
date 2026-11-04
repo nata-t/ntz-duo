@@ -84,8 +84,8 @@ export default function Notes({ width, slot, mirror, close }: AppProps) {
         ) : (
           <>
             <aside
-              className="h-full shrink-0 overflow-hidden border-r-[0.5px] border-sep bg-grouped transition-[width] duration-500"
-              style={{ width: hidden ? 0 : SIDEBAR_W, transitionTimingFunction: "var(--ease-ios)" }}
+              className="h-full shrink-0 overflow-hidden border-r-[0.5px] border-sep bg-grouped transition-[width] duration-500 ease-ios"
+              style={{ width: hidden ? 0 : SIDEBAR_W }}
               inert={hidden || undefined}
             >
               <div className="h-full" style={{ width: SIDEBAR_W }}>
@@ -190,7 +190,7 @@ function NoteList({
   return (
     <div className="relative flex h-full flex-col">
       {/* Top toolbar: sidebar toggle, then the folder's name. */}
-      <div className="relative flex h-[54px] shrink-0 items-center px-[16px]" style={{ marginTop: 24 }}>
+      <div className="relative mt-[24px] flex h-[54px] shrink-0 items-center px-[16px]">
         {onHide ? (
           <button
             type="button"
@@ -217,8 +217,7 @@ function NoteList({
       {/* Bottom toolbar: search, floating over the list's end. */}
       <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[96px] bg-gradient-to-t from-grouped via-grouped/80 to-transparent" />
       <label
-        className="glass absolute bottom-[26px] left-[20px] flex h-[40px] items-center gap-[7px] rounded-full px-[13px] text-label-2"
-        style={{ right: 20 }}
+        className="glass absolute right-[20px] bottom-[26px] left-[20px] flex h-[40px] items-center gap-[7px] rounded-full px-[13px] text-label-2"
       >
         {Glyph.search}
         <input
