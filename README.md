@@ -35,7 +35,8 @@ project slug.
 app/                 layout (fonts, theme prepaint), page, icon
 components/
   stage/             the scroll story: Stage (pin, loop, snap), story.ts (poses
-                     on a clock), HeroCopy, Nav, Footer
+                     on a clock), HeroCopy, Nav, Footer, Scrollbar (the
+                     story's chapters as an iOS page control)
   device/            the CSS 3D phone: geometry, pose math, Device (slabs,
                      extruded walls, camera plateau, faces, live display)
   os/                iOS 27 on the inner display: InnerDisplay, Home, widgets,

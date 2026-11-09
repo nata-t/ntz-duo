@@ -50,6 +50,17 @@ export const MARKS = {
   standbyOut: 8.2,
 };
 
+/** The story's chapters, as the scrollbar names them: where each begins on
+ *  the clock, and the moment a jump to it lands on. The last runs to the
+ *  end, which is the beginning again. */
+export const CHAPTERS = [
+  { id: "hello", label: "Hello", from: 0, go: 0 },
+  { id: "design", label: "Design", from: 0.8, go: 1.4 },
+  { id: "unfold", label: "Unfold", from: 2.2, go: 3.15 },
+  { id: "live", label: "Live", from: MARKS.liveIn - 0.3, go: MARKS.liveIn + 0.15 },
+  { id: "standby", label: "StandBy", from: 5.6, go: 7.6 },
+] as const;
+
 export type Story = { keys: [number, Pose][]; poseAt: (t: number, out: Pose) => Pose };
 
 export function createStory(portrait: boolean): Story {

@@ -19,6 +19,7 @@ import HeroCopy, { type HeroCopyHandle } from "./HeroCopy";
 import Footer, { type FooterHandle } from "./Footer";
 import Nav, { type NavHandle } from "./Nav";
 import FullScreen from "./FullScreen";
+import Scrollbar from "./Scrollbar";
 import Mount, { Mirror } from "./Mount";
 import { scrollToStory, visit } from "./navigate";
 import { HERO, LENGTH, MARKS, createStory, span } from "./story";
@@ -415,6 +416,7 @@ export default function Stage() {
           )}
         </div>
       </div>
+      <Scrollbar />
       {liveHost && k !== null ? createPortal(<InnerDisplay />, liveHost) : null}
       {liveHost ? <FullScreen node={liveHost} /> : null}
     </section>
