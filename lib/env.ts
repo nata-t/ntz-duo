@@ -11,6 +11,12 @@ export function finePointer(): boolean {
   return window.matchMedia("(pointer: fine) and (hover: hover)").matches;
 }
 
+/** A finger is the main pointer (phones, tablets). */
+export function coarsePointer(): boolean {
+  if (typeof window === "undefined") return false;
+  return window.matchMedia("(pointer: coarse)").matches;
+}
+
 export function isDesktop(): boolean {
   if (typeof window === "undefined") return false;
   return window.matchMedia("(min-width: 1024px)").matches;

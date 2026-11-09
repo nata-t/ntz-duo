@@ -27,6 +27,9 @@ const DISTANCE = 2800;
 const BLEED = 3;
 /** The display hole's corner (pt); the DOM's matches it plus the bleed. */
 const HOLE_R = 48;
+/** The folding halves run this far past the hinge into each other, so no
+ *  hairline of page shows between them. */
+const SEAM = 2;
 const rad = (d: number) => (d * Math.PI) / 180;
 
 type GL = {
@@ -74,7 +77,6 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
   });
   const sleep = useRef<HTMLDivElement[]>([]);
   const mirrors = useRef<HTMLDivElement[]>([]);
-  const crease = useRef<HTMLDivElement>(null);
   const m4 = useRef(new THREE.Matrix4()).current, t4 = useRef(new THREE.Matrix4()).current;
 
   // Scene, renderers, camera, lights. Once.
@@ -143,8 +145,8 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       return o;
     };
     const objects = [
-      attach(els.L, L, { ...SCREENS.innerL, x: SCREENS.innerL.x - BLEED / 2 }),
-      attach(els.R, R, { ...SCREENS.innerR, x: SCREENS.innerR.x + BLEED / 2 }),
+      attach(els.L, L, { ...SCREENS.innerL, x: SCREENS.innerL.x - BLEED / 2 + SEAM / 2 }),
+      attach(els.R, R, { ...SCREENS.innerR, x: SCREENS.innerR.x + BLEED / 2 - SEAM / 2 }),
       attach(els.live, root, SCREENS.live),
       attach(els.outer, L, SCREENS.outer, true),
     ];
@@ -213,7 +215,7 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
   useLayoutEffect(() => {
     if (!els) return;
     const px = (v: number) => `${v * k}px`, r = px(HOLE_R + BLEED);
-    const half = { width: px(INNER.w / 2 + BLEED), height: px(INNER.h + 2 * BLEED) };
+    const half = { width: px(INNER.w / 2 + BLEED + SEAM), height: px(INNER.h + 2 * BLEED) };
     Object.assign(els.L.style, half, { borderRadius: `${r} 0 0 ${r}` });
     Object.assign(els.R.style, half, { borderRadius: `0 ${r} ${r} 0` });
     Object.assign(els.live.style, { width: px(INNER.w + 2 * BLEED), height: px(INNER.h + 2 * BLEED), borderRadius: r });
@@ -255,7 +257,6 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       last.current.pull = pull;
       mirrors.current.forEach((el) => (el.style.filter = pull ? `blur(${pull}px)` : ""));
     }
-    if (crease.current) crease.current.style.opacity = Math.min(1, p.fold / 25).toFixed(3);
 
     // The live display takes over from the two halves once flat. Opacity,
     // not visibility: both stay painted, so the swap costs one frame.
@@ -280,8 +281,8 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
         ref={(el) => {
           if (el) mirrors.current[side === "L" ? 0 : 1] = el;
         }}
-        className="pointer-events-none absolute"
-        style={{ width: u(INNER.w), height: u(INNER.h), top: u(BLEED), left: side === "L" ? u(BLEED) : u(-INNER.w / 2) }}
+        className="pointer-events-none absolute isolate"
+        style={{ width: u(INNER.w), height: u(INNER.h), top: u(BLEED), left: side === "L" ? u(BLEED) : u(SEAM - INNER.w / 2) }}
       >
         <div style={{ width: INNER.w, height: INNER.h, zoom: k }}>
           <Upright portrait={portrait}>{inner(side)}</Upright>
@@ -293,12 +294,6 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
         }}
         className="pointer-events-none absolute inset-0 bg-black"
       />
-      {side === "R" ? (
-        <div
-          ref={crease}
-          className="pointer-events-none absolute inset-y-0 left-0 w-[18px] bg-[linear-gradient(90deg,rgba(0,0,0,0.18),rgba(255,255,255,0.06)_40%,rgba(0,0,0,0))] opacity-0"
-        />
-      ) : null}
     </>
   );
 

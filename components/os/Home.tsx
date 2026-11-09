@@ -63,16 +63,21 @@ function Icons({ ids, x0, y0, cell = CELL, row = ROW, mirror }: { ids: string[];
 function Page({ page, width, height, layout, rail, mirror }: { page: number; width: number; height: number; layout: Layout; rail: boolean; mirror: boolean }) {
   const pair = 2 * SMALL + GAP;
   const style = { width, left: page * width };
+  // Upright, columns narrow to fit a phone-width screen (full screen on a
+  // phone is about 400 pt across).
+  const col = Math.min(132, (width - 24) / 4);
 
   if (layout === "port-half")
     return (
       <div className="absolute top-0 h-full" style={style}>
-        <Icons ids={[...GRID, ...DOCK]} x0={(width - 4 * 132) / 2} y0={28} cell={132} row={(height - 50) / 4} mirror={mirror} />
+        <Icons ids={[...GRID, ...DOCK]} x0={(width - 4 * col) / 2} y0={28} cell={col} row={(height - 50) / 4} mirror={mirror} />
       </div>
     );
 
   if (layout === "port") {
     const cx = (width - pair) / 2;
+    // The tall widget gives up height before it crowds Search and the dock.
+    const largeH = Math.min(LARGE_H, height - (TOP + 26) - GAP - SMALL - 196);
     return (
       <div className="absolute top-0 h-full" style={style}>
         {page === 0 ? (
@@ -81,14 +86,14 @@ function Page({ page, width, height, layout, rail, mirror }: { page: number; wid
               <WeatherWidget size={SMALL} />
               <MapWidget size={SMALL} />
             </div>
-            <Icons ids={GRID} x0={(width - 4 * 132) / 2} y0={TOP + 26 + SMALL + 40} cell={132} row={122} mirror={mirror} />
+            <Icons ids={GRID} x0={(width - 4 * col) / 2} y0={TOP + 26 + SMALL + 40} cell={col} row={122} mirror={mirror} />
           </>
         ) : page === 1 ? (
           <>
             <div className="absolute" style={{ left: (width - LARGE_W) / 2, top: TOP + 26 }}>
-              <PortraitWidget w={LARGE_W} h={LARGE_H} />
+              <PortraitWidget w={LARGE_W} h={largeH} />
             </div>
-            <div className="absolute flex" style={{ left: cx, top: TOP + 26 + LARGE_H + GAP, gap: GAP }}>
+            <div className="absolute flex" style={{ left: cx, top: TOP + 26 + largeH + GAP, gap: GAP }}>
               <ClockWidget size={SMALL} />
               <CalendarWidget size={SMALL} />
             </div>
@@ -96,9 +101,9 @@ function Page({ page, width, height, layout, rail, mirror }: { page: number; wid
         ) : (
           <>
             <div className="absolute" style={{ left: (width - LARGE_W) / 2, top: TOP + 26 }}>
-              <ExperienceWidget w={LARGE_W} h={LARGE_H} />
+              <ExperienceWidget w={LARGE_W} h={largeH} />
             </div>
-            <div className="absolute" style={{ left: cx, top: TOP + 26 + LARGE_H + GAP }}>
+            <div className="absolute" style={{ left: cx, top: TOP + 26 + largeH + GAP }}>
               <StackWidget w={pair} h={SMALL} />
             </div>
           </>
@@ -234,7 +239,8 @@ export default function Home({ region, mirror = false }: { region: Slot; mirror?
       </div>
 
       {pages > 1 ? (
-        <div className="absolute flex gap-[8px]" style={{ left: dotsX - (pages * 7 + (pages - 1) * 8) / 2, bottom: portrait ? 132 : 26 }}>
+        // Upright, the dots sit over Search, clear of it.
+        <div className="absolute flex gap-[8px]" style={{ left: dotsX - (pages * 7 + (pages - 1) * 8) / 2, bottom: portrait ? 170 : 26 }}>
           {Array.from({ length: pages }, (_, i) => (
             <button
               key={i}

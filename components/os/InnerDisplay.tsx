@@ -2,6 +2,7 @@
 
 import { useEffect, useRef } from "react";
 import { closeWindow, goHome, homeRegion, os, swapSides, syncAppearance, useDims, useOS } from "@/lib/os";
+import { exitFull } from "@/lib/full";
 import Home, { homePages } from "./Home";
 import Window from "./Window";
 import StatusBar from "./StatusBar";
@@ -75,7 +76,8 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
     return () => el.removeEventListener("wheel", onWheel);
   }, [mirror]);
 
-  // Keyboard: Escape goes home (or closes what's on top).
+  // Keyboard: Escape goes home (or closes what's on top); at home, it
+  // leaves full screen.
   useEffect(() => {
     if (mirror) return;
     const onKey = (e: KeyboardEvent) => {
@@ -85,6 +87,7 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
       if (s.alert) os.set({ alert: null });
       else if (s.overlay) os.set({ overlay: null });
       else if (s.focus) closeWindow(s.focus);
+      else if (s.windows.length === 0 && s.screen) exitFull();
       else goHome();
     };
     window.addEventListener("keydown", onKey);
@@ -99,7 +102,10 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
       data-lenis-prevent={!mirror && live ? "" : undefined}
       aria-hidden={mirror || undefined}
       inert={mirror || !live || undefined}
-      className="relative overflow-hidden bg-black font-sans tracking-[-0.01em] text-label select-none"
+      // Isolated: windows and the status bar stack above the wallpaper
+      // only, never above what the device lays over its screen (the black
+      // of a sleeping display).
+      className="relative isolate overflow-hidden bg-black font-sans tracking-[-0.01em] text-label select-none"
       style={{ width: W, height: H, touchAction: live && !mirror ? "none" : undefined }}
     >
       <img

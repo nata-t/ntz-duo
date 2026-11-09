@@ -28,6 +28,7 @@ export default function Window({ win, mirror }: { win: Win; mirror: boolean }) {
   const frameEl = useRef<HTMLDivElement>(null);
   const contentEl = useRef<HTMLDivElement>(null);
   const splashEl = useRef<HTMLDivElement>(null);
+  const chromeEl = useRef<HTMLDivElement>(null);
   const frame = useRef<Frame>({ ...target, r: targetR });
   const tween = useRef<gsap.core.Tween | null>(null);
   const [menu, setMenu] = useState(false);
@@ -44,6 +45,16 @@ export default function Window({ win, mirror }: { win: Win; mirror: boolean }) {
     const t = slotRect(win.slot, os.get().split, d.w, d.h);
     const s = Math.max(f.w / t.w, f.h / t.h);
     c.style.transform = `translate(${(f.w - t.w * s) / 2}px, ${(f.h - t.h * s) / 2}px) scale(${s})`;
+  };
+
+  /** The multitasking control and the home indicator are system UI: they
+   *  wait out the launch and leave at once on close, never riding the
+   *  window's frame into or out of its icon. */
+  const showChrome = (v: boolean) => {
+    const el = chromeEl.current;
+    if (!el) return;
+    el.style.transition = v ? "opacity 0.25s ease-out" : "none";
+    el.style.opacity = v ? "1" : "0";
   };
 
   const animateTo = (to: Frame, opts: { duration?: number; ease?: (p: number) => number; onComplete?: () => void; onUpdate?: (p: number) => void } = {}) => {
@@ -87,13 +98,14 @@ export default function Window({ win, mirror }: { win: Win; mirror: boolean }) {
         onUpdate: (k) => {
           if (splash) splash.style.opacity = String(Math.max(0, 1 - Math.max(0, k - 0.12) / 0.38));
         },
+        onComplete: () => showChrome(true),
       });
     } else {
       // Opened from somewhere without an icon (search, footer): rise in.
       frame.current = { x: target.x + target.w * 0.06, y: target.y + target.h * 0.06, w: target.w * 0.88, h: target.h * 0.88, r: targetR };
       paint();
       if (frameEl.current) gsap.fromTo(frameEl.current, { opacity: 0 }, { opacity: 1, duration: 0.25 });
-      animateTo({ ...target, r: targetR });
+      animateTo({ ...target, r: targetR }, { onComplete: () => showChrome(true) });
     }
     return () => void tween.current?.kill();
     // Launch runs once per window.
@@ -101,27 +113,32 @@ export default function Window({ win, mirror }: { win: Win; mirror: boolean }) {
   }, []);
 
   // Moves between slots (Split View on iPhone Duo is a fixed half and half).
-  const placed = useRef(`${win.slot}:${split}:${W}`);
+  // A new display size (full screen in or out) takes the new frame at once:
+  // the transition there is the screen's, not the window's.
+  const placed = useRef({ slot: win.slot, split, W, H });
   useEffect(() => {
-    const key = `${win.slot}:${split}:${W}`;
-    if (win.closing || (key === placed.current && !mirror)) return;
-    placed.current = key;
+    const was = placed.current;
+    const moved = was.slot !== win.slot || was.split !== split;
+    if (win.closing || (!moved && was.W === W && was.H === H && !mirror)) return;
+    placed.current = { slot: win.slot, split, W, H };
     const to = { ...target, r: targetR };
-    if (mirror) {
+    if (mirror || !moved) {
       tween.current?.kill();
       frame.current = to;
       paint();
+      showChrome(true);
       return;
     }
     const f = frame.current;
     if (Math.abs(f.x - to.x) + Math.abs(f.w - to.w) + Math.abs(f.h - to.h) < 0.5) return;
     animateTo(to);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [win.slot, split, W, mirror, win.closing]);
+  }, [win.slot, split, W, H, mirror, win.closing]);
 
   // Close: shrink back into the icon when it is on screen, else sink away.
   useEffect(() => {
     if (!win.closing || mirror) return;
+    showChrome(false);
     const icon = document.querySelector<HTMLElement>(`[data-os-root="live"] [data-home] [data-app="${win.app}"] [data-face]`);
     const root = document.querySelector<HTMLElement>(`[data-os-root="live"]`);
     let to: Frame | null = null;
@@ -205,7 +222,7 @@ export default function Window({ win, mirror }: { win: Win; mirror: boolean }) {
       </div>
 
       {mirror ? null : (
-        <>
+        <div ref={chromeEl} className="pointer-events-none absolute inset-0 z-10 opacity-0 *:pointer-events-auto">
           <WindowControls
             open={menu && !win.closing}
             setOpen={setMenu}
@@ -217,7 +234,7 @@ export default function Window({ win, mirror }: { win: Win; mirror: boolean }) {
             onClose={() => closeWindow(win.id)}
           />
           <HomeIndicator onClose={() => closeWindow(win.id)} />
-        </>
+        </div>
       )}
     </div>
   );

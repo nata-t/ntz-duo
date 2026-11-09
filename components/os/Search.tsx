@@ -78,7 +78,7 @@ export default function Search() {
             onChange={(e) => setQ(e.target.value)}
             placeholder="Search projects, stack, apps"
             aria-label="Search"
-            className="h-full min-w-0 flex-1 bg-transparent text-[17px] outline-none placeholder:text-label-2"
+            className="h-full min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 text-[17px] tracking-[-0.02em] text-label outline-none placeholder:text-label-2 focus-visible:outline-none"
           />
           <button type="button" onClick={close} className="text-[15px] font-medium text-blue">
             Cancel

@@ -42,7 +42,12 @@ type OS = {
   portrait: boolean;
   /** A window showing dark media (a photo viewer) asks for a white status bar. */
   statusLight: string | null;
+  /** Full screen: the display has left the device and fills the window,
+   *  laid out at the window's size in points (shown at zoom z). */
+  screen: Screen | null;
 };
+
+export type Screen = { w: number; h: number; z: number };
 
 export const os = createStore<OS>({
   windows: [],
@@ -59,16 +64,32 @@ export const os = createStore<OS>({
   alert: null,
   portrait: false,
   statusLight: null,
+  screen: null,
 });
 
 export const useOS = os.use;
 
-/** The inner display in points: 951 × 669 landscape, turned for portrait. */
-export function dims(portrait = os.get().portrait) {
+/** The inner display in points: 951 × 669 landscape, turned for portrait,
+ *  or the window's own size in full screen. */
+export function dims(portrait = os.get().portrait, screen = os.get().screen) {
+  if (screen) return { w: screen.w, h: screen.h };
   return portrait ? { w: 669, h: 951 } : { w: 951, h: 669 };
 }
 export function useDims() {
-  return dims(useOS((s) => s.portrait));
+  const portrait = useOS((s) => s.portrait);
+  const screen = useOS((s) => s.screen);
+  return dims(portrait, screen);
+}
+
+/** The OS laid out across a whole window. Upright, phone widths stay at
+ *  1:1 (never narrower than 400 pt); on its side, the kit's 669 pt height
+ *  fills the window, a little larger, with the extra width to spare. */
+export function screenFor(vw: number, vh: number): Screen {
+  const z =
+    vh > vw
+      ? Math.max(Math.min(1, vw / 400), Math.min(vw / 669, vh / 951))
+      : Math.min(vw / 951, vh / 669, 1.4);
+  return { w: vw / z, h: vh / z, z };
 }
 
 let seq = 0;

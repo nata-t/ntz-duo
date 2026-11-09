@@ -1,17 +1,11 @@
 "use client";
 
 import { forwardRef, useImperativeHandle, useRef } from "react";
-import { openApp, setAppearance, useOS } from "@/lib/os";
-import { scrollToStory } from "./HeroCopy";
+import { setAppearance, useOS } from "@/lib/os";
+import { scrollToStory, visit } from "./navigate";
 import { MARKS, span } from "./story";
 
 export type NavHandle = { apply: (t: number) => void };
-
-/** Scroll into the live phone, then open an app once it's there. */
-function go(app?: string) {
-  scrollToStory(MARKS.liveIn + 0.15);
-  if (app) window.setTimeout(() => openApp(app, null), 1000);
-}
 
 // apple.com's 2026 local nav: a floating glass capsule with the product
 // name, a few links and one blue pill. It steps aside while the phone is
@@ -43,13 +37,13 @@ const Nav = forwardRef<NavHandle>(function Nav(_, ref) {
         ntz duo
       </button>
       <div className="flex items-center gap-[2px]">
-        <button type="button" className={`${link} max-phone:hidden`} onClick={() => go()}>
+        <button type="button" className={`${link} max-phone:hidden`} onClick={() => visit()}>
           Work
         </button>
-        <button type="button" className={`${link} max-phone:hidden`} onClick={() => go("about")}>
+        <button type="button" className={`${link} max-phone:hidden`} onClick={() => visit("about")}>
           About
         </button>
-        <button type="button" className={`${link} max-phone:hidden`} onClick={() => go("contact")}>
+        <button type="button" className={`${link} max-phone:hidden`} onClick={() => visit("contact")}>
           Contact
         </button>
         <button
@@ -65,7 +59,7 @@ const Nav = forwardRef<NavHandle>(function Nav(_, ref) {
         </button>
         <button
           type="button"
-          onClick={() => go()}
+          onClick={() => visit()}
           className="rounded-full bg-cta px-[12px] py-[5px] text-[12px] leading-[18px] text-white transition-colors hover:bg-cta-hover"
         >
           Unfold

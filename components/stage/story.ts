@@ -26,9 +26,10 @@ function build(portrait: boolean) {
   at(1.15, P({ yaw: 172, s: 0.6, y: 1, view: -12, pitch: 4 }, { s: 1, y: 0 }));
   at(1.55, { yaw: 196, view: -10 });
   // Edge on, open side facing the viewer.
-  at(2.2, P({ yaw: 270, s: 0.6, view: -4, pitch: 0 }, { s: 0.92 }));
+  at(2.2, P({ yaw: 270, s: 0.6, view: -4, pitch: 0 }, { s: 0.8 }));
   // Open like a book toward the viewer; the V stays symmetric.
-  at(3.15, P({ fold: 16, yaw: 352, s: 0.68, view: -3, wake: 1, shadow: 0.6 }, { s: 0.66 }));
+  // Upright, it turns to stand as it opens, so it never runs off a phone's sides.
+  at(3.15, P({ fold: 16, yaw: 352, s: 0.68, view: -3, wake: 1, shadow: 0.6 }, { s: 0.58, roll: 70 }));
   // Flatten and come close: the display takes the viewport.
   at(3.9, P({ fold: 0, yaw: 360, s: 1, y: 0, view: 0, shadow: 0 }, { roll: 90 }));
   // Live: the visitor uses the phone.

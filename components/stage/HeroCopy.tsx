@@ -2,17 +2,14 @@
 
 import { forwardRef, useImperativeHandle, useRef } from "react";
 import { profile } from "@/content/site";
-import { scrollToTarget } from "@/lib/lenis";
-import { LENGTH, MARKS, span } from "./story";
+import { visit } from "./navigate";
+import { span } from "./story";
 
 export type HeroCopyHandle = { apply: (t: number) => void };
 
-/** Scroll to a moment of the story. */
-export function scrollToStory(t: number) {
-  const track = document.querySelector<HTMLElement>("[aria-label='ntz duo']");
-  if (!track) return;
-  scrollToTarget(track.offsetTop + (t / LENGTH) * (track.offsetHeight - window.innerHeight));
-}
+/** The two captions beside the turning device; on phones, centred under it. */
+const CAPTION =
+  "pointer-events-none absolute top-1/2 z-10 max-w-[min(30vw,420px)] -translate-y-1/2 opacity-0 max-phone:top-auto max-phone:right-5 max-phone:bottom-[max(6vh,24px)] max-phone:left-5 max-phone:max-w-none max-phone:translate-y-0 max-phone:text-center";
 
 // The opening words, laid out like the iPhone Duo page: product name,
 // a two-word headline, and a price bar that here carries who he is.
@@ -67,10 +64,10 @@ const HeroCopy = forwardRef<HeroCopyHandle>(function HeroCopy(_, ref) {
 
       <div
         ref={capA}
-        className="pointer-events-none absolute top-1/2 left-[clamp(24px,8vw,140px)] z-10 max-phone:hidden max-w-[min(30vw,420px)] -translate-y-1/2 opacity-0"
+        className={`${CAPTION} left-[clamp(24px,8vw,140px)]`}
       >
-        <p className="text-[clamp(17px,1.4vw,21px)] font-semibold text-ink-2">Designed and built in Addis Ababa.</p>
-        <p className="mt-2 font-display text-[clamp(32px,3.6vw,56px)] leading-[1.07] font-semibold tracking-[-0.005em]">
+        <p className="text-[clamp(17px,1.4vw,21px)] font-semibold text-ink-2 max-phone:text-[15px]">Designed and built in Addis Ababa.</p>
+        <p className="mt-2 font-display text-[clamp(32px,3.6vw,56px)] leading-[1.07] font-semibold tracking-[-0.005em] max-phone:mt-1 max-phone:text-[28px]">
           One engineer.
           <br />
           Two screens of work.
@@ -79,27 +76,31 @@ const HeroCopy = forwardRef<HeroCopyHandle>(function HeroCopy(_, ref) {
 
       <div
         ref={capB}
-        className="pointer-events-none absolute top-1/2 right-[clamp(24px,8vw,140px)] z-10 max-phone:hidden max-w-[min(30vw,420px)] -translate-y-1/2 text-right opacity-0"
+        className={`${CAPTION} right-[clamp(24px,8vw,140px)] text-right`}
       >
-        <p className="font-display text-[clamp(32px,3.6vw,56px)] leading-[1.07] font-semibold tracking-[-0.005em]">Unfold it.</p>
-        <p className="mt-3 text-[clamp(17px,1.4vw,21px)] leading-[1.38] font-semibold text-ink-2">
+        <p className="font-display text-[clamp(32px,3.6vw,56px)] leading-[1.07] font-semibold tracking-[-0.005em] max-phone:text-[28px]">Unfold it.</p>
+        <p className="mt-3 text-[clamp(17px,1.4vw,21px)] leading-[1.38] font-semibold text-ink-2 max-phone:mt-1 max-phone:text-[15px]">
           Six projects, a life story and a way to say hello. All inside, all yours to open.
         </p>
       </div>
 
       <div
         ref={bar}
-        className="absolute bottom-[clamp(20px,5vh,56px)] left-1/2 z-20 flex w-[min(640px,calc(100vw-32px))] items-center justify-between gap-4 rounded-full bg-[color-mix(in_srgb,var(--page-alt)_82%,transparent)] py-3 pr-3 pl-7 backdrop-blur-xl backdrop-saturate-150 transform-[translate3d(-50%,0,0)]"
+        className="absolute bottom-[max(clamp(20px,5vh,56px),env(safe-area-inset-bottom))] left-1/2 z-20 flex w-[min(640px,calc(100vw-32px))] items-center justify-between gap-4 rounded-full bg-[color-mix(in_srgb,var(--page-alt)_82%,transparent)] py-3 pr-3 pl-7 backdrop-blur-xl backdrop-saturate-150 transform-[translate3d(-50%,0,0)] max-phone:pl-5"
       >
         <div className="min-w-0 animate-intro text-[14px] leading-[1.43] tracking-[-0.016em] text-ink [animation-delay:1.1s] motion-reduce:animate-none">
           <p className="truncate">
-            {profile.name}, {profile.title.toLowerCase()} in Addis Ababa.
+            {profile.name}
+            <span className="max-phone:hidden">, {profile.title.toLowerCase()} in Addis Ababa.</span>
           </p>
-          <p className="truncate text-ink-2">{profile.availability}.</p>
+          <p className="truncate text-ink-2">
+            <span className="max-phone:hidden">{profile.availability}.</span>
+            <span className="hidden max-phone:inline">{profile.title}, Addis Ababa</span>
+          </p>
         </div>
         <button
           type="button"
-          onClick={() => scrollToStory(MARKS.liveIn + 0.15)}
+          onClick={() => visit()}
           className="shrink-0 rounded-full bg-cta px-[22px] py-[11px] text-[17px] leading-none font-normal tracking-[-0.022em] text-white transition-colors hover:bg-cta-hover"
         >
           Unfold

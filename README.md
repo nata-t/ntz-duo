@@ -57,18 +57,27 @@ scripts/shoot.mjs    headless screenshots at any moment of the story
 - **The story** (`components/stage/story.ts`) lists poses on a clock (one unit
   is one viewport of scrolling). Every pose property follows a monotone cubic
   between keys, so motion carries through without stalls or overshoot.
-- **One OS, three copies.** The phone's state is one store (`lib/os.ts`). The
-  live display renders it when the device lies flat; while it folds, each half
-  renders the same state as a static mirror, so an open app stays open as the
-  phone closes around it.
+- **One OS, rendered once.** The phone's state is one store (`lib/os.ts`) and
+  the live display renders it into a single node that moves between the device
+  and full screen without remounting (`components/stage/Mount.tsx`). While the
+  device folds, each half shows a still copy of that DOM taken as it leaves
+  flat (`lib/mirror.ts`), scroll offsets and all, so the phone closes around
+  exactly what was on screen.
+- **Full screen.** While the phone is live, *Full screen* (or `F`) lifts the
+  display out of the device and lays the OS out at the window's own size
+  (`lib/full.ts`); `F`, `Esc` at the Home Screen, the corner button or Back
+  returns it. On touch screens a tap on the device's display opens it full
+  screen and presses whatever was under the finger.
 - **Sizing.** The device is built at the zoom `k` that makes it fill the
   viewport, and its displays use CSS `zoom`, so the interactive state is never
   an upscaled raster. On phones the open device turns upright and iOS lays out
   in portrait.
 - **Scroll.** Lenis on GSAP's ticker. While the phone is live, wheel input over
-  it goes to the phone (app scroll views first, else Home Screen paging); the
-  margin around it scrolls the page. The last frame equals the first, so the
-  jump back to the top is invisible.
+  the whole device goes to the phone (app scroll views first, else Home Screen
+  paging); scroll views never hand overscroll to the page, and a gesture that
+  starts on the phone stays the phone's as it drifts off. Only the margin
+  scrolls the page. The last frame equals the first, so the jump back to the
+  top is invisible.
 
 ## Screenshots
 

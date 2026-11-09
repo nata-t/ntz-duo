@@ -338,6 +338,24 @@
   .lenis.lenis-stopped {
     overflow: clip;
   }
+
+  /* The phone keeps its scrolling: an app's scroll view that reaches its
+     end stops at the display's edge instead of handing the rest to the
+     page, which would fold the device out from under the visitor. Only the
+     root: on the clipped boxes inside (images, cards) it would stop the
+     wheel before it ever reached the scroll view around them. */
+  [data-os-root] {
+    overscroll-behavior: contain;
+  }
+
+  /* Copies of the live display (lib/mirror.ts) show it as it stood: no
+     entrance or transition replays in them. */
+  [data-os-root="mirror"] *,
+  [data-os-root="mirror"] *::before,
+  [data-os-root="mirror"] *::after {
+    animation: none !important;
+    transition: none !important;
+  }
 }
 
 @keyframes duo-pop {

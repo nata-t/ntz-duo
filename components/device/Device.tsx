@@ -32,6 +32,8 @@ type Register = (el: HTMLElement | null, phi: number, half: "L" | "R", soft?: bo
 // optics and the static layers.
 const FINISH: Record<Finish, string> = { star: "finish-star", night: "finish-night" };
 const FACE = "absolute inset-0 overflow-hidden backface-hidden";
+/** How far each half's screen runs past the hinge under the other's. */
+const SEAM = 2;
 const STRIP = "absolute top-0 left-0 bg-[#9a968f] backface-hidden";
 /** Cover glass: a broad reflection that slides as the glass turns. */
 const GLARE =
@@ -57,7 +59,6 @@ const Device = forwardRef<DeviceHandle, Props>(function Device({ k, inner, live,
   const glare = useRef<HTMLDivElement[]>([]);
   const sheen = useRef<HTMLDivElement | null>(null);
   const wakeRef = useRef<HTMLDivElement[]>([]);
-  const crease = useRef<HTMLDivElement>(null);
   const facets = useRef<Map<HTMLElement, Facet>>(new Map());
   const last = useRef({ live: false, pull: 0 });
   const lastPose = useRef<Pose | null>(null);
@@ -121,7 +122,6 @@ const Device = forwardRef<DeviceHandle, Props>(function Device({ k, inner, live,
         last.current.pull = pull;
         halves.current.forEach((el) => (el.style.filter = pull ? `blur(${pull.toFixed(1)}px) saturate(${(1 + (1 - p.wake) * 0.4).toFixed(2)})` : ""));
       }
-      if (crease.current) crease.current.style.opacity = String(Math.min(1, p.fold / 25));
 
       // Hand the screen over between the mirrored halves and the live
       // display once the device lies flat.
@@ -166,15 +166,17 @@ const Device = forwardRef<DeviceHandle, Props>(function Device({ k, inner, live,
         <Wall segs={walls} k={k} z0={0} depth={T} side={side} register={register} />
         {isL ? null : <Buttons k={k} register={register} />}
 
-        {/* Front: the display running to the hinge, under the kit's bezel. */}
-        <div className={`${FACE} bg-transparent`} style={{ borderRadius: radius }}>
-          <div className="absolute isolate overflow-hidden bg-black" style={{ top: u(inset), bottom: u(inset), [far]: u(inset), [isL ? "right" : "left"]: 0 }}>
+        {/* Front: the display running to the hinge, under the kit's bezel.
+            Unclipped, so each half's screen can run a hair past the hinge
+            under the other's and no seam of page shows between them. */}
+        <div className="absolute inset-0 bg-transparent backface-hidden" style={{ borderRadius: radius }}>
+          <div className="absolute isolate overflow-hidden bg-black" style={{ top: u(inset), bottom: u(inset), [far]: u(inset), [isL ? "right" : "left"]: u(-SEAM) }}>
             <div
               ref={(el) => {
                 if (el) halves.current[isL ? 0 : 1] = el;
               }}
               className="pointer-events-none absolute top-0"
-              style={{ width: u(INNER.w), height: u(INNER.h), left: isL ? 0 : u(-INNER.w / 2) }}
+              style={{ width: u(INNER.w), height: u(INNER.h), left: isL ? 0 : u(SEAM - INNER.w / 2) }}
             >
               <div style={{ width: INNER.w, height: INNER.h, zoom: k }}>
                 <Upright portrait={portrait}>{inner(side)}</Upright>
@@ -186,8 +188,6 @@ const Device = forwardRef<DeviceHandle, Props>(function Device({ k, inner, live,
               }}
               className="pointer-events-none absolute inset-0 bg-black"
             />
-            {/* The fold reads as a soft crease once the halves leave the flat. */}
-            {isL ? null : <div ref={crease} className="pointer-events-none absolute inset-y-0 -left-[18px] w-[36px] bg-[linear-gradient(90deg,rgba(0,0,0,0)_0%,rgba(0,0,0,0.16)_38%,rgba(255,255,255,0.1)_52%,rgba(0,0,0,0.12)_62%,rgba(0,0,0,0)_100%)] opacity-0" />}
             <div
               ref={(el) => {
                 if (el) glare.current[isL ? 0 : 1] = el;
