@@ -1,4 +1,5 @@
 import { createStore } from "@/lib/store";
+import { refitGlass } from "@/lib/glass";
 
 // The phone's state. Every copy of the inner display (the live one and the
 // two mirrored halves shown while the device folds) renders from this, so
@@ -45,6 +46,8 @@ type OS = {
   /** Full screen: the display has left the device and fills the window,
    *  laid out at the window's size in points (shown at zoom z). */
   screen: Screen | null;
+  /** iOS 27's Liquid Glass slider: 0 clear … 1 tinted, 0.5 by default. */
+  glass: number;
 };
 
 export type Screen = { w: number; h: number; z: number };
@@ -65,6 +68,7 @@ export const os = createStore<OS>({
   portrait: false,
   statusLight: null,
   screen: null,
+  glass: 0.5,
 });
 
 export const useOS = os.use;
@@ -177,6 +181,23 @@ export function setAppearance(appearance: Appearance) {
     localStorage.setItem("duo:appearance", appearance);
   } catch {}
   syncAppearance();
+}
+
+/** Settings › Appearance › Liquid Glass: from clear to tinted. */
+export function setGlass(glass: number) {
+  os.set({ glass });
+  try {
+    localStorage.setItem("duo:glass", String(Math.round(glass * 100) / 100));
+  } catch {}
+  applyGlass();
+}
+
+/** Mirror the Liquid Glass setting onto <html> (CSS reads --frost) and
+ *  rebuild the refraction filters, whose blur depends on it. */
+export function applyGlass() {
+  if (typeof window === "undefined") return;
+  document.documentElement.style.setProperty("--frost", String(os.get().glass));
+  refitGlass();
 }
 
 /** Resolve "auto" against the system and mirror the result onto <html>. */

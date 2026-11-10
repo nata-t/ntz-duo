@@ -47,6 +47,7 @@ components/
 lib/                 gsap, lenis, env, store, os (phone state), spring
 docs/                research (web, Figma spec, content), app brief
 scripts/shoot.mjs    headless screenshots at any moment of the story
+scripts/phone.mjs    headless screenshots of the live phone, full screen
 ```
 
 ## How it works
@@ -73,6 +74,14 @@ scripts/shoot.mjs    headless screenshots at any moment of the story
   viewport, and its displays use CSS `zoom`, so the interactive state is never
   an upscaled raster. On phones the open device turns upright and iOS lays out
   in portrait.
+- **Liquid Glass.** Every `.glass`, `.glass-clear` and `.glass-lens` element
+  refracts what's behind it (`lib/glass.ts`, after kube.io's method): a
+  displacement map worked out with Snell's law over a squircle bezel, a
+  specular rim and a faint prism fringe, run as an SVG `backdrop-filter`.
+  Maps are cached per shape and refit as elements resize. Only Chromium takes
+  SVG filters as backdrop filters; Safari and Firefox keep the frosted CSS
+  version. Settings › Appearance › Liquid Glass (iOS 27's slider) tunes it
+  from clear to tinted. Research and rules: `docs/research/LIQUID-GLASS.md`.
 - **Scroll.** Lenis on GSAP's ticker. While the phone is live, wheel input over
   the whole device goes to the phone (app scroll views first, else Home Screen
   paging); scroll views never hand overscroll to the page, and a gesture that

@@ -1,6 +1,6 @@
 "use client";
 
-import { useState, useSyncExternalStore, type ReactNode } from "react";
+import { useRef, useState, useSyncExternalStore, type ReactNode } from "react";
 import type { Slot } from "@/lib/os";
 
 // Shared iOS 27 pieces for Settings, Notes, Résumé and the project pages:
@@ -26,7 +26,9 @@ export function Rail({ slot, children, bottom }: { slot: Slot; children: ReactNo
   const left = slot === "left";
   return (
     <div
-      className="absolute top-0 bottom-0 z-20 flex flex-col"
+      // The strip itself lets clicks through to content running under it;
+      // only its buttons take them.
+      className="pointer-events-none absolute top-0 bottom-0 z-20 flex flex-col *:pointer-events-auto"
       style={{
         width: RAIL,
         [left ? "left" : "right"]: 0,
@@ -49,14 +51,28 @@ type RailButtonProps = {
   href?: string;
   download?: string | boolean;
   external?: boolean;
+  /** Glyph colour on plain glass. */
   tint?: string;
+  /** Prominent glass: the one primary action, filled with this colour. */
+  prominent?: string | true;
   active?: boolean;
+  /** Inside a RailGroup: no glass of its own. */
+  bare?: boolean;
 };
 
-export function RailButton({ label, children, onClick, href, download, external, tint, active }: RailButtonProps) {
-  const cls =
-    "glass grid size-[48px] shrink-0 place-items-center rounded-full text-label transition-[transform,filter] duration-200 ease-out hover:brightness-[1.04] active:scale-[0.92]";
-  const style = { color: tint, background: active ? "var(--fill)" : undefined };
+/** A Liquid Glass control on the rail: a 48 pt circle. Pressed, it swells
+ *  a little and glows from within, as iOS 26 glass does under a finger. */
+export function RailButton({ label, children, onClick, href, download, external, tint, prominent, active, bare }: RailButtonProps) {
+  const cls = bare
+    ? "grid size-[44px] shrink-0 place-items-center rounded-full text-label transition-[background-color,scale] duration-300 ease-ios hover:bg-fill-3 active:scale-110 active:bg-fill-2"
+    : `grid size-[48px] shrink-0 place-items-center rounded-full transition-[scale,filter] duration-300 ease-ios active:scale-110 ${
+        prominent ? "glass glass-tint hover:brightness-110" : "glass text-label hover:brightness-[1.03]"
+      }`;
+  const style = {
+    color: prominent ? undefined : tint,
+    background: active ? "var(--fill)" : undefined,
+    "--tint": prominent && prominent !== true ? prominent : undefined,
+  } as React.CSSProperties;
   if (href)
     return (
       <a
@@ -77,6 +93,12 @@ export function RailButton({ label, children, onClick, href, download, external,
       {children}
     </button>
   );
+}
+
+/** Related rail actions share one vertical capsule of glass, their
+ *  buttons bare inside it (Apple groups toolbar items this way). */
+export function RailGroup({ children }: { children: ReactNode }) {
+  return <div className="glass flex w-[48px] flex-col items-center gap-[2px] rounded-full py-[2px]">{children}</div>;
 }
 
 /** SF Symbol stand-ins, drawn on a 24 pt grid with round caps. */
@@ -153,7 +175,9 @@ export const Glyph = {
   ),
 };
 
-/** The iOS 26/27 switch: a wider track and a capsule knob. */
+/** The iOS 26/27 switch: a wider track and a capsule knob. Held, the
+ *  knob swells into a clear glass lens the track shows through; it can be
+ *  dragged across and settles back to solid white when let go. */
 export function Toggle({
   on,
   onChange,
@@ -165,6 +189,19 @@ export function Toggle({
   label: string;
   disabled?: boolean;
 }) {
+  const [held, setHeld] = useState(false);
+  const [drag, setDrag] = useState<boolean | null>(null);
+  const start = useRef<{ x: number; moved: boolean } | null>(null);
+  const shown = drag ?? on;
+  const end = (commit: boolean) => {
+    const s = start.current;
+    start.current = null;
+    setHeld(false);
+    setDrag(null);
+    if (!commit || !s || disabled) return;
+    const next = s.moved && drag !== null ? drag : !on;
+    if (next !== on) onChange?.(next);
+  };
   return (
     <button
       type="button"
@@ -174,14 +211,98 @@ export function Toggle({
       aria-disabled={disabled || undefined}
       onClick={(e) => {
         e.stopPropagation();
-        if (!disabled) onChange?.(!on);
+        // Pointer presses commit on release; this is the keyboard's path.
+        if (e.detail === 0 && !disabled) onChange?.(!on);
       }}
-      className={`relative h-[28px] w-[64px] shrink-0 rounded-full transition-colors duration-300 ${on ? "bg-green" : "bg-fill"} ${disabled ? "cursor-default" : ""}`}
+      onPointerDown={(e) => {
+        if (disabled) return;
+        e.stopPropagation();
+        e.currentTarget.setPointerCapture(e.pointerId);
+        start.current = { x: e.clientX, moved: false };
+        setHeld(true);
+      }}
+      onPointerMove={(e) => {
+        const s = start.current;
+        if (!s) return;
+        const r = e.currentTarget.getBoundingClientRect();
+        if (Math.abs(e.clientX - s.x) > 4) s.moved = true;
+        if (s.moved) setDrag(e.clientX > r.left + r.width / 2);
+      }}
+      onPointerUp={() => end(true)}
+      onPointerCancel={() => end(false)}
+      className={`relative h-[28px] w-[64px] shrink-0 touch-none rounded-full transition-colors duration-300 ${shown ? "bg-green" : "bg-fill"} ${disabled ? "cursor-default" : ""}`}
     >
       <span
-        className={`absolute top-[2px] left-[2px] h-[24px] w-[38px] rounded-full bg-white shadow-[0_2px_6px_rgba(0,0,0,0.16),0_0_0_0.5px_rgba(0,0,0,0.04)] transition-transform duration-300 ease-ios ${on ? "translate-x-[22px]" : ""}`}
+        className={`absolute top-[2px] left-[2px] h-[24px] w-[38px] rounded-full transition-[translate,scale,background-color,box-shadow] duration-300 ease-ios ${
+          held ? "glass-lens scale-x-[1.42] scale-y-[1.5]" : "bg-white shadow-[0_2px_6px_rgba(0,0,0,0.16),0_0_0_0.5px_rgba(0,0,0,0.04)]"
+        } ${shown ? "translate-x-[22px]" : ""}`}
       />
     </button>
+  );
+}
+
+/** The iOS 26 slider: a slim track filled to the value, a capsule thumb
+ *  that turns to a glass lens while it's dragged. Horizontal. */
+export function Slider({
+  value,
+  min = 0,
+  onChange,
+  label,
+  disabled,
+  tint = "var(--blue)",
+}: {
+  value: number;
+  min?: number;
+  onChange: (v: number) => void;
+  label: string;
+  disabled?: boolean;
+  tint?: string;
+}) {
+  const track = useRef<HTMLDivElement>(null);
+  const [held, setHeld] = useState(false);
+  const k = (value - min) / (1 - min);
+  const at = (x: number) => {
+    const r = track.current?.getBoundingClientRect();
+    if (!r) return;
+    const f = Math.min(1, Math.max(0, (x - r.left) / r.width));
+    onChange(min + f * (1 - min));
+  };
+  return (
+    <div
+      ref={track}
+      role="slider"
+      tabIndex={disabled ? -1 : 0}
+      aria-label={label}
+      aria-valuemin={Math.round(min * 100)}
+      aria-valuemax={100}
+      aria-valuenow={Math.round(value * 100)}
+      className="relative h-[28px] flex-1 cursor-pointer touch-none"
+      onPointerDown={(e) => {
+        if (disabled) return;
+        e.currentTarget.setPointerCapture(e.pointerId);
+        setHeld(true);
+        at(e.clientX);
+      }}
+      onPointerMove={(e) => e.currentTarget.hasPointerCapture(e.pointerId) && at(e.clientX)}
+      onPointerUp={() => setHeld(false)}
+      onPointerCancel={() => setHeld(false)}
+      onKeyDown={(e) => {
+        const d = e.key === "ArrowRight" || e.key === "ArrowUp" ? 0.05 : e.key === "ArrowLeft" || e.key === "ArrowDown" ? -0.05 : 0;
+        if (!d) return;
+        e.preventDefault();
+        onChange(Math.min(1, Math.max(min, value + d)));
+      }}
+    >
+      <span className="absolute inset-x-0 top-1/2 h-[6px] -translate-y-1/2 overflow-hidden rounded-full bg-fill">
+        <span className="block h-full" style={{ width: `${k * 100}%`, background: tint }} />
+      </span>
+      <span
+        className={`absolute top-1/2 h-[24px] w-[38px] -translate-x-1/2 -translate-y-1/2 rounded-full transition-[scale,background-color,box-shadow] duration-300 ease-ios ${
+          held ? "glass-lens scale-x-[1.45] scale-y-[1.55]" : "bg-white shadow-[0_2px_7px_rgba(0,0,0,0.18),0_0_0_0.5px_rgba(0,0,0,0.06)]"
+        }`}
+        style={{ left: `calc(19px + ${k} * (100% - 38px))` }}
+      />
+    </div>
   );
 }
 

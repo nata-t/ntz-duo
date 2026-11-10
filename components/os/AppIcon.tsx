@@ -24,9 +24,10 @@ export function IconFace({ id, size }: { id: string; size: number }) {
       style={{ width: size, height: size, borderRadius: iconRadius(size) }}
     >
       {Face ? <Face /> : <span className="block h-full w-full bg-gray" />}
-      {/* iOS 27's glass edge: a lit rim, a soft top sheen. */}
+      {/* iOS 27's glass edge: flatter than 26's, light caught only along
+          the top edge and, fainter, the bottom one. */}
       <span
-        className="pointer-events-none absolute inset-0 bg-[linear-gradient(180deg,rgba(255,255,255,0.16)_0%,rgba(255,255,255,0)_46%)] shadow-[inset_0_0_0_0.5px_rgba(255,255,255,0.32),inset_0_1px_1.2px_rgba(255,255,255,0.45),inset_0_-1px_1.5px_rgba(0,0,0,0.08)]"
+        className="pointer-events-none absolute inset-0 shadow-[inset_0_1.2px_0.8px_-0.4px_rgba(255,255,255,0.62),inset_0_-1px_0.8px_-0.4px_rgba(255,255,255,0.3),inset_0_0_0_0.5px_rgba(255,255,255,0.18)]"
         style={{ borderRadius: iconRadius(size) }}
       />
     </span>

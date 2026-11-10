@@ -19,8 +19,8 @@ function Toggle({ on, onClick, label, children, tint = "var(--blue)" }: { on: bo
       aria-label={label}
       aria-pressed={on}
       onClick={onClick}
-      className="grid size-[52px] place-items-center rounded-full transition-[background-color,transform] duration-200 text-white active:scale-90"
-      style={{ background: on ? tint : "rgba(255,255,255,0.14)" }}
+      className={`grid size-[52px] place-items-center rounded-full text-white transition-[background-color,scale] duration-300 ease-ios active:scale-110 ${on ? "glass-tint" : "glass-clear"}`}
+      style={{ "--tint": tint } as React.CSSProperties}
     >
       <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
         {children}
@@ -54,10 +54,10 @@ function Slider({ value, onChange, label, icon }: { value: number; onChange: (v:
         set(e.clientY);
       }}
       onPointerMove={(e) => e.buttons && set(e.clientY)}
-      className="relative cursor-ns-resize overflow-hidden rounded-[34px] bg-white/14 touch-none"
+      className="glass-clear relative cursor-ns-resize touch-none overflow-hidden rounded-[31px] transition-[scale] duration-300 ease-ios active:scale-x-[1.06]"
       style={{ width: CELL, height: span(2) }}
     >
-      <div className="absolute inset-x-0 bottom-0 bg-white transition-[height] duration-75" style={{ height: `${value * 100}%` }} />
+      <div className="absolute inset-x-0 bottom-0 bg-white/95 transition-[height] duration-75" style={{ height: `${value * 100}%` }} />
       <div className="absolute inset-x-0 bottom-[18px] grid place-items-center text-[#8e8e93]">
         <svg width="26" height="26" viewBox="0 0 24 24" aria-hidden="true">
           {icon}
@@ -84,14 +84,14 @@ export default function ControlCenter() {
     <div className="absolute inset-0 z-[44] text-white" onClick={close}>
       {/* Only the layers animate, never their parent: an ancestor fading
           in would cut the blur off from what's behind it. */}
-      <div className="absolute inset-0 animate-[duo-fade_0.3s_ease-out_backwards] bg-black/35 backdrop-blur-[30px] backdrop-saturate-150" />
+      <div className="absolute inset-0 animate-[duo-fade_0.3s_ease-out_backwards] bg-black/30 backdrop-blur-[24px] backdrop-saturate-[1.4] backdrop-brightness-[0.85]" />
       <div
         className={`absolute grid animate-[duo-cc_0.46s_var(--ease-ios)_backwards] ${portrait ? "top-[70px] left-1/2 -translate-x-1/2" : "top-[24px] right-[108px]"}`}
         style={{ gap: GAP, gridTemplateColumns: `repeat(4, ${CELL}px)`, gridAutoRows: `${CELL}px` }}
         onClick={(e) => e.stopPropagation()}
       >
         {/* Connectivity, 2 × 2 */}
-        <div className="col-span-2 row-span-2 grid grid-cols-2 place-items-center rounded-[32px] bg-white/12 p-[8px]">
+        <div className="glass-clear col-span-2 row-span-2 grid grid-cols-2 place-items-center rounded-[34px] p-[8px]">
           <Toggle on={air} onClick={() => setAir(!air)} label="Airplane Mode" tint="#ff9500">
             <path d="M21 16v-2l-8-5V3.5a1.5 1.5 0 0 0-3 0V9l-8 5v2l8-2.5V19l-2 1.5V22l3.5-1 3.5 1v-1.5L13 19v-5.5z" fill="currentColor" />
           </Toggle>
@@ -107,7 +107,7 @@ export default function ControlCenter() {
         </div>
 
         {/* Now Playing, 2 × 2 */}
-        <div className="col-span-2 row-span-2 flex flex-col justify-between rounded-[32px] bg-white/12 p-[16px]">
+        <div className="glass-clear col-span-2 row-span-2 flex flex-col justify-between rounded-[34px] p-[16px]">
           <div className="flex items-center gap-[10px]">
             <span className="size-[44px] rounded-[10px] bg-[linear-gradient(135deg,#ff8a00,#e52e71)]" />
             <span className="min-w-0 text-[13px] leading-[1.25]">
@@ -154,9 +154,9 @@ export default function ControlCenter() {
           type="button"
           aria-pressed={dark}
           onClick={() => setAppearance(dark ? "light" : "dark")}
-          className="col-span-2 flex items-center gap-[10px] rounded-full bg-white/12 px-[5px] text-left row-3 transition-colors hover:bg-white/18"
+          className="glass-clear col-span-2 row-3 flex items-center gap-[10px] rounded-full px-[5px] text-left"
         >
-          <span className={`grid size-[52px] shrink-0 place-items-center rounded-full ${dark ? "bg-white text-black" : "bg-[rgba(255,255,255,0.16)] text-white"}`}>
+          <span className={`grid size-[52px] shrink-0 place-items-center rounded-full transition-colors duration-300 ${dark ? "bg-white text-black" : "bg-white/12 text-white"}`}>
             <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
               <circle cx="12" cy="12" r="8.5" fill="none" stroke="currentColor" strokeWidth="2" />
               <path d="M12 3.5a8.5 8.5 0 0 1 0 17z" fill="currentColor" />
@@ -173,9 +173,9 @@ export default function ControlCenter() {
           type="button"
           aria-pressed={focus}
           onClick={() => setFocus(!focus)}
-          className="col-span-2 flex items-center gap-[10px] rounded-full bg-white/12 px-[5px] text-left row-3 transition-colors hover:bg-white/18"
+          className="glass-clear col-span-2 row-3 flex items-center gap-[10px] rounded-full px-[5px] text-left"
         >
-          <span className={`grid size-[52px] shrink-0 place-items-center rounded-full ${focus ? "bg-[#5e5ce6]" : "bg-[rgba(255,255,255,0.16)]"}`}>
+          <span className={`grid size-[52px] shrink-0 place-items-center rounded-full transition-colors duration-300 ${focus ? "bg-[#5e5ce6]" : "bg-white/12"}`}>
             <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
               <path d="M20 14.5A8.5 8.5 0 0 1 9.5 4a8.5 8.5 0 1 0 10.5 10.5" fill="currentColor" />
             </svg>
@@ -199,11 +199,10 @@ export default function ControlCenter() {
               aria-label={c.label}
               aria-pressed={c.on}
               onClick={c.set}
-              className="grid size-[62px] place-items-center rounded-full transition-[background-color,transform] active:scale-90"
-              style={{ background: c.on ? (c.tint ?? "#fff") : "rgba(255,255,255,0.12)" }}
+              className={`grid size-[62px] place-items-center rounded-full transition-[background-color,scale] duration-300 ease-ios active:scale-110 ${c.on ? "bg-white" : "glass-clear"}`}
             >
               <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true">
-                <path d={c.d} fill="none" stroke="#fff" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
+                <path d={c.d} fill="none" stroke={c.on ? (c.tint ?? "#000") : "#fff"} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" />
               </svg>
             </button>
           </div>

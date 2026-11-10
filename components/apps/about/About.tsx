@@ -1,7 +1,7 @@
 "use client";
 
 import { useRef, type ReactNode } from "react";
-import { experience, profile, projects, skills } from "@/content/site";
+import { contact as reach, experience, profile, projects, skills, socials } from "@/content/site";
 import { openApp } from "@/lib/os";
 import type { AppProps } from "../types";
 import {
@@ -15,8 +15,10 @@ import {
   More,
   Pill,
   Section,
+  SWELL,
   Tile,
   heroType,
+  lift,
   reducedMotion,
   reveal,
   usePage,
@@ -153,10 +155,7 @@ function Hero({ height }: { height: number }) {
 /** apple.com's glass price platter, carrying the one-line pitch. */
 function Platter({ compact }: { compact?: boolean }) {
   return (
-    <div
-      {...reveal(3)}
-      className="flex items-center justify-between gap-[12px] rounded-full bg-[rgba(232,232,237,0.72)] py-[8px] pr-[8px] pl-[20px] backdrop-blur-[20px] backdrop-saturate-[1.8] dark:bg-[rgba(51,51,54,0.72)]"
-    >
+    <div {...reveal(3)} className="glass flex items-center justify-between gap-[12px] rounded-full py-[8px] pr-[8px] pl-[20px]">
       <p className={`min-w-0 leading-[1.3] ${compact ? "text-[12px]" : "text-[13px]"}`}>
         <span className="block truncate font-semibold">
           {profile.title} · {profile.location.split(",")[0]}
@@ -473,13 +472,95 @@ function Closing() {
       <Lockup i={1} className="mx-auto mt-[18px] max-w-[440px]">
         <strong>{profile.availability}.</strong> Based in {profile.location}.
       </Lockup>
-      <div {...reveal(2)} className={`mt-[26px] flex justify-center gap-[30px] ${compact ? "text-[15px]" : "text-[17px]"}`}>
-        <More href={profile.cv.href} external>
-          Download CV
-        </More>
-        <More onClick={contact}>Get in touch</More>
-      </div>
+      <ContactCard />
     </Section>
+  );
+}
+
+/* ---------- Contact card ---------- */
+
+const linkedin = socials.find((s) => s.label === "LinkedIn")!;
+const telegram = socials.find((s) => s.label === "Telegram")!;
+
+/** iOS 26's Contacts card: a contact poster (the cut-out in front of his
+ *  name), and under it four equal glass tiles for the ways to reach him. */
+function ContactCard() {
+  const { compact } = usePage();
+  const actions: { label: string; title: string; href: string; external?: boolean; icon: ReactNode }[] = [
+    { label: "message", title: `Message on Telegram (${telegram.handle})`, href: telegram.href, external: true, icon: <Bubble /> },
+    { label: "mail", title: `Email ${reach.email.label}`, href: reach.email.href, icon: <Envelope size={21} /> },
+    { label: "connect", title: `LinkedIn (${linkedin.handle})`, href: linkedin.href, external: true, icon: <LinkedIn /> },
+    { label: "résumé", title: profile.cv.label, href: profile.cv.href, external: true, icon: <DocDown size={21} /> },
+  ];
+  return (
+    <div {...lift(2)} className={`mx-auto mt-[34px] text-left ${compact ? "max-w-[360px]" : "max-w-[400px]"}`}>
+      <div
+        className={`relative isolate overflow-hidden rounded-[34px] bg-[linear-gradient(170deg,#9fb6d8_0%,#6f86b4_48%,#3a4a72_100%)] dark:bg-[linear-gradient(170deg,#3b4c6e_0%,#253352_50%,#121a2c_100%)] ${
+          compact ? "h-[420px]" : "h-[460px]"
+        }`}
+      >
+        {/* The poster's name sits behind the subject, as iOS sets it. */}
+        <p
+          aria-hidden="true"
+          className={`absolute inset-x-0 text-center font-display leading-[0.92] font-bold tracking-[-0.03em] text-white/95 ${
+            compact ? "top-[30px] text-[52px]" : "top-[32px] text-[58px]"
+          }`}
+        >
+          {profile.name.split(" ")[0]}
+          <br />
+          <span className="text-white/80">{profile.name.split(" ").slice(1).join(" ")}</span>
+        </p>
+        {/* eslint-disable-next-line @next/next/no-img-element -- the same cut-out as the hero */}
+        <img
+          src={profile.portrait.source}
+          alt=""
+          draggable={false}
+          className="absolute bottom-0 left-1/2 h-[77%] w-auto max-w-none -translate-x-1/2 mask-[linear-gradient(90deg,transparent_2%,#000_22%,#000_78%,transparent_98%)] select-none"
+        />
+        {/* Media under clear glass gets a dim, so white glyphs hold up. */}
+        <div aria-hidden="true" className="absolute inset-x-0 bottom-0 h-[46%] bg-[linear-gradient(to_top,rgba(0,0,0,0.5),rgba(0,0,0,0.18)_55%,transparent)]" />
+
+        <div className="absolute inset-x-[16px] bottom-[16px]">
+          <p className="text-center text-[13px] font-medium text-white/85 [text-shadow:0_1px_8px_rgba(0,0,0,0.35)]">
+            {profile.title} · {profile.location.split(",")[0]}
+          </p>
+          <div className="mt-[12px] grid grid-cols-4 gap-[8px]">
+            {actions.map((a) => (
+              <a
+                key={a.label}
+                href={a.href}
+                target={a.external ? "_blank" : undefined}
+                rel={a.external ? "noopener noreferrer" : undefined}
+                title={a.title}
+                aria-label={a.title}
+                className={`glass-clear flex h-[60px] flex-col items-center justify-center gap-[4px] rounded-[20px] text-white ${SWELL}`}
+              >
+                <span className="grid h-[22px] place-items-center">{a.icon}</span>
+                <span className="text-[11.5px] leading-none font-medium tracking-[0.005em]">{a.label}</span>
+              </a>
+            ))}
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+}
+
+function Bubble() {
+  return (
+    <svg width="21" height="21" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+      <path d="M12 3.5c-5 0-9 3.4-9 7.7 0 2.4 1.3 4.6 3.4 6-.2 1.2-.8 2.4-1.8 3.3 1.9 0 3.6-.7 4.8-1.8.8.2 1.7.3 2.6.3 5 0 9-3.4 9-7.8s-4-7.7-9-7.7" />
+    </svg>
+  );
+}
+
+function LinkedIn() {
+  return (
+    <svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true" fill="currentColor">
+      <circle cx="5.6" cy="5.4" r="2" />
+      <rect x="3.9" y="8.6" width="3.4" height="11.4" rx="0.4" />
+      <path d="M10 8.6h3.2v1.6c.5-.9 1.7-1.9 3.5-1.9 3.4 0 4 2.2 4 5.1V20h-3.4v-5.8c0-1.4 0-3.1-1.9-3.1s-2.1 1.5-2.1 3V20H10z" />
+    </svg>
   );
 }
 

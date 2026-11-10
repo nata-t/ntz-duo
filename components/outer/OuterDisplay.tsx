@@ -50,11 +50,7 @@ function LockScreen() {
 
       <div className="absolute top-[64px] left-[30px] right-[90px]">
         <p className="text-[20px] leading-[1.2] font-semibold tracking-[-0.01em] opacity-90">{date}</p>
-        <p
-          className="font-display text-[132px] leading-[0.9] font-bold tracking-[-0.03em] text-[rgba(255,255,255,0.86)] mix-blend-plus-lighter text-shadow-[0_1px_0_rgba(255,255,255,0.5),0_10px_30px_rgba(0,0,0,0.12)]"
-        >
-          {time}
-        </p>
+        <GlassTime time={time} />
       </div>
 
       {/* One notification: the invitation. */}
@@ -84,6 +80,54 @@ function LockScreen() {
         ))}
       </div>
     </div>
+  );
+}
+
+/** iOS 26's Lock Screen clock: numerals of Liquid Glass. The wallpaper
+ *  shows through a pale fill; an embossed bevel catches light on the
+ *  upper left of every stroke and a soft shade runs along the lower right.
+ *  Pure SVG lighting, so it renders the same in every browser. */
+function GlassTime({ time }: { time: string }) {
+  return (
+    <svg width="340" height="128" viewBox="0 0 340 128" aria-label={time} role="img" className="-mt-[2px] -ml-[4px] overflow-visible">
+      <defs>
+        <filter id="lock-glass" x="-10%" y="-10%" width="120%" height="130%" colorInterpolationFilters="sRGB">
+          {/* The bevel: a rounded height field from the glyphs' alpha. */}
+          <feGaussianBlur in="SourceAlpha" stdDeviation="3.2" result="h" />
+          <feSpecularLighting in="h" surfaceScale="6" specularConstant="1.1" specularExponent="22" lightingColor="#fff" result="spec">
+            <feDistantLight azimuth="225" elevation="42" />
+          </feSpecularLighting>
+          <feComposite in="spec" in2="SourceAlpha" operator="in" result="specIn" />
+          {/* A shade along the far edges, and a thin bright rim. */}
+          <feOffset in="h" dx="-1.6" dy="-1.6" result="hs" />
+          <feComposite in="SourceAlpha" in2="hs" operator="out" result="edge" />
+          <feFlood floodColor="#000" floodOpacity="0.18" />
+          <feComposite in2="edge" operator="in" result="shade" />
+          <feMorphology in="SourceAlpha" operator="erode" radius="1" result="thin" />
+          <feComposite in="SourceAlpha" in2="thin" operator="out" result="rimA" />
+          <feFlood floodColor="#fff" floodOpacity="0.55" />
+          <feComposite in2="rimA" operator="in" result="rim" />
+          <feMerge>
+            <feMergeNode in="SourceGraphic" />
+            <feMergeNode in="shade" />
+            <feMergeNode in="specIn" />
+            <feMergeNode in="rim" />
+          </feMerge>
+        </filter>
+      </defs>
+      <text
+        x="2"
+        y="112"
+        fill="rgba(255,255,255,0.24)"
+        filter="url(#lock-glass)"
+        fontFamily="var(--font-display)"
+        fontSize="132"
+        fontWeight="700"
+        letterSpacing="-4"
+      >
+        {time}
+      </text>
+    </svg>
   );
 }
 

@@ -4,11 +4,15 @@ import { useEffect } from "react";
 import Lenis from "lenis";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { lenisRef } from "@/lib/lenis";
+import { observeGlass } from "@/lib/glass";
 
 // Site-wide scroll runtime: Lenis driven by GSAP's ticker so smooth scroll
 // and every ScrollTrigger advance on the same frame (artcraft's wiring).
 // Reduced-motion visitors keep native scroll and get no Lenis at all.
 export default function MotionProvider({ children }: { children: React.ReactNode }) {
+  // Liquid Glass refracts wherever the browser can bend a backdrop.
+  useEffect(() => observeGlass(document.body), []);
+
   useEffect(() => {
     if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) return;
 

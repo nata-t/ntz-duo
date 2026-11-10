@@ -68,15 +68,15 @@ const hidden = projects.filter((p) => p.confidential);
 /** A project's own line: its client when that says something new, else its category. */
 export const byline = (p: Project) => (p.client === p.name ? p.category : p.client);
 
-export type Section = { id: string; title: string; sub: string; photos: Photo[] };
+export type Section = { id: string; title: string; sub: string; year: number | null; photos: Photo[] };
 
 // Oldest first, so the newest sits at the bottom where Library opens, as on
 // iOS. Only years are known, so projects within a year keep the site's order.
 export const sections: Section[] = [
   ...[...visible]
     .sort((a, b) => a.year - b.year)
-    .map((p) => ({ id: p.slug, title: p.name, sub: `${p.year} · ${byline(p)}`, photos: photosOf(p) })),
-  { id: "portrait", title: profile.name, sub: profile.location, photos: [portrait] },
+    .map((p) => ({ id: p.slug, title: p.name, sub: `${p.year} · ${byline(p)}`, year: p.year, photos: photosOf(p) })),
+  { id: "portrait", title: profile.name, sub: profile.location, year: null, photos: [portrait] },
 ];
 
 export const library: Photo[] = sections.flatMap((s) => s.photos);

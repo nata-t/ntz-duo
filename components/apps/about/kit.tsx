@@ -2,6 +2,7 @@
 
 import { createContext, useContext, useEffect, useRef, useState, type CSSProperties, type ReactNode, type RefObject } from "react";
 import { useOS } from "@/lib/os";
+import { Rail, RailButton as GlassButton, RailGroup } from "../settings/ios";
 import type { AppProps } from "../types";
 
 // The apple.com "detail page" kit shared by About and Contact: a scroll view
@@ -12,8 +13,6 @@ import type { AppProps } from "../types";
 /** The side rail (Figma kit §3.6): status bar on top, controls below. */
 export const RAIL = 84;
 const BTN = 48;
-const RAIL_INSET = 24; // button to screen edge
-const PITCH = 60;
 
 // apple.com's "StaggeredFadeIn": [data-reveal] blocks rise 30 and fade,
 // staggered by --i. Only armed in the live window, so the folding mirrors
@@ -23,6 +22,10 @@ const ARMED = [
   "**:data-reveal:transition-[transform,opacity] **:data-reveal:duration-[0.7s,0.9s] **:data-reveal:ease-[cubic-bezier(0.4,0,0.6,1)] **:data-reveal:delay-[calc(var(--i,0)*0.15s)]",
   "**:data-reveal:data-in:transform-none **:data-reveal:data-in:opacity-100",
   "motion-reduce:**:data-reveal:transform-none motion-reduce:**:data-reveal:opacity-100 motion-reduce:**:data-reveal:transition-none",
+  // [data-lift] blocks hold Liquid Glass: they only rise. Fading them would
+  // cut the glass inside off from the backdrop it bends.
+  "**:data-lift:transform-[translate3d(0,30px,0)] **:data-lift:transition-transform **:data-lift:duration-[0.8s] **:data-lift:ease-[cubic-bezier(0.4,0,0.6,1)] **:data-lift:delay-[calc(var(--i,0)*0.15s)]",
+  "**:data-lift:data-in:transform-none motion-reduce:**:data-lift:transform-none motion-reduce:**:data-lift:transition-none",
 ].join(" ");
 
 /** The local nav slides away while [data-hidden]. */
@@ -32,8 +35,11 @@ const NAV = [
   "motion-reduce:transition-opacity motion-reduce:duration-200 motion-reduce:ease-linear motion-reduce:data-hidden:transform-none",
 ].join(" ");
 
-/** Rail and pill buttons: a springy press and a quick colour change. */
-const PRESS = "transition-[scale,background-color] duration-[0.25s,0.2s] ease-[cubic-bezier(0.3,2,0.5,1),linear] active:scale-[0.92]";
+/** apple.com's pills: a quick colour change, no bounce (they're content). */
+const PRESS = "transition-[scale,background-color] duration-[0.25s,0.2s] ease-[cubic-bezier(0.3,2,0.5,1),linear] active:scale-[0.97]";
+
+/** Pressed Liquid Glass swells a little and glows from within. */
+export const SWELL = "transition-[scale,filter,background-color] duration-300 ease-ios active:scale-110";
 
 type Page = {
   compact: boolean;
@@ -57,6 +63,11 @@ export function usePage() {
 /** Props that put an element into the staggered reveal. */
 export function reveal(i = 0, style?: CSSProperties) {
   return { "data-reveal": "", style: { "--i": i, ...style } as CSSProperties };
+}
+
+/** The reveal for blocks that hold glass: transform only, no fade. */
+export function lift(i = 0, style?: CSSProperties) {
+  return { "data-lift": "", style: { "--i": i, ...style } as CSSProperties };
 }
 
 export function reducedMotion() {
@@ -146,7 +157,7 @@ export function DetailPage({ app, title, cta, primary, group, navAfter, children
   useEffect(() => {
     const root = scroller.current;
     if (!root || mirror) return;
-    const els = root.querySelectorAll<HTMLElement>("[data-reveal]:not([data-in])");
+    const els = root.querySelectorAll<HTMLElement>("[data-reveal]:not([data-in]), [data-lift]:not([data-in])");
     const io = new IntersectionObserver(
       (entries) => {
         for (const e of entries) {
@@ -173,9 +184,20 @@ export function DetailPage({ app, title, cta, primary, group, navAfter, children
   }, [mirror, threshold]);
 
   const ctx: Page = { compact, mirror, bars, padL, padR, scroller };
-  const edge = railLeft ? { left: RAIL_INSET } : { right: RAIL_INSET };
   const closeItem: RailItem = { label: "Close", icon: <XMark />, onClick: close };
   const navInset = compact ? 10 : 16;
+  const item = (it: RailItem, extra: { prominent?: true; bare?: boolean } = {}) => (
+    <GlassButton
+      key={it.label}
+      label={it.label}
+      href={it.href}
+      external={it.external}
+      onClick={it.href ? undefined : () => it.onClick?.(scroller.current)}
+      {...extra}
+    >
+      {it.icon}
+    </GlassButton>
+  );
 
   return (
     <PageCtx.Provider value={ctx}>
@@ -184,29 +206,28 @@ export function DetailPage({ app, title, cta, primary, group, navAfter, children
           {children}
         </div>
 
-        {/* Upright, the status bar lies over the page: a scroll-edge fade
-            keeps it legible, as iOS does under its bars. */}
-        {bars && slot !== "right" ? (
-          <div aria-hidden="true" className="pointer-events-none absolute inset-x-0 top-0 z-10 h-[64px] bg-gradient-to-b from-page via-page/80 to-transparent" />
-        ) : null}
+        {/* Upright, the status bar lies over the page: the scroll edge
+            effect keeps it legible, as iOS does under bar-less chrome. */}
+        {bars && slot !== "right" ? <div aria-hidden="true" className="scroll-edge-top absolute inset-x-0 top-0 z-10 h-[64px] [--edge:var(--page)]" /> : null}
 
-        {/* Local nav: Apple's floating capsule, over the content area only. */}
+        {/* Local nav: a floating capsule of Liquid Glass over the content
+            area, with the page's one call to action tinted inside it. */}
         <div
-          className={`glass absolute z-20 flex h-[44px] items-center justify-between rounded-[16px] bg-(--glass-strong) pr-[7px] pl-[18px] ${NAV}`}
+          className={`glass absolute z-20 flex h-[46px] items-center justify-between gap-[12px] rounded-full pr-[6px] pl-[20px] text-label ${NAV}`}
           style={{
-            top: bars ? top + 2 : 38,
+            top: bars ? top + 1 : 36,
             left: bars ? 16 + BTN + 10 : padL - navInset,
             right: bars ? 16 : padR - navInset,
           }}
           data-hidden={nav ? undefined : ""}
           aria-hidden={!nav}
         >
-          <span className="truncate font-display text-[16px] font-semibold tracking-[0.005em]">{title}</span>
+          <span className="truncate font-display text-[16px] font-semibold tracking-[-0.01em]">{title}</span>
           <button
             type="button"
             tabIndex={nav ? 0 : -1}
             onClick={() => cta.onClick(scroller.current)}
-            className={`h-[28px] shrink-0 rounded-full bg-cta px-[13px] text-[12px] leading-none text-white hover:bg-cta-hover ${PRESS}`}
+            className={`glass-tint h-[34px] shrink-0 rounded-full px-[15px] text-[13px] leading-none font-semibold tracking-[-0.005em] hover:brightness-110 ${SWELL}`}
           >
             {cta.label}
           </button>
@@ -215,75 +236,28 @@ export function DetailPage({ app, title, cta, primary, group, navAfter, children
         {bars ? (
           // Upright: Close leads the top bar; the actions sit in the bottom
           // bar's trailing corner, clear of the home indicator.
-          <nav aria-label={`${title} toolbar`} className="pointer-events-none absolute inset-0 z-30">
-            <RailButton item={closeItem} page={scroller} style={{ top, left: 16 }} />
+          <nav aria-label={`${title} toolbar`} className="pointer-events-none absolute inset-0 z-30 *:pointer-events-auto">
+            <div className="absolute left-[16px]" style={{ top }}>
+              {item(closeItem)}
+            </div>
             <div className="absolute right-[16px] bottom-[24px] flex items-center gap-[10px]">
-              <div className="glass pointer-events-auto flex items-center justify-between rounded-full px-[4px]" style={{ width: 100, height: BTN }}>
-                {group.map((it) => (
-                  <RailButton key={it.label} item={it} page={scroller} bare />
-                ))}
-              </div>
-              <RailButton item={primary} page={scroller} tint flow />
+              <div className="glass flex h-[48px] items-center gap-[2px] rounded-full px-[2px]">{group.map((it) => item(it, { bare: true }))}</div>
+              {item(primary, { prominent: true })}
             </div>
           </nav>
         ) : (
-          // The rail: Close on top, the prominent action, a group at the bottom.
-          <nav aria-label={`${title} toolbar`} className="pointer-events-none absolute inset-y-0 z-30" style={{ width: RAIL, ...(railLeft ? { left: 0 } : { right: 0 }) }}>
-            <RailButton item={closeItem} page={scroller} style={{ top, ...edge }} />
-            <RailButton item={primary} page={scroller} tint style={{ top: top + PITCH, ...edge }} />
-            <div
-              className="glass pointer-events-auto absolute flex flex-col items-center justify-between rounded-full py-[4px]"
-              style={{ width: BTN, height: 100, bottom: 24, ...edge }}
-            >
-              {group.map((it) => (
-                <RailButton key={it.label} item={it} page={scroller} bare />
-              ))}
-            </div>
+          // The rail (HIG, iPhone Duo): Close on top, the prominent action,
+          // then the other actions grouped in one capsule of glass.
+          <nav aria-label={`${title} toolbar`}>
+            <Rail slot={slot}>
+              {item(closeItem)}
+              {item(primary, { prominent: true })}
+              <RailGroup>{group.map((it) => item(it, { bare: true }))}</RailGroup>
+            </Rail>
           </nav>
         )}
       </div>
     </PageCtx.Provider>
-  );
-}
-
-function RailButton({
-  item,
-  page,
-  style,
-  tint,
-  bare,
-  flow,
-}: {
-  item: RailItem;
-  page: RefObject<HTMLDivElement | null>;
-  style?: CSSProperties;
-  tint?: boolean;
-  /** Inside a capsule: no glass of its own. */
-  bare?: boolean;
-  /** Laid out by its parent rather than placed. */
-  flow?: boolean;
-}) {
-  const cls = `pointer-events-auto grid place-items-center rounded-full ${PRESS} ${
-    bare ? "size-[40px] text-label hover:bg-fill-3" : `size-[48px] ${tint ? "bg-blue text-white shadow-[0_6px_20px_rgba(0,110,255,0.32)]" : "glass text-label"}`
-  } ${bare || flow ? "" : "absolute"}`;
-  if (item.href)
-    return (
-      <a
-        href={item.href}
-        target={item.external ? "_blank" : undefined}
-        rel={item.external ? "noopener noreferrer" : undefined}
-        aria-label={item.label}
-        title={item.label}
-        className={cls}
-        style={style}
-      >
-        {item.icon}
-      </a>
-    );
-  return (
-    <button type="button" aria-label={item.label} title={item.label} onClick={() => item.onClick?.(page.current)} className={cls} style={style}>
-      {item.icon}
-    </button>
   );
 }
 

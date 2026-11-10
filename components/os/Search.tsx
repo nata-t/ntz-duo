@@ -31,10 +31,10 @@ export default function Search() {
     <div className="absolute inset-0 z-[44]" onClick={close}>
       <div className="absolute inset-0 animate-[duo-fade_0.25s_ease-out_backwards] bg-black/25 backdrop-blur-[30px] backdrop-saturate-150" />
       <div
-        className="absolute right-[96px] bottom-[22px] left-[96px] mx-auto flex max-w-[620px] animate-[duo-rise_0.42s_var(--ease-ios)_backwards] flex-col gap-[14px]"
+        className="absolute right-[96px] bottom-[22px] left-[96px] mx-auto flex max-w-[620px] animate-[duo-lift_0.5s_var(--ease-ios)_backwards] flex-col gap-[14px]"
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="glass rounded-[30px] p-[10px] text-label">
+        <div className="glass rounded-[34px] bg-(--glass-strong) p-[10px] text-label">
           <p className="px-[12px] pt-[4px] pb-[8px] text-[13px] font-semibold text-label-2">{q ? "Top Hits" : "Siri Suggestions"}</p>
           {results.length ? (
             <ul className="grid grid-cols-4 gap-y-[6px]">
@@ -57,33 +57,48 @@ export default function Search() {
             <p className="px-[12px] pb-[12px] text-[15px] text-label-2">No results for “{q}”.</p>
           )}
         </div>
-        <form
-          className="glass flex h-[50px] items-center gap-[8px] rounded-full px-[18px] text-label"
-          onSubmit={(e) => {
-            e.preventDefault();
-            const first = results[0];
-            if (first) {
-              if (first.kind === "link") os.set({ overlay: null, alert: first.id });
-              else openApp(first.id, null);
-            }
-          }}
-        >
-          <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true" className="shrink-0 text-label-2">
-            <circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" strokeWidth="2.2" />
-            <path d="m13 13 5 5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
-          </svg>
-          <input
-            ref={input}
-            value={q}
-            onChange={(e) => setQ(e.target.value)}
-            placeholder="Search projects, stack, apps"
-            aria-label="Search"
-            className="h-full min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 text-[17px] tracking-[-0.02em] text-label outline-none placeholder:text-label-2 focus-visible:outline-none"
-          />
-          <button type="button" onClick={close} className="text-[15px] font-medium text-blue">
-            Cancel
+        {/* iOS 26: the field is a glass capsule docked at the bottom, its
+            dismiss a glass circle of its own beside it. */}
+        <div className="flex items-center gap-[10px]">
+          <form
+            className="glass flex h-[50px] min-w-0 flex-1 items-center gap-[8px] rounded-full px-[18px] text-label"
+            onSubmit={(e) => {
+              e.preventDefault();
+              const first = results[0];
+              if (first) {
+                if (first.kind === "link") os.set({ overlay: null, alert: first.id });
+                else openApp(first.id, null);
+              }
+            }}
+          >
+            <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true" className="shrink-0 text-label-2">
+              <circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" strokeWidth="2.2" />
+              <path d="m13 13 5 5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+            </svg>
+            <input
+              ref={input}
+              value={q}
+              onChange={(e) => setQ(e.target.value)}
+              placeholder="Search projects, stack, apps"
+              aria-label="Search"
+              className="h-full min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 text-[17px] tracking-[-0.02em] text-label outline-none placeholder:text-label-2 focus-visible:outline-none"
+            />
+            <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true" className="shrink-0 text-label-2">
+              <rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="currentColor" />
+              <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
+            </svg>
+          </form>
+          <button
+            type="button"
+            onClick={close}
+            aria-label="Close Search"
+            className="glass grid size-[50px] shrink-0 place-items-center rounded-full text-label transition-[scale] duration-300 ease-ios active:scale-110"
+          >
+            <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+              <path d="m6.5 6.5 11 11m0-11-11 11" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+            </svg>
           </button>
-        </form>
+        </div>
       </div>
     </div>
   );

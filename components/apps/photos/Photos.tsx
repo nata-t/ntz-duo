@@ -7,33 +7,39 @@ import { LAUNCH, SNAP } from "@/lib/spring";
 import { os, useOS } from "@/lib/os";
 import type { AppProps } from "../types";
 import type { Photo } from "./data";
-import Library from "./Library";
+import Library, { type View } from "./Library";
 import Collections from "./Collections";
 import Search from "./Search";
 import Album from "./Album";
 import Viewer from "./Viewer";
-import { ChevronLeft, CollectionsIcon, LibraryIcon, SearchIcon } from "./icons";
-import { GlassButton, RAIL } from "./ui";
+import { Favs } from "./Grid";
+import { ChevronLeft } from "./icons";
+import { SearchButton, TabBar, TabCircle, type Tab } from "./Bars";
+import { GlassButton, RAIL, type Frame } from "./ui";
 
-type Tab = "library" | "collections" | "search";
 type Open = { list: Photo[]; start: number; origin: HTMLElement };
 
-const TABS: { id: Exclude<Tab, "search">; label: string; Icon: typeof LibraryIcon }[] = [
-  { id: "library", label: "Library", Icon: LibraryIcon },
-  { id: "collections", label: "Collections", Icon: CollectionsIcon },
-];
-
-// Photos, iOS 26/27: Library and Collections tabs plus a separate Search
-// button, on a vertical Liquid Glass bar at the window's outer edge (iPhone
-// Duo puts tab bars on the side in landscape). Albums push over their tab;
-// photos open in a viewer that zooms out of their cell.
+// Photos, iOS 26/27. Library and Collections on a glass tab bar with a
+// separate Search circle. On the Duo's wide landscape window the bar stands
+// up as a vertical capsule at the foot of a side rail on the outer edge,
+// with Back at the rail's top (HIG: Designing for iPhone Duo); in a half or
+// upright window it floats at the bottom as on iPhone. Content runs full
+// bleed under all of it. Albums push over their tab; photos open in a
+// viewer that zooms out of their cell.
 export default function Photos({ id, width, height, slot, mirror }: AppProps) {
   const focused = useOS((s) => s.focus === id);
+  const portrait = useOS((s) => s.portrait);
   const [tab, setTab] = useState<Tab>("library");
   const [seen, setSeen] = useState<Set<Tab>>(() => new Set(["library"]));
   const [album, setAlbum] = useState<{ id: string; tab: Tab } | null>(null);
   const [viewer, setViewer] = useState<Open | null>(null);
   const [current, setCurrent] = useState<string | null>(null);
+  const [favs, setFavs] = useState<Set<string>>(() => new Set());
+  // Library's Years | Projects | All, lifted so Collections can link into it.
+  const [view, setView] = useState<View>("all");
+  // Library has scrolled back in time: the floating bar gives way to the segmented control.
+  const [away, setAway] = useState(false);
+  const [jump, setJump] = useState(0);
 
   // The viewer is black: ask the system for a white status bar meanwhile.
   useEffect(() => {
@@ -47,9 +53,16 @@ export default function Photos({ id, width, height, slot, mirror }: AppProps) {
   const root = useRef<HTMLDivElement>(null);
   const albumEl = useRef<HTMLDivElement>(null);
 
+  // Chrome placement. The rail only in a wide landscape window; the status
+  // bar is a top strip when upright and a column at the right otherwise.
+  const rail = width >= 600 && width > height;
   const leftRail = slot === "left";
-  const cw = width - RAIL;
-  const cx = leftRail ? RAIL : 0;
+  const statusTop = portrait && slot !== "right" ? 54 : 0;
+  const statusSide = !portrait && slot !== "left";
+  const frame: Frame = rail
+    ? { rail, l: leftRail ? RAIL : 0, r: leftRail ? 0 : RAIL, t: 0, b: 0, tr: leftRail ? 16 : RAIL + 12 }
+    : { rail, l: 0, r: 0, t: statusTop, b: 96, tr: statusSide ? 92 : 16 };
+
   const shownAlbum = album && album.tab === tab ? album.id : null;
 
   const show = (t: Tab) => {
@@ -60,6 +73,11 @@ export default function Photos({ id, width, height, slot, mirror }: AppProps) {
   };
 
   const openAlbum = useCallback((aid: string) => setAlbum({ id: aid, tab }), [tab]);
+
+  const toLibrary = useCallback((v: View) => {
+    setView(v);
+    setTab("library");
+  }, []);
 
   // Push: the album slides in over its tab.
   useLayoutEffect(() => {
@@ -100,6 +118,15 @@ export default function Photos({ id, width, height, slot, mirror }: AppProps) {
     setCurrent(null);
   }, []);
 
+  const toggleFav = useCallback((pid: string) => {
+    setFavs((s) => {
+      const n = new Set(s);
+      if (n.has(pid)) n.delete(pid);
+      else n.add(pid);
+      return n;
+    });
+  }, []);
+
   // Escape walks back out of an album when no photo is open.
   useEffect(() => {
     if (mirror || !focused || viewer || !shownAlbum) return;
@@ -112,95 +139,110 @@ export default function Photos({ id, width, height, slot, mirror }: AppProps) {
     return () => window.removeEventListener("keydown", on, true);
   }, [mirror, focused, viewer, shownAlbum, back]);
 
-  // Panes stay mounted (each keeps its scroll); the shown one fades in.
-  const pane = (t: Tab) => (tab === t ? "animate-fade-in motion-reduce:animate-none" : "hidden");
-  // The control column sits 24 pt from the screen edge (Duo UI kit).
-  const col = leftRail ? 24 : 12;
+  // Panes stay mounted (each keeps its scroll); the hidden ones are display: none.
+  const pane = (t: Tab) => (tab === t ? "" : "hidden");
+  // The floating bar shrinks to a circle while Library is back in time.
+  const mini = !rail && tab === "library" && (away || view !== "all");
+  const backBtn = shownAlbum ? (
+    <GlassButton size={rail ? 48 : 44} aria-label="Back" title="Back" onClick={back}>
+      <ChevronLeft size={22} />
+    </GlassButton>
+  ) : null;
 
   return (
-    <div ref={root} className="relative overflow-hidden bg-bg font-sans text-label select-none" style={{ width, height }}>
-      <div className={pane("library")}>
-        <Library width={cw} left={cx} mirror={mirror} hiddenId={current} onOpen={openPhoto} />
-      </div>
-      {seen.has("collections") ? (
-        <div className={pane("collections")}>
-          <Collections width={cw} left={cx} onAlbum={openAlbum} />
+    <Favs.Provider value={favs}>
+      <div ref={root} className="relative overflow-hidden bg-bg font-sans text-label select-none" style={{ width, height }}>
+        <div className={pane("library")}>
+          <Library
+            width={width}
+            frame={frame}
+            mirror={mirror}
+            hiddenId={current}
+            onOpen={openPhoto}
+            view={view}
+            onView={setView}
+            onAway={setAway}
+            showSegments={rail || mini}
+            jump={jump}
+          />
         </div>
-      ) : null}
-      {seen.has("search") ? (
-        <div className={pane("search")}>
-          <Search width={cw} left={cx} mirror={mirror} active={tab === "search" && !shownAlbum} hiddenId={current} onOpen={openPhoto} onAlbum={openAlbum} />
-        </div>
-      ) : null}
-
-      {shownAlbum ? (
-        <div key={shownAlbum} ref={albumEl} className="absolute inset-0 z-[15] shadow-[-12px_0_32px_rgba(0,0,0,0.12)]">
-          <Album id={shownAlbum} width={cw} left={cx} mirror={mirror} hiddenId={current} onOpen={openPhoto} />
-        </div>
-      ) : null}
-
-      {/* The side bar on the outer edge: Back at the top, tabs and Search at the bottom. */}
-      <nav aria-label="Photos" className="absolute inset-y-0 z-20 bg-bg" style={{ [leftRail ? "left" : "right"]: 0, width: RAIL }}>
-        {shownAlbum ? (
-          <GlassButton
-            size={48}
-            aria-label="Back"
-            title="Back"
-            onClick={back}
-            className="absolute"
-            style={{ left: col, top: leftRail ? 24 : 122 }}
-          >
-            <ChevronLeft size={22} />
-          </GlassButton>
+        {seen.has("collections") ? (
+          <div className={pane("collections")}>
+            <Collections width={width} frame={frame} onAlbum={openAlbum} onLibrary={toLibrary} />
+          </div>
+        ) : null}
+        {seen.has("search") ? (
+          <div className={pane("search")}>
+            <Search
+              width={width}
+              frame={frame}
+              mirror={mirror}
+              active={tab === "search" && !shownAlbum}
+              hiddenId={current}
+              onOpen={openPhoto}
+              onAlbum={openAlbum}
+            />
+          </div>
         ) : null}
 
-        <div className="absolute flex flex-col items-center gap-[12px]" style={{ left: col, bottom: 24, width: 48 }}>
-          <div role="tablist" aria-orientation="vertical" className="glass flex flex-col gap-[2px] rounded-full p-[4px]">
-            {TABS.map(({ id: t, label, Icon }) => {
-              const on = tab === t;
-              return (
-                <button
-                  key={t}
-                  type="button"
-                  role="tab"
-                  aria-selected={on}
-                  aria-label={label}
-                  title={label}
-                  onClick={() => show(t)}
-                  className={`grid h-[48px] w-[40px] place-items-center rounded-full transition-colors duration-200 ${on ? "bg-fill-2 text-blue" : "text-label hover:bg-fill-3"}`}
-                >
-                  <Icon size={24} />
-                </button>
-              );
-            })}
+        {shownAlbum ? (
+          <div key={shownAlbum} ref={albumEl} className="absolute inset-0 z-[15] bg-bg shadow-[-12px_0_32px_rgba(0,0,0,0.12)]">
+            <Album id={shownAlbum} width={width} frame={frame} mirror={mirror} hiddenId={current} onOpen={openPhoto} nav={rail ? null : backBtn} />
           </div>
-          <GlassButton
-            size={48}
-            aria-label="Search"
-            title="Search"
-            aria-pressed={tab === "search"}
-            onClick={() => show("search")}
-            className={tab === "search" ? "!text-blue" : ""}
-          >
-            <SearchIcon size={21} />
-          </GlassButton>
-        </div>
-      </nav>
+        ) : null}
 
-      {viewer ? (
-        <Viewer
-          list={viewer.list}
-          start={viewer.start}
-          origin={viewer.origin}
-          width={width}
-          height={height}
-          slot={slot}
-          focused={focused}
-          thumbFor={thumbFor}
-          onIndex={setCurrent}
-          onClosed={closed}
-        />
-      ) : null}
-    </div>
+        {rail ? (
+          // The side rail on the outer edge: Back at the top, the tab bar
+          // and Search bottom-aligned. Glass floating over the content.
+          <nav aria-label="Photos" className="pointer-events-none absolute inset-y-0 z-20 *:pointer-events-auto" style={{ [leftRail ? "left" : "right"]: 0, width: RAIL }}>
+            {backBtn ? (
+              <div className="absolute" style={{ [leftRail ? "left" : "right"]: 24, top: leftRail ? 24 : 122 }}>
+                {backBtn}
+              </div>
+            ) : null}
+            <div className="absolute flex w-[48px] flex-col items-center gap-[12px]" style={{ [leftRail ? "left" : "right"]: 24, bottom: 24 }}>
+              <TabBar vertical tab={tab} onTab={show} />
+              <SearchButton size={48} on={tab === "search"} onClick={() => show("search")} />
+            </div>
+          </nav>
+        ) : (
+          // iOS 26's floating tab bar: the capsule leading, Search trailing.
+          <nav aria-label="Photos" className="pointer-events-none absolute inset-x-[16px] bottom-[24px] z-20 flex items-end justify-between *:pointer-events-auto">
+            {mini ? (
+              <TabCircle
+                tab={tab}
+                onClick={() => {
+                  setView("all");
+                  setJump((j) => j + 1);
+                }}
+              />
+            ) : (
+              <TabBar tab={tab} onTab={show} />
+            )}
+            <SearchButton size={62} on={tab === "search"} onClick={() => show("search")} />
+          </nav>
+        )}
+
+        {viewer ? (
+          <Viewer
+            list={viewer.list}
+            start={viewer.start}
+            origin={viewer.origin}
+            width={width}
+            height={height}
+            slot={slot}
+            rail={rail}
+            top={statusTop}
+            statusSide={statusSide}
+            focused={focused}
+            favs={favs}
+            onFav={toggleFav}
+            thumbFor={thumbFor}
+            onIndex={setCurrent}
+            onClosed={closed}
+          />
+        ) : null}
+      </div>
+    </Favs.Provider>
   );
 }

@@ -317,7 +317,7 @@ function WindowControls({
       {open ? (
         <div
           role="menu"
-          className="glass absolute top-[28px] left-1/2 w-[214px] -translate-x-1/2 animate-[duo-pop_0.28s_var(--ease-ios)_backwards] overflow-hidden rounded-[22px] p-[6px] text-label"
+          className="glass absolute top-[30px] left-1/2 w-[220px] -translate-x-1/2 animate-[duo-pop_0.36s_cubic-bezier(0.2,1.3,0.4,1)_backwards] overflow-hidden rounded-[32px] bg-(--glass-strong) p-[8px] text-label origin-top"
         >
           <div className="flex justify-between px-[4px] pb-[6px]">
             {items.slice(0, 3).map((it) => (
@@ -327,7 +327,7 @@ function WindowControls({
                 role="menuitem"
                 aria-label={it.label}
                 onClick={() => onMove(it.id as Win["slot"])}
-                className={`grid h-[42px] w-[60px] place-items-center rounded-[14px] transition-colors hover:bg-fill-3 ${slot === it.id ? "text-blue" : ""}`}
+                className={`grid h-[44px] w-[62px] place-items-center rounded-full transition-colors hover:bg-fill-3 ${slot === it.id ? "bg-fill-3 text-blue" : ""}`}
               >
                 <svg width="24" height="24" viewBox="0 0 24 24" aria-hidden="true" className={portrait ? "rotate-90" : undefined}>
                   {it.icon}
@@ -340,7 +340,7 @@ function WindowControls({
             type="button"
             role="menuitem"
             onClick={onClose}
-            className="mt-[4px] flex w-full items-center justify-between rounded-[14px] px-[12px] py-[9px] text-[15px] transition-colors hover:bg-fill-3"
+            className="mt-[6px] flex w-full items-center justify-between rounded-full px-[14px] py-[10px] text-[17px] transition-colors hover:bg-fill-3"
           >
             Close
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">

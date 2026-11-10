@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef } from "react";
-import { closeWindow, goHome, homeRegion, os, swapSides, syncAppearance, useDims, useOS } from "@/lib/os";
+import { applyGlass, closeWindow, goHome, homeRegion, os, swapSides, syncAppearance, useDims, useOS } from "@/lib/os";
 import { exitFull } from "@/lib/full";
 import Home, { homePages } from "./Home";
 import Window from "./Window";
@@ -29,8 +29,11 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
     try {
       const a = localStorage.getItem("duo:appearance");
       if (a === "light" || a === "dark" || a === "auto") os.set({ appearance: a });
+      const g = parseFloat(localStorage.getItem("duo:glass") ?? "");
+      if (g >= 0 && g <= 1) os.set({ glass: g });
     } catch {}
     syncAppearance();
+    applyGlass();
     const mq = window.matchMedia("(prefers-color-scheme: dark)");
     mq.addEventListener("change", syncAppearance);
     return () => mq.removeEventListener("change", syncAppearance);

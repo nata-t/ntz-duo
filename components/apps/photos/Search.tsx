@@ -4,11 +4,11 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { search, suggestions, type Photo } from "./data";
 import Grid from "./Grid";
 import { ChevronRight, SearchIcon, XIcon } from "./icons";
-import { HEADER, LargeTitle, SectionHeader, plural } from "./ui";
+import { LargeTitle, SectionHeader, headerH, plural, type Frame } from "./ui";
 
 type Props = {
   width: number;
-  left: number;
+  frame: Frame;
   mirror: boolean;
   active: boolean;
   hiddenId: string | null;
@@ -18,11 +18,13 @@ type Props = {
 
 // Search across what each screen belongs to: project, client, category,
 // year and stack.
-export default function Search({ width, left, mirror, active, hiddenId, onOpen, onAlbum }: Props) {
+export default function Search({ width, frame, mirror, active, hiddenId, onOpen, onAlbum }: Props) {
   const [q, setQ] = useState("");
   const input = useRef<HTMLInputElement>(null);
   const res = useMemo(() => search(q), [q]);
-  const cols = width < 600 ? 3 : 6;
+  const cols = width - frame.l - frame.r < 600 ? 3 : 6;
+  const top = headerH(frame);
+  const ins = frame.l;
   const open = useCallback((ph: Photo, el: HTMLElement) => onOpen(res.photos, ph, el), [onOpen, res.photos]);
 
   // Focus the field when the tab opens, without scrolling the page under the phone.
@@ -31,13 +33,13 @@ export default function Search({ width, left, mirror, active, hiddenId, onOpen, 
   }, [active, mirror]);
 
   return (
-    <div className="absolute inset-y-0" style={{ left, width }}>
+    <div className="absolute inset-0">
       <div data-scroll className="h-full overflow-y-auto overscroll-contain no-scrollbar">
-        <div className="pb-[48px]" style={{ paddingTop: HEADER + 52 }}>
+        <div className="animate-fade-in motion-reduce:animate-none" style={{ paddingTop: top + 56, paddingBottom: frame.b + 40 }}>
           {!q.trim() ? (
             <>
-              <SectionHeader title="Suggestions" />
-              <div className="flex flex-wrap gap-[8px] px-[18px]">
+              <SectionHeader title="Suggestions" inset={ins} />
+              <div className="flex flex-wrap gap-[8px]" style={{ paddingLeft: frame.l + 18, paddingRight: frame.r + 18 }}>
                 {suggestions.map((s) => (
                   <button
                     key={s}
@@ -51,7 +53,7 @@ export default function Search({ width, left, mirror, active, hiddenId, onOpen, 
               </div>
             </>
           ) : res.photos.length === 0 && res.albums.length === 0 ? (
-            <div className="px-[24px] pt-[80px] text-center">
+            <div className="pt-[80px] text-center" style={{ paddingLeft: frame.l + 24, paddingRight: frame.r + 24 }}>
               <p className="text-[22px] leading-[28px] font-bold text-label">No Results</p>
               <p className="mt-[4px] text-[15px] text-label-2">Nothing matches “{q.trim()}”. Try a project, a client or a technology.</p>
             </div>
@@ -59,8 +61,8 @@ export default function Search({ width, left, mirror, active, hiddenId, onOpen, 
             <div key={q} className="animate-fade-in motion-reduce:animate-none">
               {res.albums.length ? (
                 <>
-                  <SectionHeader title="Albums" />
-                  <div className="mx-[18px] mb-[24px] overflow-hidden rounded-[22px] bg-fill-3">
+                  <SectionHeader title="Albums" inset={ins} />
+                  <div className="mb-[24px] overflow-hidden rounded-[26px] bg-fill-3" style={{ marginLeft: frame.l + 16, marginRight: frame.r + 16 }}>
                     {res.albums.map((a) => (
                       <button
                         key={a.id}
@@ -86,7 +88,7 @@ export default function Search({ width, left, mirror, active, hiddenId, onOpen, 
               ) : null}
               {res.photos.length ? (
                 <>
-                  <SectionHeader title={plural(res.photos.length, "Photo")} />
+                  <SectionHeader title={plural(res.photos.length, "Photo")} inset={ins} />
                   <Grid photos={res.photos} cols={cols} hiddenId={hiddenId} onOpen={open} />
                 </>
               ) : null}
@@ -95,9 +97,9 @@ export default function Search({ width, left, mirror, active, hiddenId, onOpen, 
         </div>
       </div>
 
-      <LargeTitle title="Search" width={width} />
-      <div className="absolute top-[80px] right-[18px] left-[18px] z-10">
-        <label className="glass flex h-[40px] items-center gap-[8px] rounded-full px-[13px] text-label-2">
+      <LargeTitle title="Search" frame={frame} width={width} />
+      <div className="absolute z-10" style={{ top: frame.t + 76, left: frame.l + 16, right: Math.max(frame.r + 16, frame.tr) }}>
+        <label className="glass flex h-[44px] items-center gap-[8px] rounded-full px-[14px] text-label-2">
           <SearchIcon size={17} />
           <input
             ref={input}

@@ -1,8 +1,11 @@
 "use client";
 
-import { memo } from "react";
+import { createContext, memo, useContext } from "react";
 import type { Photo } from "./data";
-import { CheckIcon } from "./icons";
+import { CheckIcon, HeartIcon } from "./icons";
+
+/** Photos marked with the viewer's heart. */
+export const Favs = createContext<Set<string>>(new Set());
 
 export type GridProps = {
   photos: Photo[];
@@ -19,6 +22,7 @@ export type GridProps = {
 
 // Photos' grid: edge to edge, square cells, a hairline of background between.
 function Grid({ photos, cols, fit, hiddenId, selecting, selected, onOpen, onToggle }: GridProps) {
+  const favs = useContext(Favs);
   return (
     <div className="grid gap-[2px]" style={{ gridTemplateColumns: `repeat(${cols}, minmax(0, 1fr))` }}>
       {photos.map((ph) => {
@@ -43,6 +47,9 @@ function Grid({ photos, cols, fit, hiddenId, selecting, selected, onOpen, onTogg
               className={`absolute inset-0 size-full ${fit ? "object-contain" : "object-cover"}`}
               style={ph.backdrop && fit ? { background: ph.backdrop } : undefined}
             />
+            {favs.has(ph.id) ? (
+              <HeartIcon filled size={15} className="absolute bottom-[5px] left-[5px] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.5)]" />
+            ) : null}
             {selecting ? (
               <>
                 {/* Only chosen photos are marked, as in Photos. */}

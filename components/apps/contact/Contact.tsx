@@ -13,13 +13,15 @@ import {
   Lockup,
   More,
   Pill,
+  SWELL,
   Section,
   Tile,
+  lift,
   reveal,
   scrollToEl,
   usePage,
 } from "../about/kit";
-import Composer, { PRESS } from "./Composer";
+import Composer, { PRESS, type ComposerApi } from "./Composer";
 import { DocIcon, GitHubIcon, LinkedInIcon, MailIcon, TelegramIcon } from "./icons";
 
 // Contact: the same apple.com detail page as About. A short hero with a
@@ -31,11 +33,17 @@ const social = (label: string) => socials.find((s) => s.label === label)!;
 export default function Contact(props: AppProps) {
   const composer = useRef<HTMLElement>(null);
   const body = useRef<HTMLTextAreaElement>(null);
+  const sheet = useRef<ComposerApi>(null);
 
   // Scroll to the sheet, then put the caret in the message.
   const write = (page: HTMLElement | null) => {
     scrollToEl(page, composer.current);
     window.setTimeout(() => body.current?.focus({ preventScroll: true }), 450);
+  };
+  // The hero's Messages field: its text carries over into the sheet.
+  const quick = (page: HTMLElement | null, text: string) => {
+    sheet.current?.fill(text);
+    write(page);
   };
 
   return (
@@ -51,9 +59,9 @@ export default function Contact(props: AppProps) {
       ]}
     >
       <div data-still={props.mirror || undefined}>
-        <Hero onWrite={write} />
+        <Hero onWrite={write} onQuick={quick} />
         <Channels live={!props.mirror} />
-        <Write sref={composer} body={body} />
+        <Write sref={composer} body={body} api={sheet} />
         <Footer />
       </div>
     </DetailPage>
@@ -62,7 +70,9 @@ export default function Contact(props: AppProps) {
 
 /* ---------- Hero ---------- */
 
-function Hero({ onWrite }: { onWrite: (page: HTMLElement | null) => void }) {
+type Go = (page: HTMLElement | null) => void;
+
+function Hero({ onWrite, onQuick }: { onWrite: Go; onQuick: (page: HTMLElement | null, text: string) => void }) {
   const { compact, padL, padR, scroller } = usePage();
   const copy = (
     <>
@@ -93,7 +103,7 @@ function Hero({ onWrite }: { onWrite: (page: HTMLElement | null) => void }) {
     return (
       <header className="bg-page pt-[78px] pb-[56px] text-center" style={{ paddingLeft: padL, paddingRight: padR }}>
         {copy}
-        <Thread className="mx-auto mt-[40px] max-w-[320px]" />
+        <Thread className="mx-auto mt-[40px] max-w-[320px]" onMore={() => onWrite(scroller.current)} onSend={(t) => onQuick(scroller.current, t)} />
       </header>
     );
 
@@ -101,14 +111,15 @@ function Hero({ onWrite }: { onWrite: (page: HTMLElement | null) => void }) {
     <header className="bg-page" style={{ paddingLeft: padL, paddingRight: padR }}>
       <div className="grid min-h-[570px] grid-cols-[1fr_1fr] items-center gap-[36px] pt-[56px] pb-[40px]">
         <div>{copy}</div>
-        <Thread />
+        <Thread onMore={() => onWrite(scroller.current)} onSend={(t) => onQuick(scroller.current, t)} />
       </div>
     </header>
   );
 }
 
-/** A Messages exchange, standing in for the product shot. */
-function Thread({ className = "" }: { className?: string }) {
+/** A Messages exchange, standing in for the product shot, with iOS 26's
+ *  field under it: a "+" circle and a glass capsule whose send is real. */
+function Thread({ className = "", onMore, onSend }: { className?: string; onMore: () => void; onSend: (text: string) => void }) {
   const { compact } = usePage();
   const bubble = `relative max-w-[86%] rounded-[19px] px-[13px] py-[8px] ${compact ? "text-[14px]" : "text-[15px]"} leading-[1.35] tracking-[-0.016em]`;
   return (
@@ -140,6 +151,55 @@ function Thread({ className = "" }: { className?: string }) {
           ))}
         </div>
       </div>
+      <Field onMore={onMore} onSend={onSend} />
+    </div>
+  );
+}
+
+/** Messages' input row. Sending moves the text into the compose sheet,
+ *  where it picks up a subject and goes out through the visitor's mail. */
+function Field({ onMore, onSend }: { onMore: () => void; onSend: (text: string) => void }) {
+  const [text, setText] = useState("");
+  const ready = !!text.trim();
+  return (
+    <div {...lift(7)} className="relative mt-[18px] flex items-center gap-[8px] font-sans">
+      <button type="button" onClick={onMore} aria-label="Open the full message form" title="More fields" className={`glass grid size-[40px] shrink-0 place-items-center rounded-full text-label ${SWELL}`}>
+        <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
+          <path d="M12 5v14M5 12h14" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+        </svg>
+      </button>
+      <form
+        className="glass flex h-[40px] min-w-0 flex-1 items-center rounded-full pr-[4px] pl-[16px]"
+        onSubmit={(e) => {
+          e.preventDefault();
+          if (!ready) return;
+          onSend(text.trim());
+          setText("");
+        }}
+      >
+        <input
+          value={text}
+          onChange={(e) => setText(e.target.value)}
+          placeholder="Message"
+          aria-label="Message Natnael"
+          enterKeyHint="send"
+          className="min-w-0 flex-1 appearance-none rounded-none border-0 bg-transparent p-0 text-[15px] tracking-[-0.016em] text-label caret-blue outline-none placeholder:text-label-3 focus-visible:outline-none"
+        />
+        {ready ? (
+          <button type="submit" aria-label="Send" title="Send" className={`glass-tint grid size-[32px] shrink-0 place-items-center rounded-full ${SWELL}`}>
+            <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.8" strokeLinecap="round" strokeLinejoin="round">
+              <path d="M12 19.5V5m-6.5 6.5L12 5l6.5 6.5" />
+            </svg>
+          </button>
+        ) : (
+          <span aria-hidden="true" className="grid size-[32px] shrink-0 place-items-center text-label-2">
+            <svg width="17" height="17" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.9" strokeLinecap="round">
+              <rect x="9" y="3" width="6" height="11.5" rx="3" />
+              <path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3" />
+            </svg>
+          </span>
+        )}
+      </form>
     </div>
   );
 }
@@ -354,7 +414,7 @@ function Dial({ h, m, s, size }: { h: number; m: number; s: number; size: number
 
 /* ---------- Write ---------- */
 
-function Write({ sref, body }: { sref: RefObject<HTMLElement | null>; body: RefObject<HTMLTextAreaElement | null> }) {
+function Write({ sref, body, api }: { sref: RefObject<HTMLElement | null>; body: RefObject<HTMLTextAreaElement | null>; api: RefObject<ComposerApi | null> }) {
   const { compact } = usePage();
   const intro = (
     <div>
@@ -373,14 +433,15 @@ function Write({ sref, body }: { sref: RefObject<HTMLElement | null>; body: RefO
     <Section sref={sref}>
       <div className={compact ? "" : "grid grid-cols-[0.8fr_1.2fr] items-center gap-[44px]"}>
         {intro}
-        <div {...reveal(compact ? 3 : 2)} className={`relative ${compact ? "mt-[30px]" : ""}`}>
+        {/* Rises without fading: a fade would blank the glass sheet. */}
+        <div {...lift(compact ? 3 : 2)} className={`relative ${compact ? "mt-[30px]" : ""}`}>
           {/* Colour for the glass to sit on. */}
           <div
             aria-hidden="true"
             className="absolute -inset-x-[56px] -inset-y-[64px] bg-[radial-gradient(28%_34%_at_30%_32%,rgba(10,132,255,0.3),transparent),radial-gradient(28%_34%_at_72%_36%,rgba(191,90,242,0.24),transparent),radial-gradient(30%_30%_at_54%_72%,rgba(255,55,95,0.18),transparent)] opacity-80 dark:opacity-60"
           />
           <div className="relative">
-            <Composer bodyRef={body} />
+            <Composer bodyRef={body} api={api} />
           </div>
         </div>
       </div>

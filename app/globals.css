@@ -205,11 +205,21 @@
     --teal: #00c3d0;
     --gray: #8e8e93;
 
-    /* Liquid Glass, regular variant */
-    --glass: rgba(255, 255, 255, 0.58);
-    --glass-strong: rgba(255, 255, 255, 0.78);
-    --glass-edge: rgba(255, 255, 255, 0.7);
-    --glass-shadow: 0 8px 40px rgba(0, 0, 0, 0.12);
+    /* Liquid Glass. Regular glass is a light veil over a bent, lightly
+       frosted backdrop; strong is for menus and sheets that carry text.
+       The rim is lit from the top left and bounces off the bottom right. */
+    --glass: rgba(255, 255, 255, calc(0.08 + 0.66 * var(--frost, 0.5)));
+    --glass-strong: rgba(250, 250, 252, calc(0.62 + 0.34 * var(--frost, 0.5)));
+    --glass-press: rgba(255, 255, 255, 0.72);
+    --glass-edge: rgba(255, 255, 255, 0.95);
+    --glass-edge-2: rgba(255, 255, 255, 0.55);
+    /* iOS 27 darkens the very edge, under the lit rim. */
+    --glass-line: rgba(0, 0, 0, 0.08);
+    --glass-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 8px 24px rgba(0, 0, 0, 0.1);
+    /* Clear glass over wallpaper and photos: barely tinted, so whatever's
+       behind stays in view; a faint dim keeps white glyphs legible. */
+    --glass-clear: rgba(255, 255, 255, calc(0.02 + 0.1 * var(--frost, 0.5)));
+    --glass-clear-dim: rgba(0, 0, 0, 0.06);
   }
 
   [data-theme="dark"] {
@@ -246,10 +256,15 @@
     --teal: #00d2e0;
     --gray: #8e8e93;
 
-    --glass: rgba(40, 40, 44, 0.5);
-    --glass-strong: rgba(30, 30, 34, 0.72);
-    --glass-edge: rgba(255, 255, 255, 0.16);
-    --glass-shadow: 0 8px 40px rgba(0, 0, 0, 0.4);
+    --glass: rgba(77, 77, 82, calc(0.12 + 0.62 * var(--frost, 0.5)));
+    --glass-strong: rgba(36, 36, 40, calc(0.62 + 0.32 * var(--frost, 0.5)));
+    --glass-press: rgba(70, 70, 76, 0.6);
+    --glass-edge: rgba(255, 255, 255, 0.34);
+    --glass-edge-2: rgba(255, 255, 255, 0.14);
+    --glass-line: rgba(0, 0, 0, 0.32);
+    --glass-shadow: 0 2px 6px rgba(0, 0, 0, 0.18), 0 10px 32px rgba(0, 0, 0, 0.32);
+    --glass-clear: rgba(255, 255, 255, calc(0.03 + 0.1 * var(--frost, 0.5)));
+    --glass-clear-dim: rgba(0, 0, 0, 0.14);
   }
 
   *,
@@ -382,10 +397,17 @@
   }
 }
 
+/* Glass panels move in without fading: an ancestor below full opacity
+   would cut their glass off from the backdrop it bends. */
 @keyframes duo-cc {
   from {
-    opacity: 0;
-    transform: translateY(-24px) scale(1.04);
+    transform: translateY(-36px) scale(0.94);
+  }
+}
+
+@keyframes duo-lift {
+  from {
+    transform: translateY(40px) scale(0.96);
   }
 }
 
@@ -419,39 +441,102 @@
 }
 
 @layer components {
-  /* Liquid Glass for the functional layer: blur, a lift in saturation, a
-     translucent fill, a specular rim and a soft drop. */
+  /* Liquid Glass for the functional layer (Chromium bends the backdrop
+     through lib/glass.ts, which sets --lg; elsewhere it frosts). A veil of
+     tint, a hairline, a specular rim lit from the top left with a dimmer
+     bounce on the bottom right, and a soft lift off the content. */
   .glass {
     background: var(--glass);
-    -webkit-backdrop-filter: blur(24px) saturate(1.8);
-    backdrop-filter: blur(24px) saturate(1.8);
+    -webkit-backdrop-filter: blur(calc(8px + 24px * var(--frost, 0.5))) saturate(1.8);
+    backdrop-filter: var(--lg, blur(calc(8px + 24px * var(--frost, 0.5))) saturate(1.8));
     box-shadow:
-      inset 0 0.5px 0 0.5px var(--glass-edge),
-      inset 0 -0.5px 0 0 rgba(255, 255, 255, 0.08),
+      inset 1.5px 1.5px 0.5px -1px var(--glass-edge),
+      inset -1.5px -1.5px 0.5px -1px var(--glass-edge-2),
+      inset 0 0 0 0.5px var(--glass-line),
+      inset 0 0 12px -4px var(--glass-edge-2),
       var(--glass-shadow);
   }
 
   /* Clear glass, for controls over wallpaper and photos. */
   .glass-clear {
-    background: rgba(255, 255, 255, 0.14);
-    -webkit-backdrop-filter: blur(12px) saturate(1.6) brightness(1.08);
-    backdrop-filter: blur(12px) saturate(1.6) brightness(1.08);
+    background: linear-gradient(var(--glass-clear), var(--glass-clear)), var(--glass-clear-dim);
+    -webkit-backdrop-filter: blur(6px) saturate(1.6) brightness(1.05);
+    backdrop-filter: var(--lg, blur(6px) saturate(1.6) brightness(1.05));
     box-shadow:
-      inset 0 1px 0.5px rgba(255, 255, 255, 0.45),
-      inset 0 -1px 0.5px rgba(255, 255, 255, 0.12),
-      inset 0 0 0 0.5px rgba(255, 255, 255, 0.22),
-      0 6px 24px rgba(0, 0, 0, 0.12);
+      inset 1.5px 1.5px 0.5px -1px rgba(255, 255, 255, 0.9),
+      inset -1.5px -1.5px 0.5px -1px rgba(255, 255, 255, 0.5),
+      inset 0 0 0 0.5px rgba(255, 255, 255, 0.18),
+      inset 0 0 14px -4px rgba(255, 255, 255, 0.35),
+      0 6px 22px rgba(0, 0, 0, 0.12);
+  }
+
+  /* A lens: a switch knob or a slider thumb while a finger holds it. Pure
+     refraction with a bright rim; the track shows through it. */
+  .glass-lens {
+    background: rgba(255, 255, 255, 0.06);
+    -webkit-backdrop-filter: blur(1px) saturate(1.4);
+    backdrop-filter: var(--lg, blur(1px) saturate(1.4));
+    box-shadow:
+      inset 1.5px 1.5px 0.5px -1px rgba(255, 255, 255, 0.95),
+      inset -1.5px -1.5px 0.5px -1px rgba(255, 255, 255, 0.6),
+      inset 0 0 0 0.5px rgba(0, 0, 0, 0.05),
+      inset 0 0 10px -3px rgba(255, 255, 255, 0.5),
+      0 4px 14px rgba(0, 0, 0, 0.14);
+  }
+
+  /* Prominent glass: tinted with the control's colour (--tint), for the
+     one primary action on screen. */
+  .glass-tint {
+    background: color-mix(in srgb, var(--tint, var(--blue)) 88%, transparent);
+    color: #fff;
+    box-shadow:
+      inset 1.5px 1.5px 0.5px -1px rgba(255, 255, 255, 0.7),
+      inset -1.5px -1.5px 0.5px -1px rgba(255, 255, 255, 0.35),
+      inset 0 0 12px -4px rgba(255, 255, 255, 0.45),
+      0 6px 20px color-mix(in srgb, var(--tint, var(--blue)) 30%, transparent);
+  }
+
+  /* The folding halves are copies turning in 3D on every scroll frame:
+     they frost instead of bending, which costs a fraction as much and
+     can't be told apart at that angle. */
+  [data-os-root="mirror"] :is(.glass, .glass-clear, .glass-lens) {
+    --lg: initial !important;
+  }
+
+  /* Glass that's pressed glows from within. */
+  :is(button, a, label).glass:active,
+  :is(button, a).glass-clear:active {
+    background: var(--glass-press);
   }
 
   @media (prefers-reduced-transparency: reduce) {
     .glass,
-    .glass-clear {
+    .glass-clear,
+    .glass-lens {
       -webkit-backdrop-filter: none;
       backdrop-filter: none;
       background: var(--bg-2);
     }
   }
+}
 
+/* Under a scroll view's bar-less edge, iOS 26 fades the content out
+   through a soft blur instead of drawing a bar: the scroll edge effect.
+   Put it on an absolutely placed strip; --edge sets the colour it fades
+   to (the view's background). */
+@utility scroll-edge-top {
+  background: linear-gradient(to bottom, var(--edge, var(--bg)) 0%, color-mix(in srgb, var(--edge, var(--bg)) 70%, transparent) 45%, transparent);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  mask-image: linear-gradient(to bottom, #000 40%, transparent);
+  pointer-events: none;
+}
+@utility scroll-edge-bottom {
+  background: linear-gradient(to top, var(--edge, var(--bg)) 0%, color-mix(in srgb, var(--edge, var(--bg)) 70%, transparent) 45%, transparent);
+  -webkit-backdrop-filter: blur(3px);
+  backdrop-filter: blur(3px);
+  mask-image: linear-gradient(to top, #000 40%, transparent);
+  pointer-events: none;
 }
 
 @utility no-scrollbar {

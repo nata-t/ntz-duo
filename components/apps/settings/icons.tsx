@@ -57,6 +57,12 @@ const glyphs = {
       ))}
     </>
   ),
+  appearance: (
+    <>
+      <circle cx="12" cy="12" r="7.6" fill="none" stroke={W} strokeWidth="1.8" />
+      <path d="M12 4.4a7.6 7.6 0 0 1 0 15.2z" fill={W} />
+    </>
+  ),
   home: (
     <>
       <rect x="4.5" y="4.5" width="6.4" height="6.4" rx="1.8" fill={W} />
@@ -138,6 +144,7 @@ export const ICON_COLORS: Record<IconName, string> = {
   camera: "#8e8e93",
   control: "#8e8e93",
   display: "#007aff",
+  appearance: "linear-gradient(135deg,#5ac8fa 0%,#007aff 50%,#5856d6 100%)",
   home: "#5856d6",
   search: "#8e8e93",
   wallpaper: "#32ade6",

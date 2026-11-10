@@ -2,42 +2,45 @@
 
 import { albums, HIDDEN_ID, hiddenAlbums, people, portrait, screenshots, years, type Album } from "./data";
 import { ChevronRight, LockIcon, PersonIcon, ScreenshotIcon } from "./icons";
-import { HEADER, LargeTitle, SectionHeader, plural } from "./ui";
+import type { View } from "./Library";
+import { LargeTitle, SectionHeader, headerH, plural, type Frame } from "./ui";
 
-type Props = { width: number; left: number; onAlbum: (id: string) => void };
+type Props = { width: number; frame: Frame; onAlbum: (id: string) => void; onLibrary: (v: View) => void };
 
-// Collections: the iOS 26 tab of carousels (Pinned, Albums, days, People)
-// over grouped lists for Media Types and Utilities.
-export default function Collections({ width, left, onAlbum }: Props) {
-  const compact = width < 600;
+// Collections: the iOS 26 tab of carousels (Pinned, Albums, years, People)
+// over grouped lists for Media Types and Utilities. Full bleed: the
+// carousels run under the rail, the text keeps clear of it.
+export default function Collections({ width, frame, onAlbum, onLibrary }: Props) {
+  const compact = width - frame.l - frame.r < 600;
   const card = compact ? 136 : 158;
+  const ins = { l: frame.l, r: frame.r };
 
   return (
-    <div className="absolute inset-y-0" style={{ left, width }}>
+    <div className="absolute inset-0">
       <div data-scroll className="h-full overflow-y-auto overscroll-contain no-scrollbar">
-        <div className="pb-[48px]" style={{ paddingTop: HEADER + 8 }}>
-          <SectionHeader title="Pinned" />
-          <Row>
+        <div className="animate-fade-in motion-reduce:animate-none" style={{ paddingTop: headerH(frame) + 8, paddingBottom: frame.b + 40 }}>
+          <SectionHeader title="Pinned" inset={ins.l} />
+          <Row {...ins}>
             <Card album={screenshots} size={card} onClick={onAlbum} />
             <Card album={people} size={card} onClick={onAlbum} round />
           </Row>
 
-          <SectionHeader title="Albums" />
-          <Row>
+          <SectionHeader title="Albums" inset={ins.l} onClick={() => onLibrary("projects")} />
+          <Row {...ins}>
             {albums.map((a) => (
               <Card key={a.id} album={a} size={card} onClick={onAlbum} />
             ))}
           </Row>
 
-          <SectionHeader title="Years" />
-          <Row>
+          <SectionHeader title="Years" inset={ins.l} onClick={() => onLibrary("years")} />
+          <Row {...ins}>
             {years.map((a) => (
               <DayCard key={a.id} album={a} width={compact ? 250 : 300} onClick={onAlbum} />
             ))}
           </Row>
 
-          <SectionHeader title="People" />
-          <Row>
+          <SectionHeader title="People" inset={ins.l} onClick={() => onAlbum(people.id)} />
+          <Row {...ins}>
             <button type="button" onClick={() => onAlbum(people.id)} className="group flex w-[96px] flex-col items-center gap-[8px]">
               <span className="relative size-[96px] overflow-hidden rounded-full" style={{ background: portrait.backdrop }}>
                 <img src={portrait.src} alt="" loading="lazy" decoding="async" className="absolute top-[6px] left-1/2 w-[120%] max-w-none -translate-x-1/2 transition-transform duration-500 group-hover:scale-105" />
@@ -46,14 +49,14 @@ export default function Collections({ width, left, onAlbum }: Props) {
             </button>
           </Row>
 
-          <SectionHeader title="Media Types" />
-          <List>
+          <SectionHeader title="Media Types" inset={ins.l} />
+          <List {...ins}>
             <ListRow icon={<ScreenshotIcon size={22} />} title="Screenshots" detail={String(screenshots.photos.length)} onClick={() => onAlbum(screenshots.id)} />
             <ListRow icon={<PersonIcon size={22} />} title="Portraits" detail={String(people.photos.length)} onClick={() => onAlbum(people.id)} />
           </List>
 
-          <SectionHeader title="Utilities" />
-          <List>
+          <SectionHeader title="Utilities" inset={ins.l} />
+          <List {...ins}>
             <ListRow
               icon={<LockIcon size={20} />}
               title="Hidden"
@@ -67,13 +70,14 @@ export default function Collections({ width, left, onAlbum }: Props) {
 
       <LargeTitle
         title="Collections"
+        frame={frame}
         width={width}
         right={
           <button
             type="button"
             aria-label={people.title}
             onClick={() => onAlbum(people.id)}
-            className="glass relative size-[40px] overflow-hidden rounded-full"
+            className="glass relative size-[40px] overflow-hidden rounded-full transition-[scale] duration-300 ease-ios active:scale-110"
             style={{ background: portrait.backdrop }}
           >
             <img src={portrait.src} alt="" className="absolute top-[3px] left-1/2 w-[130%] max-w-none -translate-x-1/2" />
@@ -84,8 +88,15 @@ export default function Collections({ width, left, onAlbum }: Props) {
   );
 }
 
-function Row({ children }: { children: React.ReactNode }) {
-  return <div className="no-scrollbar mb-[26px] flex snap-x gap-[12px] overflow-x-auto overscroll-x-contain px-[18px] scroll-px-[18px]">{children}</div>;
+function Row({ children, l, r }: { children: React.ReactNode; l: number; r: number }) {
+  return (
+    <div
+      className="no-scrollbar mb-[26px] flex snap-x gap-[12px] overflow-x-auto overscroll-x-contain"
+      style={{ paddingLeft: l + 18, paddingRight: r + 18, scrollPaddingLeft: l + 18 }}
+    >
+      {children}
+    </div>
+  );
 }
 
 function Card({ album, size, onClick, round }: { album: Album; size: number; onClick: (id: string) => void; round?: boolean }) {
@@ -132,8 +143,12 @@ function DayCard({ album, width, onClick }: { album: Album; width: number; onCli
   );
 }
 
-function List({ children }: { children: React.ReactNode }) {
-  return <div className="mx-[18px] mb-[26px] overflow-hidden rounded-[22px] bg-fill-3">{children}</div>;
+function List({ children, l, r }: { children: React.ReactNode; l: number; r: number }) {
+  return (
+    <div className="mb-[26px] overflow-hidden rounded-[26px] bg-fill-3" style={{ marginLeft: l + 16, marginRight: r + 16 }}>
+      {children}
+    </div>
+  );
 }
 
 function ListRow({
@@ -150,9 +165,9 @@ function ListRow({
   onClick: () => void;
 }) {
   return (
-    <button type="button" onClick={onClick} className="group flex min-h-[50px] w-full items-center gap-[12px] pl-[16px] text-left transition-colors hover:bg-fill-3">
+    <button type="button" onClick={onClick} className="group flex min-h-[52px] w-full items-center gap-[12px] pl-[16px] text-left transition-colors hover:bg-fill-3">
       <span className="grid w-[26px] place-items-center text-blue">{icon}</span>
-      <span className="flex min-h-[50px] flex-1 items-center gap-[8px] border-b border-sep pr-[14px] group-last:border-b-0">
+      <span className="flex min-h-[52px] flex-1 items-center gap-[8px] border-b border-sep pr-[16px] group-last:border-b-0">
         <span className="flex-1">
           <span className="block text-[17px] leading-[22px] tracking-[-0.02em] text-label">{title}</span>
           {hint ? <span className="block text-[12px] leading-[15px] text-label-2">{hint}</span> : null}

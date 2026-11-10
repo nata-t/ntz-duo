@@ -1,9 +1,9 @@
 "use client";
 
-import { createContext, useContext, useRef, useState, type ReactNode } from "react";
+import { createContext, useContext, useState, type ReactNode } from "react";
 import { contact, profile, projects } from "@/content/site";
-import { openApp, os, setAppearance, useOS } from "@/lib/os";
-import { Toggle, useMedia, useMinute } from "./ios";
+import { openApp, os, setAppearance, setGlass, useOS } from "@/lib/os";
+import { Glyph, Slider, Toggle, useMedia, useMinute } from "./ios";
 import { Avatar, Group, Row } from "./list";
 import { SettingsIcon, type IconName } from "./icons";
 
@@ -250,19 +250,27 @@ function TextSizePage() {
   );
 }
 
-/* --------------------------------------------------- Display & Brightness */
+/* ----------------------------------------------------------- Appearance */
 
-function PhoneThumb({ dark }: { dark: boolean }) {
+type Mode = "auto" | "light" | "dark";
+
+function PhoneThumb({ mode }: { mode: Mode }) {
+  const src = (d: boolean) => `/wallpapers/dunes-${d ? "dark" : "light"}-portrait.webp`;
   return (
-    <span className="relative block h-[118px] w-[58px] overflow-hidden rounded-[11px] bg-black p-[2.5px] shadow-[0_1px_4px_rgba(0,0,0,0.18)]">
-      <span className="relative block h-full w-full overflow-hidden rounded-[9px]">
+    <span className="relative block h-[118px] w-[58px] overflow-hidden rounded-[12px] bg-black p-[2.5px] shadow-[0_1px_4px_rgba(0,0,0,0.18)]">
+      <span className="relative block h-full w-full overflow-hidden rounded-[9.5px]">
         {/* eslint-disable-next-line @next/next/no-img-element -- static, pre-sized assets */}
-        <img
-          src={`/wallpapers/dunes-${dark ? "dark" : "light"}-portrait.webp`}
-          alt=""
-          draggable={false}
-          className="absolute inset-0 h-full w-full object-cover"
-        />
+        <img src={src(mode === "dark")} alt="" draggable={false} className="absolute inset-0 h-full w-full object-cover" />
+        {mode === "auto" ? (
+          // Automatic: day on the top left, night on the bottom right.
+          // eslint-disable-next-line @next/next/no-img-element -- static, pre-sized assets
+          <img
+            src={src(true)}
+            alt=""
+            draggable={false}
+            className="absolute inset-0 h-full w-full object-cover [clip-path:polygon(100%_28%,100%_100%,0_100%,0_72%)]"
+          />
+        ) : null}
         <span className="absolute inset-x-0 top-[13px] text-center text-[15px] leading-none font-semibold tracking-[-0.02em] text-white drop-shadow-[0_1px_2px_rgba(0,0,0,0.25)]">
           9:41
         </span>
@@ -283,48 +291,109 @@ function Radio({ on }: { on: boolean }) {
   );
 }
 
-function Slider({ value, min, onChange, label, disabled }: { value: number; min: number; onChange: (v: number) => void; label: string; disabled?: boolean }) {
-  const track = useRef<HTMLDivElement>(null);
-  const k = (value - min) / (1 - min);
-  const at = (x: number) => {
-    const r = track.current?.getBoundingClientRect();
-    if (!r) return;
-    const f = Math.min(1, Math.max(0, (x - r.left) / r.width));
-    onChange(min + f * (1 - min));
-  };
+/** A patch of wallpaper with a few controls on it, so the Liquid Glass
+ *  slider has something to show: regular glass up top and on the tab bar,
+ *  clear glass for the search circle. */
+function GlassPreview() {
+  const dark = useOS((s) => s.dark);
   return (
-    <div
-      ref={track}
-      role="slider"
-      tabIndex={disabled ? -1 : 0}
-      aria-label={label}
-      aria-valuemin={Math.round(min * 100)}
-      aria-valuemax={100}
-      aria-valuenow={Math.round(value * 100)}
-      className="relative h-[28px] flex-1 cursor-pointer touch-none"
-      onPointerDown={(e) => {
-        if (disabled) return;
-        e.currentTarget.setPointerCapture(e.pointerId);
-        at(e.clientX);
-      }}
-      onPointerMove={(e) => e.currentTarget.hasPointerCapture(e.pointerId) && at(e.clientX)}
-      onKeyDown={(e) => {
-        const d = e.key === "ArrowRight" || e.key === "ArrowUp" ? 0.05 : e.key === "ArrowLeft" || e.key === "ArrowDown" ? -0.05 : 0;
-        if (!d) return;
-        e.preventDefault();
-        onChange(Math.min(1, Math.max(min, value + d)));
-      }}
-    >
-      <span className="absolute inset-x-0 top-1/2 h-[6px] -translate-y-1/2 overflow-hidden rounded-full bg-fill">
-        <span className="block h-full bg-blue" style={{ width: `${k * 100}%` }} />
-      </span>
-      <span
-        className="absolute top-1/2 h-[24px] w-[38px] -translate-x-1/2 -translate-y-1/2 rounded-full bg-white shadow-[0_2px_7px_rgba(0,0,0,0.18),0_0_0_0.5px_rgba(0,0,0,0.06)]"
-        style={{ left: `calc(19px + ${k} * (100% - 38px))` }}
-      />
+    <div className="p-[10px] pb-0">
+      <div className="relative h-[156px] overflow-hidden rounded-[18px]">
+        {/* eslint-disable-next-line @next/next/no-img-element -- static, pre-sized assets */}
+        <img
+          src={`/wallpapers/dunes-${dark ? "dark" : "light"}-landscape.webp`}
+          alt=""
+          draggable={false}
+          className="absolute inset-0 h-full w-full object-cover object-[50%_62%]"
+        />
+        <span className="glass absolute top-[12px] left-[12px] grid size-[40px] place-items-center rounded-full text-label">
+          {Glyph.back}
+        </span>
+        <span className="glass absolute top-[12px] right-[12px] flex h-[40px] items-center gap-[2px] rounded-full px-[4px] text-label">
+          <span className="grid size-[34px] place-items-center">{Glyph.compose}</span>
+          <span className="grid size-[34px] place-items-center">{Glyph.more}</span>
+        </span>
+        <span className="glass absolute bottom-[12px] left-[12px] flex h-[46px] items-center gap-[2px] rounded-full p-[4px] text-[12px] leading-none font-semibold">
+          <span className="grid h-full place-items-center rounded-full bg-fill-2 px-[14px] text-blue">Library</span>
+          <span className="grid h-full place-items-center px-[14px] text-label">Collections</span>
+        </span>
+        <span className="glass-clear absolute right-[12px] bottom-[12px] grid size-[46px] place-items-center rounded-full text-white">
+          <svg width="19" height="19" viewBox="0 0 24 24" aria-hidden="true">
+            <circle cx="10.5" cy="10.5" r="6.5" fill="none" stroke="currentColor" strokeWidth="2.2" />
+            <path d="m15.5 15.5 5 5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+          </svg>
+        </span>
+      </div>
     </div>
   );
 }
+
+/** Within this of the middle, the slider settles on Default. */
+const DETENT = 0.04;
+
+function AppearancePage() {
+  const appearance = useOS((s) => s.appearance);
+  const glass = useOS((s) => s.glass);
+  const modes: { m: Mode; label: string }[] = [
+    { m: "light", label: "Light" },
+    { m: "dark", label: "Dark" },
+    { m: "auto", label: "Automatic" },
+  ];
+  return (
+    <>
+      <Group footer={appearance === "auto" ? "Automatic follows the appearance of the device you’re reading this on." : undefined}>
+        <div role="radiogroup" aria-label="Appearance" className="flex justify-center gap-[clamp(20px,8%,56px)] pt-[20px] pb-[18px]">
+          {modes.map(({ m, label }) => (
+            <button
+              key={m}
+              type="button"
+              role="radio"
+              aria-checked={appearance === m}
+              onClick={() => setAppearance(m)}
+              className="flex flex-col items-center gap-[9px]"
+            >
+              <PhoneThumb mode={m} />
+              <span className="text-[15px] leading-[20px]">{label}</span>
+              <Radio on={appearance === m} />
+            </button>
+          ))}
+        </div>
+      </Group>
+
+      <Group
+        header="Liquid Glass"
+        footer="Liquid Glass is the material of the buttons, bars and menus on ntz duo. More Clear lets more of what’s behind show through; More Tinted makes it more opaque, for contrast."
+      >
+        <GlassPreview />
+        <div className="px-[16px] pt-[12px] pb-[12px]">
+          <Slider
+            value={glass}
+            label="Liquid Glass, More Clear to More Tinted"
+            onChange={(v) => setGlass(Math.abs(v - 0.5) < DETENT ? 0.5 : Math.round(v * 100) / 100)}
+          />
+          <div className="relative h-[6px]" aria-hidden>
+            <span className="absolute top-0 left-1/2 h-[6px] w-[2px] -translate-x-1/2 rounded-full bg-label-3" />
+          </div>
+          <div className="mt-[4px] flex items-baseline justify-between text-[13px] leading-[18px] text-label-2">
+            <span>More Clear</span>
+            <span className={glass === 0.5 ? "font-semibold text-label" : ""}>Default</span>
+            <span>More Tinted</span>
+          </div>
+        </div>
+      </Group>
+
+      <Group header="Text">
+        <Row title="Text Size" value="Default" />
+        <Row title="Bold Text" accessory={<LocalToggle label="Bold Text" />} />
+      </Group>
+      <Group header="Display Zoom" footer="ntz duo scales its screen to fit your window, so there’s nothing to zoom.">
+        <Row title="View" value="Default" />
+      </Group>
+    </>
+  );
+}
+
+/* --------------------------------------------------- Display & Brightness */
 
 const Sun = ({ size }: { size: number }) => (
   <svg width={size} height={size} viewBox="0 0 24 24" aria-hidden="true" className="shrink-0 text-label-2">
@@ -336,39 +405,11 @@ const Sun = ({ size }: { size: number }) => (
 );
 
 function DisplayPage() {
-  const appearance = useOS((s) => s.appearance);
-  const dark = useOS((s) => s.dark);
   const brightness = useOS((s) => s.brightness);
-  const auto = appearance === "auto";
   return (
     <>
-      <Group header="Appearance" footer={auto ? "Automatic follows the appearance of the device you’re reading this on." : undefined}>
-        <div className="flex justify-center gap-[72px] pt-[20px] pb-[16px]">
-          {(["light", "dark"] as const).map((m) => {
-            const on = (m === "dark") === dark;
-            return (
-              <button
-                key={m}
-                type="button"
-                role="radio"
-                aria-checked={on}
-                onClick={() => setAppearance(m)}
-                className="flex flex-col items-center gap-[9px]"
-              >
-                <PhoneThumb dark={m === "dark"} />
-                <span className="text-[15px] leading-[20px] capitalize">{m}</span>
-                <Radio on={on} />
-              </button>
-            );
-          })}
-        </div>
-        <Row
-          title="Automatic"
-          accessory={<Toggle on={auto} label="Automatic" onChange={(v) => setAppearance(v ? "auto" : dark ? "dark" : "light")} />}
-        />
-      </Group>
       <Group header="Brightness">
-        <div className="flex items-center gap-[14px] px-[16px] py-[12px]">
+        <div className="flex min-h-[52px] items-center gap-[14px] px-[16px] py-[12px]">
           <Sun size={15} />
           <Slider value={brightness} min={0.15} label="Brightness" onChange={(v) => os.set({ brightness: v })} />
           <Sun size={22} />
@@ -377,7 +418,6 @@ function DisplayPage() {
       </Group>
       <Group>
         <Row title="Auto-Lock" value="Never" />
-        <Row title="Display Zoom" value="Default" />
       </Group>
     </>
   );
@@ -452,8 +492,12 @@ function PrivacyPage() {
       >
         <Row title="Weather" value="Open-Meteo" />
       </Group>
-      <Group header="On This Device" footer="Your Light, Dark or Automatic choice is kept in this browser’s local storage so the phone remembers it. It never leaves your device.">
+      <Group
+        header="On this device"
+        footer="Your Appearance and Liquid Glass choices are kept in this browser’s local storage so the phone remembers them. They never leave your device."
+      >
         <Row title="Appearance" value="Local storage" />
+        <Row title="Liquid Glass" value="Local storage" />
       </Group>
     </>
   );
@@ -463,7 +507,7 @@ function PrivacyPage() {
 
 function Hero({ icon, title, text }: { icon: IconName; title: string; text: string }) {
   return (
-    <div className="mb-[22px] flex flex-col items-center rounded-[24px] bg-grouped-2 px-[22px] pt-[22px] pb-[20px] text-center">
+    <div className="mb-[24px] flex flex-col items-center rounded-[26px] bg-grouped-2 px-[22px] pt-[22px] pb-[20px] text-center">
       <SettingsIcon name={icon} size={56} />
       <p className="mt-[12px] font-display text-[22px] leading-[28px] font-bold tracking-[-0.01em]">{title}</p>
       <p className="mt-[4px] text-[15px] leading-[20px] text-label-2">{text}</p>
@@ -497,7 +541,13 @@ export const PAGES: Record<string, PageDef> = {
   motion: { title: "Motion", parent: "accessibility", keywords: "reduce motion animation", Body: MotionPage },
   camera: { title: "Camera", icon: "camera", Body: scenery("camera", "Camera") },
   control: { title: "Control Center", icon: "control", Body: scenery("control", "Control Center") },
-  display: { title: "Display & Brightness", icon: "display", keywords: "appearance dark light mode theme brightness", Body: DisplayPage },
+  appearance: {
+    title: "Appearance",
+    icon: "appearance",
+    keywords: "dark light mode theme automatic liquid glass clear tinted transparency text size bold display zoom",
+    Body: AppearancePage,
+  },
+  display: { title: "Display & Brightness", icon: "display", keywords: "brightness true tone auto-lock", Body: DisplayPage },
   home: { title: "Home Screen & App Library", icon: "home", Body: scenery("home", "Home Screen & App Library") },
   search: { title: "Search", icon: "search", Body: scenery("search", "Search") },
   wallpaper: { title: "Wallpaper", icon: "wallpaper", keywords: "dunes background", Body: WallpaperPage },
@@ -514,7 +564,7 @@ export const PAGES: Record<string, PageDef> = {
 /** The sidebar, in iOS 27's order. */
 export const SIDEBAR: string[][] = [
   ["airplane", "wifi", "bluetooth", "battery"],
-  ["general", "accessibility", "camera", "control", "display", "home", "search", "wallpaper"],
+  ["general", "accessibility", "camera", "control", "appearance", "display", "home", "search", "wallpaper"],
   ["notifications", "sounds", "focus", "screentime"],
   ["faceid", "sos", "privacy"],
   ["apps"],

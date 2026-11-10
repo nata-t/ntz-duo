@@ -1,18 +1,23 @@
 "use client";
 
-import { useId, useState, type RefObject } from "react";
+import { useId, useImperativeHandle, useState, type RefObject } from "react";
 import { contact, profile } from "@/content/site";
-import { usePage } from "../about/kit";
+import { SWELL, usePage } from "../about/kit";
 
-// A Mail compose sheet in Liquid Glass. Send hands everything to the
-// visitor's own mail app through a mailto: link; nothing leaves the page.
+// iOS 26 Mail's compose sheet: a floating sheet of Liquid Glass with an ✕
+// circle, a centred title and a prominent ↑ send circle that stays grey
+// until the message can go. Send hands everything to the visitor's own mail
+// app through a mailto: link; nothing leaves the page.
 
 type Form = { name: string; email: string; subject: string; message: string };
 const EMPTY: Form = { name: "", email: "", subject: "", message: "" };
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]{2,}$/;
 
-/** A springy press for Contact's buttons. */
-export const PRESS = "transition-[scale] duration-[0.25s] ease-[cubic-bezier(0.3,2,0.5,1)] active:scale-90";
+/** A light press for Contact's content buttons (glass ones use SWELL). */
+export const PRESS = "transition-[scale] duration-[0.25s] ease-[cubic-bezier(0.3,2,0.5,1)] active:scale-[0.96]";
+
+/** Lets the page hand the sheet a message (the Messages field in the hero). */
+export type ComposerApi = { fill: (message: string) => void };
 
 export function mailto(f: Form) {
   const name = f.name.trim();
@@ -23,12 +28,20 @@ export function mailto(f: Form) {
   return `${contact.email.href}?subject=${encodeURIComponent(subject)}&body=${encodeURIComponent(body)}`;
 }
 
-export default function Composer({ bodyRef }: { bodyRef: RefObject<HTMLTextAreaElement | null> }) {
+export default function Composer({ bodyRef, api }: { bodyRef: RefObject<HTMLTextAreaElement | null>; api?: RefObject<ComposerApi | null> }) {
   const { compact } = usePage();
   const id = useId();
   const [f, setF] = useState<Form>(EMPTY);
   const [err, setErr] = useState<{ email?: string; message?: string }>({});
   const [sent, setSent] = useState(false);
+
+  useImperativeHandle(api, () => ({
+    fill: (message: string) => {
+      setSent(false);
+      setF((p) => ({ ...p, message: p.message.trim() ? `${p.message.trimEnd()}\n\n${message}` : message }));
+      setErr((p) => ({ ...p, message: undefined }));
+    },
+  }));
 
   const set = (k: keyof Form) => (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
     setF((p) => ({ ...p, [k]: e.target.value }));
@@ -47,46 +60,53 @@ export default function Composer({ bodyRef }: { bodyRef: RefObject<HTMLTextAreaE
   };
 
   const dirty = Object.values(f).some((v) => v.trim());
-  const row = "flex min-h-[44px] items-center gap-[8px] border-b-[0.5px] border-sep px-[18px]";
-  const label = "w-[62px] shrink-0 text-[15px] text-label-2";
+  const ready = !!f.message.trim() && (!f.email.trim() || EMAIL.test(f.email.trim()));
+  // Hairline rows, inset to the text the way iOS insets its separators.
+  const row = "mx-[20px] flex min-h-[46px] items-center gap-[8px] border-b-[0.5px] border-sep";
+  const label = "w-[64px] shrink-0 text-[15px] tracking-[-0.016em] text-label-2";
   const input =
-    "min-w-0 flex-1 appearance-none rounded-none border-0 bg-transparent px-0 py-[11px] text-[15px] tracking-[-0.016em] text-label caret-blue outline-none placeholder:text-label-3 focus-visible:outline-none";
+    "min-w-0 flex-1 appearance-none rounded-none border-0 bg-transparent px-0 py-[12px] text-[15px] tracking-[-0.016em] text-label caret-blue outline-none placeholder:text-label-3 focus-visible:outline-none";
+  const circle = `grid size-[40px] place-items-center rounded-full ${SWELL}`;
 
   return (
-    <div
-      className="relative overflow-hidden rounded-[26px] bg-(--glass-strong) text-label shadow-[inset_0_0.5px_0_0.5px_var(--glass-edge),0_24px_60px_-12px_rgba(0,0,0,0.18),0_0_0_0.5px_rgba(0,0,0,0.05)]"
-    >
-      {/* Sheet header: Clear · New Message · Send */}
-      <div className="grid h-[52px] grid-cols-[1fr_auto_1fr] items-center px-[14px]">
+    <div className="glass relative overflow-hidden rounded-[34px] bg-(--glass-strong) text-label">
+      {/* Sheet header: ✕ · New Message · ↑ */}
+      <div className="grid h-[64px] grid-cols-[1fr_auto_1fr] items-center px-[12px]">
         <button
           type="button"
           onClick={() => {
             setF(EMPTY);
             setErr({});
           }}
-          disabled={!dirty}
-          className="justify-self-start px-[4px] text-[15px] text-blue transition-opacity disabled:opacity-35"
+          aria-label="Clear message"
+          title="Clear message"
+          aria-disabled={!dirty}
+          className={`glass justify-self-start text-label ${circle} aria-disabled:text-label-3`}
         >
-          Clear
+          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true">
+            <path d="m6 6 12 12M18 6 6 18" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />
+          </svg>
         </button>
-        <p className="font-display text-[16px] font-semibold tracking-[-0.01em]">New Message</p>
+        <p className="font-display text-[17px] font-semibold tracking-[-0.022em]">New Message</p>
         <button
           type="button"
           onClick={send}
           aria-label="Send"
-          title="Send"
-          className={`grid size-[32px] place-items-center justify-self-end rounded-full bg-blue text-white shadow-[0_4px_14px_rgba(0,120,255,0.35)] ${PRESS}`}
+          title={ready ? "Send" : "Write a message to send"}
+          aria-disabled={!ready}
+          className={`glass glass-tint justify-self-end ${circle} ${ready ? "hover:brightness-110" : ""}`}
+          style={{ "--tint": ready ? "var(--blue)" : "color-mix(in srgb, var(--gray) 42%, transparent)" } as React.CSSProperties}
         >
-          <svg width="16" height="16" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
-            <path d="M12 19V5m-6.5 6.5L12 5l6.5 6.5" />
+          <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true" fill="none" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" strokeLinejoin="round">
+            <path d="M12 19.5V5m-6.5 6.5L12 5l6.5 6.5" />
           </svg>
         </button>
       </div>
 
-      <div className="border-t-[0.5px] border-sep">
+      <div>
         <div className={row}>
           <span className={label}>To:</span>
-          <span className="inline-flex h-[26px] items-center rounded-full bg-[color-mix(in_srgb,var(--blue)_14%,transparent)] px-[10px] text-[14px] text-blue">
+          <span className="inline-flex h-[28px] items-center rounded-full bg-[color-mix(in_srgb,var(--blue)_14%,transparent)] px-[11px] text-[14px] tracking-[-0.01em] text-blue">
             {profile.name}
           </span>
         </div>
@@ -127,13 +147,13 @@ export default function Composer({ bodyRef }: { bodyRef: RefObject<HTMLTextAreaE
         aria-label="Message"
         aria-invalid={!!err.message}
         aria-describedby={err.message ? `${id}-msg-hint` : undefined}
-        className={`block w-full resize-none appearance-none rounded-none border-0 bg-transparent px-[18px] pt-[14px] pb-[10px] text-[15px] leading-[1.47] tracking-[-0.016em] text-label caret-blue outline-none placeholder:text-label-3 focus-visible:outline-none ${
+        className={`block w-full resize-none appearance-none rounded-none border-0 bg-transparent px-[20px] pt-[14px] pb-[10px] text-[15px] leading-[1.47] tracking-[-0.016em] text-label caret-blue outline-none placeholder:text-label-3 focus-visible:outline-none ${
           compact ? "h-[150px]" : "h-[178px]"
         }`}
       />
       {err.message ? <Hint id={`${id}-msg-hint`}>{err.message}</Hint> : null}
 
-      <p className="border-t-[0.5px] border-sep px-[18px] py-[11px] text-[11.5px] leading-[1.35] text-label-2">
+      <p className="mx-[20px] border-t-[0.5px] border-sep py-[12px] pb-[16px] text-[11.5px] leading-[1.35] text-label-2">
         Opens in your mail app, addressed to {contact.email.label}.
       </p>
 
@@ -175,7 +195,7 @@ export default function Composer({ bodyRef }: { bodyRef: RefObject<HTMLTextAreaE
 
 function Hint({ id, children }: { id: string; children: React.ReactNode }) {
   return (
-    <p id={id} role="alert" className="flex items-center gap-[6px] px-[18px] pt-[6px] pb-[4px] text-[12.5px] text-red">
+    <p id={id} role="alert" className="flex items-center gap-[6px] px-[20px] pt-[6px] pb-[4px] text-[12.5px] text-red">
       <svg width="13" height="13" viewBox="0 0 24 24" aria-hidden="true">
         <circle cx="12" cy="12" r="10" fill="currentColor" />
         <path d="M12 7v6" stroke="#fff" strokeWidth="2.4" strokeLinecap="round" />

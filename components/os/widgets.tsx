@@ -148,7 +148,7 @@ export function WeatherWidget({ size }: { size: number }) {
   const [label, kind] = WMO[v.code] ?? ["Partly Cloudy", "partly"];
   return (
     <div
-      className={`${card} bg-[linear-gradient(180deg,#3a7bd5_0%,#6aa8e8_100%)] p-[15px] text-white`}
+      className={`${card} bg-[linear-gradient(180deg,#3a7bd5_0%,#6aa8e8_100%)] dark:bg-[linear-gradient(180deg,#0e2a52_0%,#2e5688_100%)] p-[15px] text-white`}
       style={{ width: size, height: size }}
     >
       <p className="text-[14px] leading-[1.2] font-semibold">Addis Ababa</p>
@@ -177,18 +177,20 @@ export function MapWidget({ size }: { size: number }) {
       aria-label="Location: Addis Ababa. Opens Contact"
     >
       <svg className="absolute inset-0" width={size} height={size} viewBox="0 0 160 160" aria-hidden="true">
-        <rect width="160" height="160" fill="#eaf2e3" />
-        <path d="M-10 40 C40 30 60 60 110 50 S170 30 180 40 V-10 H-10z" fill="#cfe6c0" />
-        <path d="M100 160 C110 120 140 110 170 112 V170 H100z" fill="#a9d4f0" />
-        <path d="M-5 112 L170 70" stroke="#fff" strokeWidth="7" />
-        <path d="M-5 112 L170 70" stroke="#f7d774" strokeWidth="3.4" />
-        <path d="M55 -5 L80 170" stroke="#fff" strokeWidth="5" />
-        <path d="M-5 70 C30 80 60 95 90 128 S130 160 140 170" stroke="#fff" strokeWidth="4" fill="none" />
-        <path d="M120 -5 L105 80" stroke="#fff" strokeWidth="3.4" />
-        <text x="12" y="150" fontSize="8.5" fontWeight="700" fill="#2d6a4f" letterSpacing=".04em" opacity=".85">
+        <rect width="160" height="160" className="fill-[#eaf2e3] dark:fill-[#25302a]" />
+        <path d="M-10 40 C40 30 60 60 110 50 S170 30 180 40 V-10 H-10z" className="fill-[#cfe6c0] dark:fill-[#2f4433]" />
+        <path d="M100 160 C110 120 140 110 170 112 V170 H100z" className="fill-[#a9d4f0] dark:fill-[#1f3a52]" />
+        <path d="M-5 112 L170 70" className="stroke-white dark:stroke-[#4a4a4f]" strokeWidth="7" />
+        <path d="M-5 112 L170 70" className="stroke-[#f7d774] dark:stroke-[#a88a33]" strokeWidth="3.4" />
+        <g className="stroke-white dark:stroke-[#4a4a4f]" fill="none">
+          <path d="M55 -5 L80 170" strokeWidth="5" />
+          <path d="M-5 70 C30 80 60 95 90 128 S130 160 140 170" strokeWidth="4" />
+          <path d="M120 -5 L105 80" strokeWidth="3.4" />
+        </g>
+        <text x="12" y="150" fontSize="8.5" fontWeight="700" className="fill-[#2d6a4f] dark:fill-[#8fd1a8]" letterSpacing=".04em" opacity=".85">
           BOLE
         </text>
-        <text x="96" y="30" fontSize="7.5" fontWeight="700" fill="#557" opacity=".7" letterSpacing=".04em">
+        <text x="96" y="30" fontSize="7.5" fontWeight="700" className="fill-[#557] dark:fill-[#aab]" opacity=".7" letterSpacing=".04em">
           PIASSA
         </text>
       </svg>
@@ -198,10 +200,10 @@ export function MapWidget({ size }: { size: number }) {
         </span>
         <span className="absolute -bottom-[5px] left-1/2 size-[8px] -translate-x-1/2 rotate-45 bg-white" />
       </span>
-      <span className="absolute inset-x-0 bottom-0 bg-white/80 px-[13px] pt-[7px] pb-[10px] text-left backdrop-blur-md">
-        <span className="block text-[10px] font-semibold tracking-[0.02em] text-black/50 uppercase">Now</span>
-        <span className="block text-[13px] leading-[1.15] font-semibold text-black">Addis Ababa</span>
-        <span className="block text-[11px] leading-[1.2] text-black/55">{profile.utcOffset} · Ethiopia</span>
+      <span className="absolute inset-x-0 bottom-0 bg-white/80 px-[13px] pt-[7px] pb-[10px] text-left backdrop-blur-md dark:bg-[rgba(28,28,30,0.82)]">
+        <span className="block text-[10px] font-semibold tracking-[0.02em] text-black/50 dark:text-white/50 uppercase">Now</span>
+        <span className="block text-[13px] leading-[1.15] font-semibold text-black dark:text-white">Addis Ababa</span>
+        <span className="block text-[11px] leading-[1.2] text-black/55 dark:text-white/55">{profile.utcOffset} · Ethiopia</span>
       </span>
     </button>
   );
@@ -215,21 +217,21 @@ export function ClockWidget({ size }: { size: number }) {
     .map(Number) as [number, number, number];
   const hourA = ((h % 12) + m / 60) * 30, minA = (m + s / 60) * 6, secA = s * 6;
   return (
-    <div className={`${card} bg-white`} style={{ width: size, height: size, borderRadius: size / 2 }} aria-label="Clock, Addis Ababa">
-      <svg viewBox="-50 -50 100 100" width={size} height={size} aria-hidden="true">
+    <div className={`${card} bg-white dark:bg-[#1c1c1e]`} style={{ width: size, height: size, borderRadius: size / 2 }} aria-label="Clock, Addis Ababa">
+      <svg viewBox="-50 -50 100 100" width={size} height={size} aria-hidden="true" className="text-black dark:text-white">
         {Array.from({ length: 12 }, (_, i) => (
-          <text key={i} x={Math.sin((i * Math.PI) / 6) * 36} y={-Math.cos((i * Math.PI) / 6) * 36 + 4} textAnchor="middle" fontSize="11" fontWeight="600" fill="#000">
+          <text key={i} x={Math.sin((i * Math.PI) / 6) * 36} y={-Math.cos((i * Math.PI) / 6) * 36 + 4} textAnchor="middle" fontSize="11" fontWeight="600" fill="currentColor">
             {i === 0 ? 12 : i}
           </text>
         ))}
         <text x="0" y="-15" textAnchor="middle" fontSize="7" fontWeight="600" fill="#8e8e93">ADD</text>
-        <line x1="0" y1="0" x2="0" y2="-22" stroke="#000" strokeWidth="3.2" strokeLinecap="round" transform={`rotate(${hourA})`} />
-        <line x1="0" y1="0" x2="0" y2="-34" stroke="#000" strokeWidth="2.2" strokeLinecap="round" transform={`rotate(${minA})`} />
+        <line x1="0" y1="0" x2="0" y2="-22" stroke="currentColor" strokeWidth="3.2" strokeLinecap="round" transform={`rotate(${hourA})`} />
+        <line x1="0" y1="0" x2="0" y2="-34" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" transform={`rotate(${minA})`} />
         <g transform={`rotate(${secA})`}>
           <line x1="0" y1="8" x2="0" y2="-38" stroke="#ff9500" strokeWidth="1" />
         </g>
         <circle r="2.6" fill="#ff9500" />
-        <circle r="1" fill="#fff" />
+        <circle r="1" className="fill-white dark:fill-black" />
       </svg>
     </div>
   );
@@ -239,14 +241,14 @@ export function CalendarWidget({ size }: { size: number }) {
   const now = useNow("m");
   const d = now ?? new Date(2026, 10, 3);
   return (
-    <div className={`${card} bg-white p-[15px] text-black`} style={{ width: size, height: size }}>
+    <div className={`${card} bg-white p-[15px] text-black dark:bg-[#1c1c1e] dark:text-white`} style={{ width: size, height: size }}>
       <p className="text-[12px] font-semibold tracking-[0.02em] text-[#ff3b30] uppercase">
         {d.toLocaleDateString("en-US", { weekday: "long" })}
       </p>
       <p className="text-[46px] leading-[1] font-light tracking-[-0.02em]">{d.getDate()}</p>
       <div className="mt-[10px] rounded-[8px] border-l-[3px] border-[#34c759] bg-[#34c759]/12 px-[7px] py-[4px]">
         <p className="text-[11.5px] leading-[1.2] font-semibold">Open to work</p>
-        <p className="text-[10.5px] leading-[1.2] text-black/55">Full-time · remote</p>
+        <p className="text-[10.5px] leading-[1.2] text-black/55 dark:text-white/55">Full-time · remote</p>
       </div>
     </div>
   );
@@ -263,7 +265,7 @@ export function ExperienceWidget({ w, h }: { w: number; h: number }) {
       ref={ref}
       type="button"
       onClick={() => launch("about", ref.current)}
-      className={`${card} bg-white p-[20px] text-black`}
+      className={`${card} bg-white p-[20px] text-black dark:bg-[#1c1c1e] dark:text-white`}
       style={{ width: w, height: h }}
       aria-label="Experience. Opens About"
     >
@@ -272,18 +274,18 @@ export function ExperienceWidget({ w, h }: { w: number; h: number }) {
       <ol className="mt-[16px] flex flex-col gap-[14px]">
         {experience.map((r) => (
           <li key={r.company} className="flex gap-[10px]">
-            <span className={`mt-[2px] w-[4px] shrink-0 rounded-full ${r.end ? "bg-[#c7c7cc]" : "bg-[#34c759]"}`} />
+            <span className={`mt-[2px] w-[4px] shrink-0 rounded-full ${r.end ? "bg-[#c7c7cc] dark:bg-[#48484a]" : "bg-[#34c759]"}`} />
             <span className="min-w-0">
               <span className="block text-[14px] leading-[1.2] font-semibold">{r.company}</span>
-              <span className="block text-[12px] leading-[1.3] text-black/55">
+              <span className="block text-[12px] leading-[1.3] text-black/55 dark:text-white/55">
                 {r.title} · {month(r.start)} – {r.end ? month(r.end) : "Now"}
               </span>
-              <span className="mt-[3px] line-clamp-2 block text-[12px] leading-[1.3] text-black/75">{r.summary}</span>
+              <span className="mt-[3px] line-clamp-2 block text-[12px] leading-[1.3] text-black/75 dark:text-white/75">{r.summary}</span>
             </span>
           </li>
         ))}
       </ol>
-      <p className="absolute bottom-[18px] left-[20px] text-[12px] text-black/45">
+      <p className="absolute bottom-[18px] left-[20px] text-[12px] text-black/45 dark:text-white/45">
         {profile.education.degree}, {profile.education.school}
       </p>
     </button>
@@ -310,10 +312,10 @@ export function StackWidget({ w, h }: { w: number; h: number }) {
 export function WorkWidget({ w, h }: { w: number; h: number }) {
   const shown = projects.filter((p) => !p.confidential).length;
   return (
-    <div className={`${card} bg-white p-[16px] text-black`} style={{ width: w, height: h }}>
+    <div className={`${card} bg-white p-[16px] text-black dark:bg-[#1c1c1e] dark:text-white`} style={{ width: w, height: h }}>
       <p className="text-[12px] font-semibold tracking-[0.02em] text-[#0a84ff] uppercase">Work</p>
       <p className="mt-[2px] text-[36px] leading-[1] font-light">{projects.length}</p>
-      <p className="mt-[4px] text-[12px] leading-[1.3] text-black/55">
+      <p className="mt-[4px] text-[12px] leading-[1.3] text-black/55 dark:text-white/55">
         projects · {shown} with screens, {projects.length - shown} under NDA
       </p>
     </div>
