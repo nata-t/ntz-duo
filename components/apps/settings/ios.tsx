@@ -10,6 +10,10 @@ import type { Slot } from "@/lib/os";
 /** Width of the vertical toolbar on the window's outer edge (Figma kit). */
 export const RAIL = 84;
 
+/** Rail controls are 48 pt and centred in the rail, on the same line as
+ *  the status circle above them and the Home Screen's dock. */
+export const RAIL_INSET = (RAIL - 48) / 2;
+
 /** The rail's first control sits under the status bar on the trailing
  *  side, and at the top corner on the leading side (no status bar there). */
 export const railTop = (slot: Slot) => (slot === "left" ? 24 : 122);
@@ -34,8 +38,8 @@ export function Rail({ slot, children, bottom }: { slot: Slot; children: ReactNo
         [left ? "left" : "right"]: 0,
         paddingTop: railTop(slot),
         paddingBottom: 24,
-        paddingLeft: left ? 24 : 12,
-        paddingRight: left ? 12 : 24,
+        paddingLeft: RAIL_INSET,
+        paddingRight: RAIL_INSET,
       }}
     >
       <div className="flex flex-col gap-[12px]">{children}</div>

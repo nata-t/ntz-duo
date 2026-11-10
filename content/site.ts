@@ -25,7 +25,7 @@ export type Profile = {
   bio: string[];
   availability: string;
   education: { school: string; degree: string; years: string; note: string };
-  portrait: { halftone: string; dither: string; source: string };
+  portrait: { halftone: string; dither: string; source: string; studio: string; cutout: string };
   cv: Link;
 };
 
@@ -95,6 +95,10 @@ export const profile: Profile = {
     halftone: "/portrait/halftone.png",
     dither: "/portrait/dither.png",
     source: "/portrait/source.webp",
+    // Black and white on white, hand to the chin: the Home Screen's big
+    // widget, and cut out of its white (alpha) for About's hero.
+    studio: "/portrait/turtleneck.webp",
+    cutout: "/portrait/turtleneck-cutout.webp",
   },
   cv: { label: "Download CV", href: "/Natnael_Tadele_CV.pdf" },
 };

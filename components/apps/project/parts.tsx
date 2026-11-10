@@ -65,10 +65,7 @@ export function Icon({ p, size }: { p: P; size: number }) {
 /** The 21:9 hero, as App Store pages now open: promo art in the brand
  *  colour, with the first real screen rising out of its lower edge, or
  *  the icon, big, for systems under NDA. */
-export function Hero({ p, height, center, mirror, dark }: { p: P; height: number; center: number; mirror: boolean; dark: boolean }) {
-  const shot = p.confidential ? null : p.screens[0];
-  const top = Math.round(height * 0.15);
-  const h = Math.round(height - top + height * 0.08);
+export function Hero({ p, height, center, dark }: { p: P; height: number; center: number; dark: boolean }) {
   // A pale brand (cream, amber) under a white status bar (dark mode) needs
   // more shade on the top edge than a deep one.
   const pale = contrast(p.color, "#ffffff") < 3;
@@ -86,26 +83,11 @@ export function Hero({ p, height, center, mirror, dark }: { p: P; height: number
         aria-hidden="true"
         className="absolute inset-0 bg-[radial-gradient(currentColor_1px,transparent_1.4px)] bg-size-[22px_22px] opacity-[0.16] mask-[radial-gradient(70%_90%_at_50%_100%,#000,transparent)]"
       />
-      {shot ? (
-        <div
-          className="absolute -translate-x-1/2 overflow-hidden rounded-[14px] bg-page-alt shadow-[0_0_0_0.5px_rgba(0,0,0,0.12),0_24px_60px_rgba(0,0,0,0.36),0_6px_16px_rgba(0,0,0,0.16)]"
-          style={{ top, left: center, height: h, width: Math.round(h * 1.6) }}
-        >
-          {/* eslint-disable-next-line @next/next/no-img-element -- static, pre-sized assets */}
-          <img
-            src={shot}
-            alt={`${p.name}: home page`}
-            draggable={false}
-            loading={mirror ? "lazy" : "eager"}
-            decoding="async"
-            className="absolute inset-0 h-full w-full object-cover object-top"
-          />
-        </div>
-      ) : (
-        <span aria-hidden="true" className="absolute top-[54%] -translate-x-1/2 -translate-y-1/2 rotate-[-8deg]" style={{ left: center }}>
-          <Icon p={p} size={Math.round(height * 0.5)} />
-        </span>
-      )}
+      {/* The app icon, large and tilted: the screens wait under Preview,
+          after the description. */}
+      <span aria-hidden="true" className="absolute top-[54%] -translate-x-1/2 -translate-y-1/2 rotate-[-8deg]" style={{ left: center }}>
+        <Icon p={p} size={Math.round(height * 0.5)} />
+      </span>
       {/* A soft shade on the top edge, under the status bar and the rail. */}
       <div
         aria-hidden="true"

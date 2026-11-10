@@ -45,6 +45,14 @@ export function Row({ icon, title, sub, value, chevron, accessory, onClick, sele
     <>
       <span data-sep className="absolute top-0 right-[16px] h-[0.5px] bg-sep" style={{ left: inset }} />
       {selected ? <span aria-hidden className="absolute inset-x-[6px] inset-y-[4px] rounded-full bg-blue" /> : null}
+      {/* Hover and press take the selection's shape, a pill inset in the
+          card, never a box running into the card's edges. */}
+      {onClick && !selected ? (
+        <span
+          aria-hidden
+          className="absolute inset-x-[6px] inset-y-[4px] rounded-full bg-fill-3 opacity-0 transition-[opacity,background-color] duration-200 group-hover/row:opacity-100 group-active/row:bg-fill-2 group-active/row:opacity-100"
+        />
+      ) : null}
       {icon ? (
         <span className={`relative rounded-[8px] ${selected ? "shadow-[0_0_0_1px_rgba(255,255,255,0.55)]" : ""}`}>
           <SettingsIcon name={icon} size={TILE} />
@@ -86,7 +94,7 @@ export function Row({ icon, title, sub, value, chevron, accessory, onClick, sele
       type="button"
       onClick={onClick}
       aria-current={selected || undefined}
-      className={`${cls} transition-colors duration-150 ${selected ? "" : "hover:bg-fill-3 active:bg-fill-2"}`}
+      className={`group/row ${cls}`}
       style={style}
     >
       {body}

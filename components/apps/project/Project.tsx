@@ -6,6 +6,10 @@ import { openApp, os, useOS } from "@/lib/os";
 import type { AppProps } from "../types";
 import { Glyph, Rail, RailButton, RailGroup, contentBox } from "../settings/ios";
 import { accentFor, contrast } from "./color";
+import { iconRadius } from "@/components/os/AppIcon";
+
+/** The Home Screen dock's corner: its 52 pt icons' plus 8 pt of padding. */
+const DOCK_R = iconRadius(52) + 8;
 import { Carousel, Header, Hero, Icon, InfoStrip, Section, Sym, Toast, type Gutter } from "./parts";
 
 // A project's page, read like an iOS 27 App Store product page: hero media,
@@ -155,14 +159,31 @@ export default function Project({ id, width, slot, mirror, close, slug }: AppPro
   return (
     <div className="relative h-full overflow-hidden bg-page text-ink">
       <div ref={scroller} data-still={mirror || undefined} data-project-scroll className="no-scrollbar absolute inset-0 overflow-y-auto overscroll-contain">
-        <Hero p={p} height={heroH} center={box.left + box.width / 2} mirror={mirror} dark={dark} />
+        <Hero p={p} height={heroH} center={box.left + box.width / 2} dark={dark} />
         <Header p={p} wide={wide} tint={tint} host={host} style={gutter} />
 
         <div ref={strip} className="pt-[18px]">
           <InfoStrip p={p} gutter={gutter} />
         </div>
 
-        <Reveal className="pt-[4px]">
+        {/* The App Store's order: the description first, then Preview. */}
+        <Reveal className={wide ? "pt-[26px]" : "pt-[22px]"}>
+          <div style={gutter}>
+            <p className={`max-w-[640px] leading-[1.47] tracking-[-0.022em] text-ink ${wide ? "text-[17px]" : "text-[16px]"}`}>{p.summary}</p>
+            <p className="mt-[10px] text-[15px] leading-[20px]">
+              <span className="text-link">{profile.name}</span>
+              <span className="text-ink-3"> · Developer</span>
+            </p>
+          </div>
+        </Reveal>
+
+        <Reveal className={wide ? "pt-[30px]" : "pt-[26px]"}>
+          <h2
+            className={`pb-[12px] font-display font-bold tracking-[-0.01em] text-ink ${wide ? "text-[24px] leading-[30px]" : "text-[22px] leading-[28px]"}`}
+            style={gutter}
+          >
+            Preview
+          </h2>
           <Carousel p={p} wide={wide} gutter={gutter} mirror={mirror} dark={dark} />
           <p className="mt-[10px] flex items-center gap-[6px] text-[13px] leading-[18px] text-ink-3" style={gutter}>
             {p.confidential ? (
@@ -183,16 +204,6 @@ export default function Project({ id, width, slot, mirror, close, slug }: AppPro
         </Reveal>
 
         <div className={`flex flex-col ${wide ? "gap-[34px] pt-[30px]" : "gap-[28px] pt-[26px]"}`}>
-          <Reveal>
-            <div style={gutter}>
-              <p className={`max-w-[640px] leading-[1.47] tracking-[-0.022em] text-ink ${wide ? "text-[17px]" : "text-[16px]"}`}>{p.summary}</p>
-              <p className="mt-[10px] text-[15px] leading-[20px]">
-                <span className="text-link">{profile.name}</span>
-                <span className="text-ink-3"> · Developer</span>
-              </p>
-            </div>
-          </Reveal>
-
           <Reveal>
             <Section title="What I built" sub={`${p.role} · ${p.year}`} gutter={gutter}>
               <ol className={wide && p.built.length >= 4 && p.built.length % 2 === 0 ? "grid grid-cols-2 gap-x-[28px]" : ""}>
@@ -255,38 +266,39 @@ export default function Project({ id, width, slot, mirror, close, slug }: AppPro
         </div>
       </div>
 
-      {/* The scroll-edge effect under the title capsule, once the hero has
-          gone; it fades itself (no glass inside it). */}
+      {/* The scroll-edge effect under the dock, once the header has gone;
+          it fades itself (no glass inside it). */}
       <div
         aria-hidden="true"
         className={`scroll-edge-top absolute inset-x-0 top-0 z-10 h-[116px] transition-opacity duration-300 [--edge:var(--page)] ${bar ? "" : "opacity-0"}`}
       />
 
-      {/* Inline title: the App Store's nav shows the icon and Get once the
-          header has scrolled off. Glass, so it moves itself. */}
+      {/* The top dock: the App Store's inline icon and action, gathered on
+          one glass dock. Its corner is the Home Screen dock's (the icon
+          corner plus the padding), the pieces inside concentric with it. */}
       <div
         aria-hidden={!bar}
         inert={!bar || undefined}
-        className={`glass absolute top-[40px] z-20 flex h-[48px] max-w-[min(420px,calc(100%-40px))] -translate-x-1/2 items-center gap-[10px] rounded-full py-[6px] pr-[6px] pl-[6px] transition-[opacity,translate,scale] duration-400 ease-ios ${
+        className={`glass absolute top-[38px] z-20 flex h-[58px] max-w-[min(460px,calc(100%-40px))] -translate-x-1/2 items-center gap-[12px] p-[9px] pr-[9px] transition-[opacity,translate,scale] duration-400 ease-ios ${
           bar ? "" : "pointer-events-none -translate-y-[10px] scale-[0.9] opacity-0"
         }`}
-        style={{ left: box.left + box.width / 2 }}
+        style={{ left: box.left + box.width / 2, borderRadius: DOCK_R }}
       >
-        <Icon p={p} size={36} />
-        <span className="min-w-0 truncate pr-[2px] text-[15px] leading-[20px] font-semibold tracking-[-0.01em] text-label">{p.short}</span>
+        <Icon p={p} size={40} />
+        <span className="min-w-0 truncate pr-[4px] text-[16px] leading-[21px] font-semibold tracking-[-0.01em] text-label">{p.short}</span>
         {p.url ? (
           <a
             href={p.url}
             target="_blank"
             rel="noopener noreferrer"
             tabIndex={bar ? 0 : -1}
-            className="grid h-[32px] shrink-0 place-items-center rounded-full px-[16px] text-[14px] font-semibold text-white transition-[scale,filter] duration-300 ease-ios hover:brightness-110 active:scale-110"
-            style={{ background: tint }}
+            className="grid h-[40px] shrink-0 place-items-center px-[20px] text-[15px] font-semibold text-white transition-[scale,filter] duration-300 ease-ios hover:brightness-110 active:scale-110"
+            style={{ background: tint, borderRadius: DOCK_R - 9 }}
           >
             Visit
           </a>
         ) : (
-          <span className="mr-[8px] text-ink-3">{Sym.lock}</span>
+          <span className="mr-[10px] text-ink-3">{Sym.lock}</span>
         )}
       </div>
 

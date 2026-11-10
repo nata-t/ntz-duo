@@ -88,14 +88,15 @@ function Hero({ height }: { height: number }) {
         <div
           className="absolute left-1/2 aspect-square -translate-x-1/2 rounded-full bg-[radial-gradient(closest-side,#d6dff0_0%,#e8edf6_45%,rgba(245,247,251,0)_100%)] top-[-8%] w-[125%] dark:bg-[radial-gradient(closest-side,#232c3f_0%,#141925_50%,rgba(0,0,0,0)_100%)]"
         />
-        {/* The cut-out ends at the chest and shoulders: dissolve those edges
-            so he stands in the light rather than on a card. */}
+        {/* The studio portrait, cut out of its white: the shoulders run off
+            the frame, so those edges dissolve and he stands in the light
+            rather than on a card. */}
         {/* eslint-disable-next-line @next/next/no-img-element -- a fixed-size cut-out, already webp */}
         <img
-          src={profile.portrait.source}
+          src={profile.portrait.cutout}
           alt={`Portrait of ${profile.name}`}
           draggable={false}
-          className="absolute bottom-0 left-1/2 h-full w-auto max-w-none -translate-x-1/2 mask-[linear-gradient(90deg,transparent_0%,#000_16%,#000_84%,transparent_100%),linear-gradient(180deg,#000_62%,transparent_98%)] mask-intersect select-none"
+          className="absolute bottom-0 left-1/2 h-full w-auto max-w-none -translate-x-1/2 mask-[linear-gradient(90deg,transparent_0%,#000_14%,#000_86%,transparent_100%),linear-gradient(180deg,#000_64%,transparent_98%)] mask-intersect select-none"
         />
       </div>
     </div>
@@ -120,7 +121,7 @@ function Hero({ height }: { height: number }) {
     );
 
   // Full width: copy on the left, the portrait standing on the right.
-  const shotW = (height - 64) * (787 / 1100);
+  const shotW = (height - 64) * (1136 / 1385);
   return (
     <header className="relative overflow-hidden bg-page" style={{ height }}>
       <div className="absolute bottom-0" style={{ right: padR - 36, width: shotW, top: 64 }}>

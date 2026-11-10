@@ -1,12 +1,12 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import { applyGlass, closeWindow, goHome, homeRegion, os, swapSides, syncAppearance, useDims, useOS } from "@/lib/os";
 import { exitFull } from "@/lib/full";
 import Home, { homePages } from "./Home";
 import Window from "./Window";
 import StatusBar from "./StatusBar";
-import ControlCenter from "./ControlCenter";
+import ControlCenter, { cc } from "./ControlCenter";
 import Search from "./Search";
 import Alert from "./Alert";
 
@@ -18,6 +18,10 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
   const live = useOS((s) => s.live);
   const brightness = useOS((s) => s.brightness);
   const overlay = useOS((s) => s.overlay);
+  const ccShown = cc.use((s) => s.shown);
+  // Spotlight stays mounted while it animates away.
+  const [searchShown, setSearchShown] = useState(false);
+  if (overlay === "search" && !searchShown) setSearchShown(true);
   const root = useRef<HTMLDivElement>(null);
   const region = homeRegion(windows);
   const { w: W, h: H } = useDims();
@@ -146,8 +150,11 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
 
       <StatusBar />
 
-      {!mirror && overlay === "control" ? <ControlCenter /> : null}
-      {!mirror && overlay === "search" ? <Search /> : null}
+      {/* Control Center stays while it closes, folding back into the circle. */}
+      {!mirror && (overlay === "control" || ccShown) ? <ControlCenter /> : null}
+      {!mirror && (overlay === "search" || searchShown) ? (
+        <Search closing={overlay !== "search"} onClosed={() => setSearchShown(false)} />
+      ) : null}
       {!mirror ? <Alert /> : null}
 
       {/* Brightness, as the panel would dim. */}

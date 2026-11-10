@@ -9,7 +9,7 @@ import { openApp, type Slot } from "@/lib/os";
 import type { Photo } from "./data";
 import { byline } from "./data";
 import { ChevronLeft, ChevronRight, CompassIcon, EllipsisIcon, HeartIcon, InfoIcon, LinkIcon, OpenAppIcon, SaveIcon, ShareIcon } from "./icons";
-import { GlassButton, Menu, MenuItem, RAIL } from "./ui";
+import { GlassButton, Menu, MenuItem, RAIL, RAIL_INSET } from "./ui";
 
 type Rect = { x: number; y: number; w: number; h: number };
 
@@ -343,7 +343,7 @@ export default function Viewer({ list, start, origin, width, height, slot, rail,
   // Placement. Rail: Back and "…" at the top of the outer edge, the actions
   // bottom-aligned, the title over the stage's top left. Otherwise a top
   // row (Back, title, "…") and a bottom row (Share, the capsule, Open).
-  const railX = leftRail ? 24 : width - 24 - 48;
+  const railX = leftRail ? RAIL_INSET : width - RAIL_INSET - 48;
   const railTop = leftRail ? 24 : 122;
   const rowTop = top + 36;
   const rowRight = statusSide ? 92 : 16;

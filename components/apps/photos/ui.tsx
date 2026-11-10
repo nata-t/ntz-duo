@@ -7,6 +7,8 @@ import { CheckIcon } from "./icons";
 
 /** The side rail is 84 pt on the window's outer edge (Duo UI kit). */
 export const RAIL = 84;
+/** Its 48 pt controls sit centred, in line with the status circle. */
+export const RAIL_INSET = (RAIL - 48) / 2;
 /** Height the large-title header takes over the top of a scroll view. */
 export const HEADER = 92;
 

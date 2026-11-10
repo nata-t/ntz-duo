@@ -4,6 +4,7 @@ import { stage } from "@/components/stage/stage-state";
 import { useOS } from "@/lib/os";
 import { OUTER } from "@/components/device/geometry";
 import { useNow } from "@/components/os/widgets";
+import { StatusRing, useBattery } from "@/components/os/StatusRing";
 
 /** The outer camera's centre (from the UI kit): the rail's controls line up under it. */
 const CAM_X = 418.2;
@@ -27,6 +28,7 @@ export default function OuterDisplay() {
 
 function LockScreen() {
   const now = useNow("m");
+  const level = useBattery();
   const dark = useOS((s) => s.dark);
   const d = now ?? new Date(2026, 10, 3, 9, 41);
   const time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).replace(/\s?[AP]M$/, "");
@@ -37,15 +39,11 @@ function LockScreen() {
       <img src={`/wallpapers/outer-${dark ? "dark" : "light"}.webp`} alt="" draggable={false} className="absolute inset-0 h-full w-full object-cover" />
       <div className="absolute inset-x-0 top-0 h-[55%] bg-gradient-to-b from-black/10 to-transparent" />
 
-      {/* Rail: status on the trailing edge, centred under the camera. */}
-      <div className="absolute top-[76px] flex -translate-x-1/2 flex-col items-center gap-[7px]" style={{ left: CAM_X }}>
-        <svg width="17" height="13" viewBox="0 0 16 12" aria-hidden="true">
-          <path d="M8 2.4c2.3 0 4.4.9 6 2.4l1.1-1.1A10 10 0 0 0 8 .8 10 10 0 0 0 .9 3.7L2 4.8a8.4 8.4 0 0 1 6-2.4M8 5.6c1.4 0 2.7.5 3.7 1.4l1.1-1.1A7 7 0 0 0 8 4a7 7 0 0 0-4.8 1.9L4.3 7c1-.9 2.3-1.4 3.7-1.4M8 8.8c.6 0 1.1.2 1.5.6L8 11 6.5 9.4c.4-.4.9-.6 1.5-.6" fill="#fff" />
-        </svg>
-        <svg width="25" height="12" viewBox="0 0 25 12" aria-hidden="true">
-          <rect x=".5" y=".5" width="21" height="11" rx="3.4" fill="none" stroke="#fff" strokeOpacity=".5" />
-          <rect x="2" y="2" width="15" height="8" rx="2" fill="#fff" />
-        </svg>
+      {/* Rail: the Duo's status circle (battery ring, Wi-Fi, signal) on
+          the trailing edge, centred under the camera. The Lock Screen's own
+          clock stands in for the time. */}
+      <div className="absolute top-[78px] -translate-x-1/2 text-white" style={{ left: CAM_X }}>
+        <StatusRing level={level} size={42} />
       </div>
 
       <div className="absolute top-[64px] left-[30px] right-[90px]">
@@ -54,7 +52,8 @@ function LockScreen() {
       </div>
 
       {/* One notification: the invitation. */}
-      <div className="glass-clear absolute right-[96px] bottom-[34px] left-[18px] rounded-[26px] p-[14px]">
+      {/* Its foot sits on the camera button's: one baseline along the bottom. */}
+      <div className="glass-clear absolute right-[96px] bottom-[28px] left-[18px] rounded-[26px] p-[14px]">
         <div className="flex items-start gap-[11px]">
           <span className="grid size-[38px] shrink-0 place-items-center overflow-hidden rounded-[9px] bg-[#c9d6ff]">
             <img src="/portrait/source.webp" alt="" className="mt-[6px] w-full" draggable={false} />

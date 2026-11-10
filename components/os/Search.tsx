@@ -9,7 +9,9 @@ import { launch } from "./launch";
 
 // Spotlight: a Liquid Glass field at the bottom of the trailing side, results
 // rising above it. Matches app names, and projects by client and stack.
-export default function Search() {
+// Closing, it stays a moment: the glass sinks and fades, the blur clears,
+// then it tells InnerDisplay it's gone.
+export default function Search({ closing = false, onClosed }: { closing?: boolean; onClosed?: () => void }) {
   const [q, setQ] = useState("");
   const input = useRef<HTMLInputElement>(null);
   useEffect(() => input.current?.focus({ preventScroll: true }), []);
@@ -26,16 +28,25 @@ export default function Search() {
   }, [q]);
 
   const close = () => os.set({ overlay: null });
+  const fade = closing ? "animate-[duo-out_0.26s_ease-in_forwards]" : "animate-[duo-fade_0.3s_ease-out_backwards]";
 
   return (
-    <div className="absolute inset-0 z-[44]" onClick={close}>
-      <div className="absolute inset-0 animate-[duo-fade_0.25s_ease-out_backwards] bg-black/25 backdrop-blur-[30px] backdrop-saturate-150" />
+    <div className={`absolute inset-0 z-[44] ${closing ? "pointer-events-none" : ""}`} onClick={close}>
       <div
-        className="absolute right-[96px] bottom-[22px] left-[96px] mx-auto flex max-w-[620px] animate-[duo-lift_0.5s_var(--ease-ios)_backwards] flex-col gap-[14px]"
+        className={`absolute inset-0 bg-black/30 backdrop-blur-[26px] backdrop-saturate-[1.5] backdrop-brightness-[0.85] ${
+          closing ? "animate-[duo-out_0.32s_ease-in_forwards]" : "animate-[duo-fade_0.25s_ease-out_backwards]"
+        }`}
+        onAnimationEnd={(e) => closing && e.target === e.currentTarget && onClosed?.()}
+      />
+      {/* Moves by transform only; each glass piece fades itself. */}
+      <div
+        className={`absolute right-[96px] bottom-[22px] left-[96px] mx-auto flex max-w-[620px] flex-col gap-[14px] ${
+          closing ? "animate-[duo-sink_0.34s_var(--ease-ios)_forwards]" : "animate-[duo-lift_0.5s_var(--ease-ios)_backwards]"
+        }`}
         onClick={(e) => e.stopPropagation()}
       >
-        <div className="glass rounded-[34px] bg-(--glass-strong) p-[10px] text-label">
-          <p className="px-[12px] pt-[4px] pb-[8px] text-[13px] font-semibold text-label-2">{q ? "Top Hits" : "Siri Suggestions"}</p>
+        <div className={`glass-clear rounded-[34px] p-[10px] text-white ${fade}`}>
+          <p className="px-[12px] pt-[4px] pb-[8px] text-[13px] font-semibold text-white/65">{q ? "Top Hits" : "Siri Suggestions"}</p>
           {results.length ? (
             <ul className="grid grid-cols-4 gap-y-[6px]">
               {results.slice(0, 8).map((a) => (
@@ -43,7 +54,7 @@ export default function Search() {
                   <button
                     type="button"
                     onClick={(e) => launch(a.id, (e.currentTarget as HTMLElement).querySelector("[data-face]"))}
-                    className="flex w-full flex-col items-center gap-[6px] rounded-[18px] py-[8px] transition-colors hover:bg-fill-3"
+                    className="flex w-full flex-col items-center gap-[6px] rounded-[22px] py-[8px] transition-[background-color,scale] duration-300 ease-ios hover:bg-white/10 active:scale-105"
                   >
                     <span data-face>
                       <IconFace id={a.id} size={52} />
@@ -54,14 +65,14 @@ export default function Search() {
               ))}
             </ul>
           ) : (
-            <p className="px-[12px] pb-[12px] text-[15px] text-label-2">No results for “{q}”.</p>
+            <p className="px-[12px] pb-[12px] text-[15px] text-white/65">No results for “{q}”.</p>
           )}
         </div>
         {/* iOS 26: the field is a glass capsule docked at the bottom, its
             dismiss a glass circle of its own beside it. */}
         <div className="flex items-center gap-[10px]">
           <form
-            className="glass flex h-[50px] min-w-0 flex-1 items-center gap-[8px] rounded-full px-[18px] text-label"
+            className={`glass-clear flex h-[50px] min-w-0 flex-1 items-center gap-[8px] rounded-full px-[18px] text-white ${fade}`}
             onSubmit={(e) => {
               e.preventDefault();
               const first = results[0];
@@ -71,7 +82,7 @@ export default function Search() {
               }
             }}
           >
-            <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true" className="shrink-0 text-label-2">
+            <svg width="18" height="18" viewBox="0 0 20 20" aria-hidden="true" className="shrink-0 text-white/70">
               <circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" strokeWidth="2.2" />
               <path d="m13 13 5 5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
             </svg>
@@ -81,9 +92,9 @@ export default function Search() {
               onChange={(e) => setQ(e.target.value)}
               placeholder="Search projects, stack, apps"
               aria-label="Search"
-              className="h-full min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 text-[17px] tracking-[-0.02em] text-label outline-none placeholder:text-label-2 focus-visible:outline-none"
+              className="h-full min-w-0 flex-1 appearance-none border-0 bg-transparent p-0 text-[17px] tracking-[-0.02em] text-white caret-white outline-none placeholder:text-white/60 focus-visible:outline-none"
             />
-            <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true" className="shrink-0 text-label-2">
+            <svg width="15" height="15" viewBox="0 0 24 24" aria-hidden="true" className="shrink-0 text-white/70">
               <rect x="8.5" y="2.5" width="7" height="12" rx="3.5" fill="currentColor" />
               <path d="M5.5 11a6.5 6.5 0 0 0 13 0M12 17.5V21" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" />
             </svg>
@@ -92,7 +103,7 @@ export default function Search() {
             type="button"
             onClick={close}
             aria-label="Close Search"
-            className="glass grid size-[50px] shrink-0 place-items-center rounded-full text-label transition-[scale] duration-300 ease-ios active:scale-110"
+            className={`glass-clear grid size-[50px] shrink-0 place-items-center rounded-full text-white transition-[scale] duration-300 ease-ios active:scale-110 ${fade}`}
           >
             <svg width="18" height="18" viewBox="0 0 24 24" aria-hidden="true">
               <path d="m6.5 6.5 11 11m0-11-11 11" stroke="currentColor" strokeWidth="2.4" strokeLinecap="round" />

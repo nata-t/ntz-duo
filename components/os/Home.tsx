@@ -1,10 +1,10 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import { gsap } from "@/lib/gsap";
 import { os, useDims, useOS, type Slot } from "@/lib/os";
 import { projects } from "@/content/site";
-import AppIcon from "./AppIcon";
+import AppIcon, { iconRadius } from "./AppIcon";
 import {
   CalendarWidget,
   ClockWidget,
@@ -238,9 +238,20 @@ export default function Home({ region, mirror = false }: { region: Slot; mirror?
         </div>
       </div>
 
-      {layout !== "port-half" ? (
-        // Upright, it sits over the dock.
-        <SearchPill x={dotsX} bottom={portrait ? 128 : 22} pages={pages} at={at} mirror={mirror} />
+      {pages > 1 ? (
+        // Upright, the dots sit over Search, clear of it.
+        <div className="absolute flex gap-[8px]" style={{ left: dotsX - (pages * 7 + (pages - 1) * 8) / 2, bottom: portrait ? 170 : 26 }}>
+          {Array.from({ length: pages }, (_, i) => (
+            <button
+              key={i}
+              type="button"
+              tabIndex={mirror ? -1 : 0}
+              aria-label={`Page ${i + 1}`}
+              onClick={() => os.set({ page: i })}
+              className={`size-[7px] rounded-full transition-colors duration-300 ${i === at ? "bg-[rgba(255,255,255,0.95)]" : "bg-[rgba(255,255,255,0.4)]"}`}
+            />
+          ))}
+        </div>
       ) : null}
 
       {rail ? <Dock vertical width={width} height={height} mirror={mirror} /> : layout === "port" ? <Dock vertical={false} width={width} height={height} mirror={mirror} /> : null}
@@ -248,61 +259,22 @@ export default function Home({ region, mirror = false }: { region: Slot; mirror?
   );
 }
 
-/** iOS 26's Search pill, where the page dots used to be. Paging turns it
- *  into the dots for a moment, then it settles back into Search. */
-function SearchPill({ x, bottom, pages, at, mirror }: { x: number; bottom: number; pages: number; at: number; mirror: boolean }) {
-  const [dots, setDots] = useState(false);
-  const first = useRef(true);
-  useEffect(() => {
-    if (first.current || mirror) {
-      first.current = false;
-      return;
-    }
-    setDots(true);
-    const id = window.setTimeout(() => setDots(false), 1400);
-    return () => window.clearTimeout(id);
-  }, [at, mirror]);
-  const w = dots ? Math.max(56, pages * 7 + (pages - 1) * 9 + 28) : 96;
-  return (
-    <button
-      type="button"
-      tabIndex={mirror ? -1 : 0}
-      aria-label="Search"
-      onClick={() => os.set({ overlay: "search" })}
-      className="glass-clear absolute flex h-[32px] items-center justify-center overflow-hidden rounded-full text-white transition-[width,scale] duration-500 ease-ios active:scale-110"
-      style={{ left: x - w / 2, bottom, width: w }}
-    >
-      <span
-        className={`absolute inset-0 flex items-center justify-center gap-[5px] text-[14px] font-semibold tracking-[-0.01em] transition-[opacity,scale] duration-300 ${dots ? "scale-75 opacity-0" : ""}`}
-      >
-        <svg width="13" height="13" viewBox="0 0 20 20" aria-hidden="true">
-          <circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" strokeWidth="2.6" />
-          <path d="m13 13 5 5" stroke="currentColor" strokeWidth="2.6" strokeLinecap="round" />
-        </svg>
-        Search
-      </span>
-      <span className={`absolute inset-0 flex items-center justify-center gap-[9px] transition-[opacity,scale] duration-300 ${dots ? "" : "scale-75 opacity-0"}`}>
-        {Array.from({ length: pages }, (_, i) => (
-          <span key={i} className={`size-[7px] rounded-full transition-colors duration-300 ${i === at ? "bg-white" : "bg-white/40"}`} />
-        ))}
-      </span>
-    </button>
-  );
-}
-
-/** The dock: in the trailing rail in landscape, along the bottom in
- *  portrait. A capsule of clear glass. */
+/** The dock and the Search button: in the trailing rail in landscape,
+ *  along the bottom in portrait. */
 function Dock({ vertical, width, height, mirror }: { vertical: boolean; width: number; height: number; mirror: boolean }) {
   const size = 52, pad = 8, gap = 12;
   const long = DOCK.length * size + (DOCK.length - 1) * gap + 2 * pad;
   const thick = size + 2 * pad;
   const box = vertical
-    ? { left: width - SIDE + (SIDE - thick) / 2, top: height / 2 - long / 2 + 44, width: thick, height: long }
+    ? { left: width - SIDE + (SIDE - thick) / 2, top: height / 2 - long / 2 + 34, width: thick, height: long }
     : { left: (width - long) / 2, top: height - thick - 24, width: long, height: thick };
+  const search = vertical ? { left: width - SIDE + (SIDE - 48) / 2, top: height - 72 } : { left: (width - 48) / 2, top: height - thick - 24 - 62 };
 
   return (
     <>
-      <div className={`glass-clear absolute flex items-center ${vertical ? "flex-col" : "flex-row"}`} style={{ ...box, padding: pad, gap, borderRadius: thick / 2 }}>
+      {/* A rounded rectangle, not a capsule: its corner is concentric
+          with the icons' inside it. */}
+      <div className={`glass-clear absolute flex items-center ${vertical ? "flex-col" : "flex-row"}`} style={{ ...box, padding: pad, gap, borderRadius: iconRadius(size) + pad }}>
         {DOCK.map((id) => (
           <div key={id} style={{ width: size, height: size }} className="grid place-items-center">
             <div className="-mx-[9px]">
@@ -311,6 +283,19 @@ function Dock({ vertical, width, height, mirror }: { vertical: boolean; width: n
           </div>
         ))}
       </div>
+      <button
+        type="button"
+        tabIndex={mirror ? -1 : 0}
+        aria-label="Search"
+        onClick={() => os.set({ overlay: "search" })}
+        className="glass-clear absolute grid size-[48px] place-items-center rounded-full text-white transition-[scale] duration-300 ease-ios active:scale-110"
+        style={search}
+      >
+        <svg width="19" height="19" viewBox="0 0 20 20" aria-hidden="true">
+          <circle cx="8.5" cy="8.5" r="6" fill="none" stroke="currentColor" strokeWidth="2.2" />
+          <path d="m13 13 5 5" stroke="currentColor" strokeWidth="2.2" strokeLinecap="round" />
+        </svg>
+      </button>
     </>
   );
 }

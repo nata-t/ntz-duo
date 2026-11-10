@@ -15,7 +15,7 @@ import Viewer from "./Viewer";
 import { Favs } from "./Grid";
 import { ChevronLeft } from "./icons";
 import { SearchButton, TabBar, TabCircle, type Tab } from "./Bars";
-import { GlassButton, RAIL, type Frame } from "./ui";
+import { GlassButton, RAIL, RAIL_INSET, type Frame } from "./ui";
 
 type Open = { list: Photo[]; start: number; origin: HTMLElement };
 
@@ -196,11 +196,11 @@ export default function Photos({ id, width, height, slot, mirror }: AppProps) {
           // and Search bottom-aligned. Glass floating over the content.
           <nav aria-label="Photos" className="pointer-events-none absolute inset-y-0 z-20 *:pointer-events-auto" style={{ [leftRail ? "left" : "right"]: 0, width: RAIL }}>
             {backBtn ? (
-              <div className="absolute" style={{ [leftRail ? "left" : "right"]: 24, top: leftRail ? 24 : 122 }}>
+              <div className="absolute" style={{ [leftRail ? "left" : "right"]: RAIL_INSET, top: leftRail ? 24 : 122 }}>
                 {backBtn}
               </div>
             ) : null}
-            <div className="absolute flex w-[48px] flex-col items-center gap-[12px]" style={{ [leftRail ? "left" : "right"]: 24, bottom: 24 }}>
+            <div className="absolute flex w-[48px] flex-col items-center gap-[12px]" style={{ [leftRail ? "left" : "right"]: RAIL_INSET, bottom: 24 }}>
               <TabBar vertical tab={tab} onTab={show} />
               <SearchButton size={48} on={tab === "search"} onClick={() => show("search")} />
             </div>

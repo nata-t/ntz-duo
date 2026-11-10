@@ -405,6 +405,36 @@
   }
 }
 
+/* Control Center's modules materialise as it opens (--p, 0 → 1, from the
+   pull or the spring), each after its own small delay (--d): out of a blur
+   into focus, settling from a touch larger, in place, the way the Duo's
+   do. On the element itself, so glass keeps its backdrop. */
+.cc-in {
+  --q: clamp(0, calc((var(--p, 1) - var(--d, 0)) / (1 - var(--d, 0))), 1);
+  opacity: var(--q);
+  filter: blur(calc((1 - var(--q)) * 12px));
+  scale: calc(1.08 - 0.08 * var(--q));
+}
+
+/* Control Center's pages trade places: transform only, they're glass. */
+@keyframes cc-page {
+  from {
+    transform: translateY(18px) scale(0.96);
+  }
+}
+
+@keyframes duo-sink {
+  to {
+    transform: translateY(44px) scale(0.96);
+  }
+}
+
+@keyframes duo-out {
+  to {
+    opacity: 0;
+  }
+}
+
 @keyframes duo-lift {
   from {
     transform: translateY(40px) scale(0.96);

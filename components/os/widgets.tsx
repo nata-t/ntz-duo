@@ -29,7 +29,8 @@ export function useNow(step: "s" | "m" = "m") {
 const addis = (d: Date, opts: Intl.DateTimeFormatOptions) =>
   new Intl.DateTimeFormat("en-US", { timeZone: "Africa/Addis_Ababa", ...opts }).format(d);
 
-/** The big card: like Photos' "On This Day", with him in it. Opens About. */
+/** The big card: like Photos' "On This Day", with his studio portrait in
+ *  it. Opens About. */
 export function PortraitWidget({ w, h }: { w: number; h: number }) {
   const ref = useRef<HTMLButtonElement>(null);
   return (
@@ -41,17 +42,12 @@ export function PortraitWidget({ w, h }: { w: number; h: number }) {
       style={{ width: w, height: h }}
       aria-label="About Natnael"
     >
-      <span
-        className="absolute inset-0 bg-[radial-gradient(120%_90%_at_30%_10%,#f0c9a6_0%,#c97b5b_38%,#5b3a4a_78%,#2d2233_100%)]"
-      />
-      <span
-        className="absolute inset-0 bg-[repeating-linear-gradient(115deg,rgba(255,255,255,0.25)_0_2px,rgba(255,255,255,0)_2px_9px)] opacity-50 mix-blend-soft-light"
-      />
+      {/* The studio portrait, black and white on white. */}
       <img
-        src="/portrait/source.webp"
+        src={profile.portrait.studio}
         alt=""
         draggable={false}
-        className="absolute bottom-0 left-1/2 w-[112%] max-w-none -translate-x-1/2 transition-transform duration-700 ease-out origin-[50%_100%] group-hover:scale-[1.03]"
+        className="absolute inset-0 h-full w-full bg-white object-cover object-[50%_18%] transition-transform duration-700 ease-out origin-[50%_40%] group-hover:scale-[1.03]"
       />
       <span className="absolute inset-x-0 bottom-0 h-[46%] bg-gradient-to-t from-black/70 via-black/25 to-transparent" />
       <span className="absolute bottom-[22px] left-[22px] right-[70px] text-white">
@@ -200,7 +196,7 @@ export function MapWidget({ size }: { size: number }) {
         </span>
         <span className="absolute -bottom-[5px] left-1/2 size-[8px] -translate-x-1/2 rotate-45 bg-white" />
       </span>
-      <span className="absolute inset-x-0 bottom-0 bg-white/80 px-[13px] pt-[7px] pb-[10px] text-left backdrop-blur-md dark:bg-[rgba(28,28,30,0.82)]">
+      <span className="absolute inset-x-0 bottom-0 rounded-b-[30px] bg-[rgba(255,255,255,0.9)] px-[13px] pt-[7px] pb-[10px] text-left dark:bg-[rgba(28,28,30,0.9)]">
         <span className="block text-[10px] font-semibold tracking-[0.02em] text-black/50 dark:text-white/50 uppercase">Now</span>
         <span className="block text-[13px] leading-[1.15] font-semibold text-black dark:text-white">Addis Ababa</span>
         <span className="block text-[11px] leading-[1.2] text-black/55 dark:text-white/55">{profile.utcOffset} · Ethiopia</span>
