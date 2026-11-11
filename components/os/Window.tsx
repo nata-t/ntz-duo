@@ -3,15 +3,28 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "@/lib/gsap";
 import { LAUNCH, spring } from "@/lib/spring";
-import { closeWindow, dims, homeRegion, moveWindow, os, removeWindow, slotRect, useDims, useOS, type Rect, type Win } from "@/lib/os";
+import { DISPLAY_CORNER, closeWindow, dims, homeRegion, moveWindow, os, removeWindow, slotRect, useDims, useOS, type Rect, type Win } from "@/lib/os";
 import { APPS } from "@/components/apps/registry";
 import { IconFace, iconRadius } from "./AppIcon";
 
 /** The display's own corner, so a full window's corners vanish into it. */
-const CORNER = 40;
+const CORNER = DISPLAY_CORNER;
 const SPLIT_CORNER = 28;
 
-type Frame = Rect & { r: number };
+/** Corner radii, clockwise from top left. */
+type Corners = [tl: number, tr: number, br: number, bl: number];
+type Frame = Rect & { r: Corners };
+
+const round = (r: number): Corners => [r, r, r, r];
+
+/** A slot's corners: a split window meets the divider square, rounding
+ *  only where it meets the display's edge. */
+function slotCorners(slot: Win["slot"], W: number, H: number): Corners {
+  if (slot === "full") return round(CORNER);
+  const c = SPLIT_CORNER;
+  if (H > W) return slot === "left" ? [c, c, 0, 0] : [0, 0, c, c];
+  return slot === "left" ? [c, 0, 0, c] : [0, c, c, 0];
+}
 
 // An app window. Its frame (position, size, corners) is animated; the app
 // inside is laid out at the window's final size and scaled to cover the
@@ -23,7 +36,7 @@ export default function Window({ win, mirror }: { win: Win; mirror: boolean }) {
   const focus = useOS((s) => s.focus === win.id);
   const app = APPS[win.app];
   const target = slotRect(win.slot, split, W, H);
-  const targetR = win.slot === "full" ? CORNER : SPLIT_CORNER;
+  const targetR = slotCorners(win.slot, W, H);
 
   const frameEl = useRef<HTMLDivElement>(null);
   const contentEl = useRef<HTMLDivElement>(null);
@@ -40,7 +53,7 @@ export default function Window({ win, mirror }: { win: Win; mirror: boolean }) {
     el.style.top = `${f.y}px`;
     el.style.width = `${f.w}px`;
     el.style.height = `${f.h}px`;
-    el.style.borderRadius = `${f.r}px`;
+    el.style.borderRadius = f.r.map((r) => `${r}px`).join(" ");
     const d = dims();
     const t = slotRect(win.slot, os.get().split, d.w, d.h);
     const s = Math.max(f.w / t.w, f.h / t.h);
@@ -73,7 +86,7 @@ export default function Window({ win, mirror }: { win: Win; mirror: boolean }) {
           y: from.y + (to.y - from.y) * k,
           w: Math.max(1, from.w + (to.w - from.w) * k),
           h: Math.max(1, from.h + (to.h - from.h) * k),
-          r: from.r + (to.r - from.r) * Math.min(1, k),
+          r: from.r.map((r, i) => r + (to.r[i]! - r) * Math.min(1, k)) as Corners,
         };
         paint();
         opts.onUpdate?.(k);
@@ -90,7 +103,7 @@ export default function Window({ win, mirror }: { win: Win; mirror: boolean }) {
     }
     const o = win.origin;
     if (o) {
-      frame.current = { ...o, r: iconRadius(o.w) };
+      frame.current = { ...o, r: round(iconRadius(o.w)) };
       paint();
       const splash = splashEl.current;
       if (splash) splash.style.opacity = "1";
@@ -144,7 +157,7 @@ export default function Window({ win, mirror }: { win: Win; mirror: boolean }) {
     let to: Frame | null = null;
     if (icon && root && homeRegion(os.get().windows) !== null) {
       const r = root.getBoundingClientRect(), e = icon.getBoundingClientRect(), s = r.width / dims().w;
-      to = { x: (e.left - r.left) / s, y: (e.top - r.top) / s, w: e.width / s, h: e.height / s, r: iconRadius(e.width / s) };
+      to = { x: (e.left - r.left) / s, y: (e.top - r.top) / s, w: e.width / s, h: e.height / s, r: round(iconRadius(e.width / s)) };
     }
     const splash = splashEl.current;
     if (to) {
@@ -159,7 +172,7 @@ export default function Window({ win, mirror }: { win: Win; mirror: boolean }) {
       });
     } else {
       const f = frame.current;
-      animateTo({ x: f.x + f.w * 0.2, y: f.y + f.h * 0.2, w: f.w * 0.6, h: f.h * 0.6, r: 40 }, { duration: 0.32, ease: (p) => 1 - Math.pow(1 - p, 3), onComplete: () => removeWindow(win.id) });
+      animateTo({ x: f.x + f.w * 0.2, y: f.y + f.h * 0.2, w: f.w * 0.6, h: f.h * 0.6, r: round(40) }, { duration: 0.32, ease: (p) => 1 - Math.pow(1 - p, 3), onComplete: () => removeWindow(win.id) });
       if (frameEl.current) gsap.to(frameEl.current, { opacity: 0, duration: 0.28 });
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -188,7 +201,7 @@ export default function Window({ win, mirror }: { win: Win; mirror: boolean }) {
         top: target.y,
         width: target.w,
         height: target.h,
-        borderRadius: targetR,
+        borderRadius: targetR.map((r) => `${r}px`).join(" "),
         zIndex: focus ? 3 : 2,
         boxShadow: win.slot === "full" ? undefined : "0 0 0 0.5px rgba(0,0,0,0.12)",
         pointerEvents: win.closing ? "none" : undefined,
@@ -255,7 +268,28 @@ function WindowControls({
   onClose: () => void;
 }) {
   const drag = useRef<{ x: number; y: number } | null>(null);
+  const wrap = useRef<HTMLDivElement>(null);
   const portrait = useOS((s) => s.portrait);
+
+  // Open, a press anywhere else dismisses it, and Escape shuts it before
+  // it would close the app.
+  useEffect(() => {
+    if (!open) return;
+    const onDown = (e: PointerEvent) => {
+      if (!wrap.current?.contains(e.target as Node)) setOpen(false);
+    };
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key !== "Escape") return;
+      e.preventDefault();
+      setOpen(false);
+    };
+    document.addEventListener("pointerdown", onDown, true);
+    window.addEventListener("keydown", onKey, true);
+    return () => {
+      document.removeEventListener("pointerdown", onDown, true);
+      window.removeEventListener("keydown", onKey, true);
+    };
+  }, [open, setOpen]);
   const items: { id: Win["slot"] | "close"; label: string; icon: React.ReactNode }[] = [
     { id: "full", label: "Full Screen", icon: <rect x="3" y="5" width="18" height="14" rx="2.5" fill="currentColor" /> },
     {
@@ -281,7 +315,7 @@ function WindowControls({
     { id: "close", label: "Close", icon: <path d="m7 7 10 10M17 7 7 17" stroke="currentColor" strokeWidth="2" strokeLinecap="round" /> },
   ];
   return (
-    <div className="absolute top-[7px] left-1/2 z-10 -translate-x-1/2">
+    <div ref={wrap} className="absolute top-[7px] left-1/2 z-10 -translate-x-1/2">
       <button
         type="button"
         aria-label="Window options"

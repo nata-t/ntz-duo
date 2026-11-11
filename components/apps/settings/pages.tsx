@@ -374,10 +374,12 @@ function AppearancePage() {
           <div className="relative h-[6px]" aria-hidden>
             <span className="absolute top-0 left-1/2 h-[6px] w-[2px] -translate-x-1/2 rounded-full bg-label-3" />
           </div>
-          <div className="mt-[4px] flex items-baseline justify-between text-[13px] leading-[18px] text-label-2">
+          {/* Three equal columns, so Default sits under the detent whatever
+              the ends' widths. */}
+          <div className="mt-[4px] grid grid-cols-3 items-baseline gap-[8px] text-[13px] leading-[18px] text-label-2">
             <span>More Clear</span>
-            <span className={glass === 0.5 ? "font-semibold text-label" : ""}>Default</span>
-            <span>More Tinted</span>
+            <span className={`text-center ${glass === 0.5 ? "font-semibold text-label" : ""}`}>Default</span>
+            <span className="text-right">More Tinted</span>
           </div>
         </div>
       </Group>

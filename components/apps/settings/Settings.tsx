@@ -8,18 +8,21 @@ import { Avatar, Group, Row } from "./list";
 import { PAGES, SIDEBAR, SettingsCtx, pathTo, type Ctx, type Local } from "./pages";
 
 // Settings, as on iPad and the open iPhone Duo: a sidebar of panes beside
-// the one you picked. In a half-width window it folds into a single
-// navigation stack, the way the outer display shows it.
+// the one you picked. Where the pane would be cramped beside the sidebar
+// (a half, or a narrow screen) it folds into a single navigation stack,
+// the way the outer display shows it.
 
 const SIDEBAR_W = 340;
+/** The narrowest a pane may be beside the sidebar. */
+const PANE_MIN = 420;
 const DEFAULT = "appearance";
 
 export default function Settings({ width, slot, mirror, close }: AppProps) {
-  const compact = width < 600;
+  const box = contentBox(slot, width);
+  const compact = box.width < SIDEBAR_W + PANE_MIN;
   const [path, setPath] = useState<string[]>(compact ? [] : [DEFAULT]);
   const [query, setQuery] = useState("");
   const [state, setState] = useState({ airplane: false, wifi: true, bluetooth: true });
-  const box = contentBox(slot, width);
 
   // In the split layout something is always selected.
   const detail = path.length ? path : [DEFAULT];

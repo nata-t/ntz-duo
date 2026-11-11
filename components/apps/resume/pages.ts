@@ -4,10 +4,16 @@ import page1 from "./page-1.svg";
 // Regenerate both when public/Natnael_Tadele_CV.pdf changes:
 //   pdftocairo -svg public/Natnael_Tadele_CV.pdf components/apps/resume/page-1.svg
 // and copy each /Link annotation's /Rect (PDF points, origin bottom left)
-// and /URI here.
+// and /URI here, and each heading's top (PDF points from the top, as
+// `pdftotext -bbox` prints yMin) into its sections.
 
 export type PageLink = { label: string; href: string; rect: [x1: number, y1: number, x2: number, y2: number] };
-export type Page = { src: string; links: PageLink[] };
+export type Section = { id: "education" | "work" | "projects" | "skills"; label: string; top: number };
+export type Page = { src: string; links: PageLink[]; sections: Section[] };
+
+/** What Preview shows under the filename. */
+export const KIND = "PDF Document";
+export const SIZE = "96 KB";
 
 const email = "mailto:nathanaeltadelez@gmail.com";
 const github = "https://github.com/nata-t";
@@ -26,6 +32,12 @@ export const PAGES: Page[] = [
       // The PDF links this footer address as http://; it's an email.
       { label: "Email", href: email, rect: [36, 12.11, 180.98, 26.19] },
       { label: "GitHub", href: github, rect: [456.43, 12.11, 574.36, 26.19] },
+    ],
+    sections: [
+      { id: "education", label: "Education", top: 51.95 },
+      { id: "work", label: "Work Experience", top: 130.85 },
+      { id: "projects", label: "Featured Projects", top: 380.94 },
+      { id: "skills", label: "Skills", top: 691.06 },
     ],
   },
 ];

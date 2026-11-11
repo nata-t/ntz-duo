@@ -210,11 +210,19 @@ export function syncAppearance() {
   if (os.get().dark !== dark) os.set({ dark });
 }
 
+/** The inner display's corner, in points. On the device the hardware
+ *  rounds it; full screen, the display rounds itself so it still reads as
+ *  a screen, and full windows share the curve. */
+export const DISPLAY_CORNER = 40;
+
+/** Split View's black divider, straddling the hinge. The UI kit draws it
+ *  at 11 pt; on the Duo's crease that read as a gutter, so it's slimmer. */
+export const DIVIDER = 6;
+
 /** The rect a slot occupies on the inner display. In portrait the two
  *  "halves" stack, top (left) over bottom (right). */
 export function slotRect(slot: Slot, split: number, W: number, H: number): Rect {
-  // An 11 pt black divider straddles the hinge (UI kit: 470 | 11 | 470).
-  const gap = 11;
+  const gap = DIVIDER;
   if (slot === "full") return { x: 0, y: 0, w: W, h: H };
   if (H > W) {
     const mid = H * split;

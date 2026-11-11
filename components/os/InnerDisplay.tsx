@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { applyGlass, closeWindow, goHome, homeRegion, os, swapSides, syncAppearance, useDims, useOS } from "@/lib/os";
+import { DISPLAY_CORNER, DIVIDER, applyGlass, closeWindow, goHome, homeRegion, os, swapSides, syncAppearance, useDims, useOS } from "@/lib/os";
 import { exitFull } from "@/lib/full";
 import Home, { homePages } from "./Home";
 import Window from "./Window";
@@ -18,6 +18,7 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
   const live = useOS((s) => s.live);
   const brightness = useOS((s) => s.brightness);
   const overlay = useOS((s) => s.overlay);
+  const fullScreen = useOS((s) => s.screen !== null);
   const ccShown = cc.use((s) => s.shown);
   // Spotlight stays mounted while it animates away.
   const [searchShown, setSearchShown] = useState(false);
@@ -113,7 +114,9 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
       // only, never above what the device lays over its screen (the black
       // of a sleeping display).
       className="relative isolate overflow-hidden bg-black font-sans tracking-[-0.01em] text-label select-none"
-      style={{ width: W, height: H, touchAction: live && !mirror ? "none" : undefined }}
+      // Full screen there's no device around it, so the display keeps its
+      // own corners against the black.
+      style={{ width: W, height: H, borderRadius: fullScreen ? DISPLAY_CORNER : undefined, touchAction: live && !mirror ? "none" : undefined }}
     >
       <img
         src={`/wallpapers/${portrait ? "outer" : "dunes"}-${dark ? "dark" : "light"}${portrait ? "" : "-landscape"}.webp`}
@@ -138,12 +141,12 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
           className="group absolute z-[4] grid animate-[duo-fade_0.3s_ease-out_both] place-items-center bg-black"
           style={
             portrait
-              ? { left: 0, top: H / 2 - 5.5, width: W, height: 11 }
-              : { top: 0, left: W / 2 - 5.5, width: 11, height: H }
+              ? { left: 0, top: (H - DIVIDER) / 2, width: W, height: DIVIDER }
+              : { top: 0, left: (W - DIVIDER) / 2, width: DIVIDER, height: H }
           }
         >
           <span
-            className={`rounded-full bg-white/65 transition-[background-color,scale] duration-300 group-hover:scale-125 group-hover:bg-white/90 ${portrait ? "h-[3px] w-[46px]" : "h-[46px] w-[3px]"}`}
+            className={`rounded-full bg-white/65 transition-[background-color,scale] duration-300 group-hover:scale-125 group-hover:bg-white/90 ${portrait ? "h-[2.5px] w-[44px]" : "h-[44px] w-[2.5px]"}`}
           />
         </button>
       ) : null}
