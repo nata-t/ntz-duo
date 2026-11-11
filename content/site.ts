@@ -37,7 +37,7 @@ export type Role = {
   summary: string;
 };
 
-export type Category = "Banking" | "Accessibility" | "Logistics" | "Education" | "Corporate" | "Personal";
+export type Category = "Banking" | "Accessibility" | "Logistics" | "Education" | "Corporate" | "Personal" | "Developer Tools";
 
 export type Project = {
   slug: string;
@@ -57,6 +57,12 @@ export type Project = {
   facts: { value: string; label: string }[];
   stack: string[];
   url: string | null;
+  /** Further links (package, source, docs) for the Information list. */
+  links?: Link[];
+  /** Still being built: shows the WIP badge, as the old portfolio did. */
+  wip?: boolean;
+  /** Kept in the content, left out of the site. */
+  hidden?: boolean;
   /** Internal bank systems: never show screens, show architecture and facts. */
   confidential: boolean;
   /** Brand-ish accent for the iOS-style app icon. */
@@ -162,8 +168,9 @@ export const skills: { group: string; items: string[] }[] = [
 const shots = (slug: string, files: string[]) => files.map((f) => `/projects/${slug}/${f}`);
 const placeholders = (slug: string) => [1, 2, 3, 4, 5, 6].map((i) => `/projects/${slug}/placeholder-${i}.svg`);
 
-// Order follows ntz: impact first.
-export const projects: Project[] = [
+// Order follows ntz: impact first. Hidden projects stay here but never reach
+// the site: everything reads `projects`, not `allProjects`.
+export const allProjects: Project[] = [
   {
     slug: "cbe-smart-branch",
     name: "Smart Branch",
@@ -312,6 +319,40 @@ export const projects: Project[] = [
     ]),
   },
   {
+    slug: "klin",
+    name: "klin",
+    short: "klin",
+    client: "Open source",
+    year: 2026,
+    category: "Developer Tools",
+    role: "Design, CLI and website",
+    tagline: "Starter kits, snapped together",
+    summary:
+      "An open-source starter for full-stack TypeScript products: one command hands you a monorepo with an API, a web app, auth, a database and one set of Zod schemas shared by both, wired end to end. Then the klin CLI stays in the project to keep adding to it.",
+    built: [
+      "create-klin: a full-screen terminal wizard that scaffolds the monorepo and strips what you didn't pick",
+      "The kit: NestJS or plain Express/Fastify, Better Auth, Prisma, Vite + TanStack Router or Next.js, shadcn/ui, Turborepo",
+      "klin generate, add, remove, doctor and upgrade, so the CLI keeps working after day one",
+      "The website, with the real wizard running in the browser, and the docs",
+    ],
+    facts: [
+      { value: "41", label: "parts to pick from" },
+      { value: "4", label: "presets" },
+    ],
+    stack: ["TypeScript", "Node.js", "NestJS", "Express", "Fastify", "Better Auth", "Prisma", "Next.js", "Vite", "TanStack", "shadcn/ui", "Zod", "Turborepo", "Astro"],
+    url: "https://create-klin.vercel.app/",
+    links: [
+      { label: "npm", href: "https://www.npmjs.com/package/create-klin" },
+      { label: "GitHub", href: "https://github.com/nata-t/klin" },
+      { label: "Docs", href: "https://create-klin.vercel.app/docs/" },
+    ],
+    wip: true,
+    confidential: false,
+    color: "#141414", // klin's ink; the mark is always white on it
+    ink: "#FFFFFF",
+    screens: shots("klin", ["home.webp", "wizard.webp", "schema.webp", "kit.webp", "grow.webp", "docs.webp"]),
+  },
+  {
     slug: "minte-and-geni",
     name: "Minte & Geni",
     short: "Minte & Geni",
@@ -331,6 +372,7 @@ export const projects: Project[] = [
     facts: [{ value: "4", label: "things guests can do" }],
     stack: ["React", "TypeScript", "Tailwind CSS", "shadcn/ui", "React Query", "GSAP", "Konva", "Express", "Supabase", "Telegram Bot API"],
     url: "https://minte-and-geni.vercel.app/",
+    hidden: true, // Off the site since 2026-11-11, klin took its place.
     confidential: false,
     color: "#F6EEE3", // REVIEW: the site's cream; glyph in rose-gold
     ink: "#B9806A",
@@ -344,6 +386,8 @@ export const projects: Project[] = [
     ]),
   },
 ];
+
+export const projects: Project[] = allProjects.filter((p) => !p.hidden);
 
 export function projectBySlug(slug: string): Project | undefined {
   return projects.find((p) => p.slug === slug);

@@ -10,7 +10,7 @@ import { iconRadius } from "@/components/os/AppIcon";
 
 /** The Home Screen dock's corner: its 52 pt icons' plus 8 pt of padding. */
 const DOCK_R = iconRadius(52) + 8;
-import { Carousel, Header, Hero, Icon, InfoStrip, Section, Sym, Toast, type Gutter } from "./parts";
+import { Carousel, Header, Hero, Icon, InfoStrip, Section, Sym, Toast, Wip, type Gutter } from "./parts";
 
 // A project's page, read like an iOS 27 App Store product page: hero media,
 // the icon with name and a Visit button, an info strip of hard facts, the
@@ -154,6 +154,15 @@ export default function Project({ id, width, slot, mirror, close, slug }: AppPro
           ),
         }
       : { label: "Screens", value: "Under NDA" },
+    ...(p.links ?? []).map((l) => ({
+      label: l.label,
+      value: (
+        <a href={l.href} target="_blank" rel="noopener noreferrer" className="text-link hover:underline">
+          {l.href.replace(/^https?:\/\/(www\.)?/, "").replace(/\/$/, "")} ›
+        </a>
+      ),
+    })),
+    ...(p.wip ? [{ label: "Status", value: "Work in progress" }] : []),
   ];
 
   return (
@@ -253,7 +262,10 @@ export default function Project({ id, width, slot, mirror, close, slug }: AppPro
               <button type="button" onClick={goNext} className="group flex w-full items-center gap-[14px] text-left">
                 <Icon p={next} size={64} />
                 <span className="min-w-0 flex-1">
-                  <span className="block truncate text-[17px] leading-[22px] font-semibold tracking-[-0.01em] text-ink">{next.name}</span>
+                  <span className="flex items-center gap-[8px]">
+                    <span className="min-w-0 truncate text-[17px] leading-[22px] font-semibold tracking-[-0.01em] text-ink">{next.name}</span>
+                    {next.wip ? <Wip /> : null}
+                  </span>
                   <span className="block truncate text-[14px] leading-[19px] text-ink-2">{next.tagline}</span>
                   <span className="block truncate text-[12px] leading-[16px] text-ink-3">{next.category}</span>
                 </span>
@@ -286,6 +298,7 @@ export default function Project({ id, width, slot, mirror, close, slug }: AppPro
       >
         <Icon p={p} size={40} />
         <span className="min-w-0 truncate pr-[4px] text-[16px] leading-[21px] font-semibold tracking-[-0.01em] text-label">{p.short}</span>
+        {p.wip ? <Wip className="-ml-[6px] mr-[2px]" /> : null}
         {p.url ? (
           <a
             href={p.url}

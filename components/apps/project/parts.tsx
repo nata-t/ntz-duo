@@ -62,6 +62,23 @@ export function Icon({ p, size }: { p: P; size: number }) {
   );
 }
 
+/** Work in progress: the old portfolio's black badge, ghost and all. */
+export function Wip({ className = "" }: { className?: string }) {
+  return (
+    <span
+      title="Work in progress"
+      className={`inline-flex h-[22px] shrink-0 items-center gap-[3px] rounded-full bg-black pr-[9px] pl-[3px] font-sans text-[12px] leading-none font-semibold tracking-[0.02em] text-white shadow-[0_0_0_0.5px_rgba(255,255,255,0.2)] ${className}`}
+    >
+      {/* The gif is 4:3 with the ghost small in the middle: framed tight. */}
+      <span aria-hidden="true" className="relative block size-[22px] shrink-0 overflow-hidden rounded-full">
+        {/* eslint-disable-next-line @next/next/no-img-element -- a tiny looping gif */}
+        <img src="/wip-ghost.gif" alt="" draggable={false} className="absolute top-[-1.5px] left-[-8.5px] h-[28.5px] w-[38px] max-w-none" />
+      </span>
+      WIP
+    </span>
+  );
+}
+
 /** The 21:9 hero, as App Store pages now open: promo art in the brand
  *  colour, with the first real screen rising out of its lower edge, or
  *  the icon, big, for systems under NDA. */
@@ -109,6 +126,7 @@ export function Header({ p, wide, tint, host, style }: { p: P; wide: boolean; ti
           className={`line-clamp-2 font-display font-bold tracking-[-0.012em] text-balance text-ink ${wide ? "text-[28px] leading-[32px]" : "text-[21px] leading-[25px]"}`}
         >
           {p.name}
+          {p.wip ? <Wip className={`ml-[8px] align-middle ${wide ? "-mt-[4px]" : "-mt-[3px]"}`} /> : null}
         </h1>
         <p className={`mt-[2px] truncate text-ink-2 ${wide ? "text-[17px] leading-[22px]" : "text-[15px] leading-[20px]"}`}>{p.tagline}</p>
         <div className={`flex items-center gap-[10px] ${wide ? "mt-[12px]" : "mt-[9px]"}`}>

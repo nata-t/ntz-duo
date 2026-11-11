@@ -153,5 +153,5 @@ export function search(q: string): { photos: Photo[]; albums: Album[] } {
 }
 
 export const suggestions: string[] = [
-  ...new Set([...visible.map((p) => p.category), ...visible.map((p) => String(p.year)), "React", "GSAP", "Supabase", "Turborepo"]),
+  ...new Set([...visible.map((p) => p.category), ...visible.map((p) => String(p.year)), "React", "NestJS", "Prisma", "Turborepo"]),
 ];

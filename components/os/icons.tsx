@@ -56,6 +56,14 @@ const GLYPHS: Record<string, (ink: string) => React.ReactNode> = {
       <path d="M19 15h6v12.2L35.6 15h7.3L31.6 27.6 43.6 45h-7.2l-8.9-13.2-2.5 2.8V45h-6z" />
     </g>
   ),
+  // klin's own mark: an egg with its first crack, the cap lifted.
+  klin: (ink) => (
+    <path
+      fill={ink}
+      transform="translate(30 33.72) scale(.1957)"
+      d="M-63.52 -68A76 102 0 0 1 63.52 -68L49.51 -68L26 -44.49L0 -70.49L-26 -44.49L-49.51 -68L-63.52 -68ZM-68.57 -44L-54.49 -44L-26 -15.51L0 -41.51L26 -15.51L54.49 -44L68.57 -44A76 102 0 0 1 76 0A76 76 0 0 1 0 76A76 76 0 0 1 -76 0A76 102 0 0 1 -68.57 -44Z"
+    />
+  ),
   // Two rings.
   "minte-and-geni": (ink) => (
     <g fill="none" stroke={ink} strokeWidth="3.2">
