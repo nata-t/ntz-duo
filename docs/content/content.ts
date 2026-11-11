@@ -25,7 +25,7 @@ export type Profile = {
   statement: string;
   bio: string[];
   availability: string;
-  education: { school: string; degree: string; years: string; note: string };
+  education: { school: string; degree: string; years: string };
   portrait: { halftone: string; dither: string; source: string };
   cv: Link;
 };
@@ -88,8 +88,7 @@ export const profile: Profile = {
   education: {
     school: "Bahir Dar University",
     degree: "B.Sc. Computer Science",
-    years: "2019–2024",
-    note: "CGPA 3.85",
+    years: "2019–2024", // CGPA stays on the downloadable CV only.
   },
   // Only processed portraits ship; the original passport photo never does.
   portrait: {

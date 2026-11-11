@@ -440,20 +440,12 @@ function Education() {
       <Headline i={1} className="mt-[10px]">
         Schooled in the fundamentals.
       </Headline>
-      <Tile i={2} className={`mt-[30px] ${compact ? "" : "flex items-end justify-between gap-[32px] p-[36px]"}`}>
-        <div>
-          <p className="text-[13px] font-semibold text-ink-2">{education.years}</p>
-          <p className={`mt-[8px] font-display font-semibold tracking-[-0.016em] ${compact ? "text-[24px]" : "text-[30px]"} leading-[1.1]`}>
-            {education.school}
-          </p>
-          <p className={`mt-[6px] text-ink-2 ${compact ? "text-[15px]" : "text-[17px]"}`}>{education.degree}</p>
-        </div>
-        <div className={compact ? "mt-[26px]" : "text-right"}>
-          <Gradient className={`font-display font-semibold tracking-[-0.03em] ${compact ? "text-[64px]" : "text-[84px]"} leading-[0.9]`}>
-            {education.note.replace(/^CGPA\s*/, "")}
-          </Gradient>
-          <p className="mt-[6px] text-[13px] text-ink-2">CGPA</p>
-        </div>
+      <Tile i={2} className={`mt-[30px] ${compact ? "" : "p-[36px]"}`}>
+        <p className="text-[13px] font-semibold text-ink-2">{education.years}</p>
+        <p className={`mt-[8px] font-display font-semibold tracking-[-0.016em] ${compact ? "text-[24px]" : "text-[30px]"} leading-[1.1]`}>
+          {education.school}
+        </p>
+        <p className={`mt-[6px] text-ink-2 ${compact ? "text-[15px]" : "text-[17px]"}`}>{education.degree}</p>
       </Tile>
     </Section>
   );

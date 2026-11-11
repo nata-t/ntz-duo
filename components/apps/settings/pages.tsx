@@ -61,7 +61,7 @@ function ProfilePage() {
         <Row title={<span className="whitespace-normal">{profile.availability}</span>} />
       </Group>
       <Group header="Education">
-        <Row title={profile.education.degree} sub={`${profile.education.school}, ${profile.education.years}`} value={profile.education.note} />
+        <Row title={profile.education.degree} sub={`${profile.education.school}, ${profile.education.years}`} />
       </Group>
       <Group>
         <Row title="About Natnael" action onClick={() => launch("about")} />

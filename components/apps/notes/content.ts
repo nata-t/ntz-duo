@@ -62,7 +62,7 @@ export const NOTES: Note[] = [
     blocks: [
       { t: "h", text: education.school },
       { t: "p", text: education.degree },
-      { t: "meta", text: `${education.years} · ${education.note}` },
+      { t: "meta", text: education.years },
     ],
   },
 ];

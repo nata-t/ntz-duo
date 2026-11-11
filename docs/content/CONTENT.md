@@ -69,7 +69,7 @@ On the site, the clause "Ethiopian banks, shipping lines and classrooms" is set 
   - `39`: "banks on the ATM voice-guidance rollout"
   - `6+1`: "CBE smart branches live, plus head office"
   - `3 yrs`: "shipping production software"
-- Education note (About): "Graduated with a cumulative GPA of 3.85."
+- Education note (About): "Graduated with a cumulative GPA of 3.85." (Dropped 2026-11-11: the CGPA stays on the downloadable CV only.)
 - 404: "No file under that name." / "← Back to the drawer"
 
 ### OLD hero (`src/sections/hero.tsx`)
