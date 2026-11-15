@@ -52,14 +52,15 @@ const photosOf = (p: Project): Photo[] =>
 
 export const portrait: Photo = {
   id: "portrait",
-  src: profile.portrait.source,
-  thumb: profile.portrait.source,
+  // The studio portrait, the Home Screen widget's: black and white on white.
+  src: profile.portrait.studio,
+  thumb: profile.portrait.studio,
   label: "Portrait",
   alt: `Portrait of ${profile.name}`,
-  ratio: 787 / 1100,
+  ratio: 1136 / 1385,
   project: null,
-  // The same warm light the Home Screen widget puts behind him.
-  backdrop: "radial-gradient(120% 90% at 30% 10%, #f0c9a6 0%, #c97b5b 38%, #5b3a4a 78%, #2d2233 100%)",
+  // Its own paper, for wherever the frame shows past the photo.
+  backdrop: "#ffffff",
 };
 
 const visible = projects.filter((p) => !p.confidential);

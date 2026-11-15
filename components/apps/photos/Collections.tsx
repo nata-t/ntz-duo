@@ -43,7 +43,8 @@ export default function Collections({ width, frame, onAlbum, onLibrary }: Props)
           <Row {...ins}>
             <button type="button" onClick={() => onAlbum(people.id)} className="group flex w-[96px] flex-col items-center gap-[8px]">
               <span className="relative size-[96px] overflow-hidden rounded-full" style={{ background: portrait.backdrop }}>
-                <img src={portrait.src} alt="" loading="lazy" decoding="async" className="absolute top-[6px] left-1/2 w-[120%] max-w-none -translate-x-1/2 transition-transform duration-500 group-hover:scale-105" />
+                {/* His face, cropped from the studio portrait. */}
+                <img src={portrait.src} alt="" loading="lazy" decoding="async" className="absolute inset-0 h-full w-full origin-[50%_25%] scale-[1.32] object-cover object-top transition-transform duration-500 group-hover:scale-[1.4]" />
               </span>
               <span className="text-[13px] leading-[16px] font-semibold text-label">{people.title.split(" ")[0]}</span>
             </button>
@@ -80,7 +81,7 @@ export default function Collections({ width, frame, onAlbum, onLibrary }: Props)
             className="glass relative size-[40px] overflow-hidden rounded-full transition-[scale] duration-300 ease-ios active:scale-110"
             style={{ background: portrait.backdrop }}
           >
-            <img src={portrait.src} alt="" className="absolute top-[3px] left-1/2 w-[130%] max-w-none -translate-x-1/2" />
+            <img src={portrait.src} alt="" className="absolute inset-0 h-full w-full origin-[50%_25%] scale-[1.32] object-cover object-top" />
           </button>
         }
       />
