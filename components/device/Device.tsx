@@ -4,6 +4,7 @@ import { forwardRef, useEffect, useImperativeHandle, useMemo, useRef } from "rea
 import { BEZEL, BODY, BUTTONS, HALF, INNER, OUTER, PLATEAU, R_HINGE, R_OUT, RIM, T, TEX, outline, type Seg } from "./geometry";
 import { type Pose, glint, shade, worldNormal } from "./pose";
 import { paintFacet, type Facet, type Finish } from "./material";
+import { SWEEP, blurs, stretch, sweep, unfold } from "./unfold";
 
 export type { Finish };
 export type DeviceHandle = { apply: (p: Pose) => void };
@@ -59,8 +60,10 @@ const Device = forwardRef<DeviceHandle, Props>(function Device({ k, inner, live,
   const glare = useRef<HTMLDivElement[]>([]);
   const sheen = useRef<HTMLDivElement | null>(null);
   const wakeRef = useRef<HTMLDivElement[]>([]);
+  const stretches = useRef<HTMLDivElement[]>([]);
+  const dark = useRef<HTMLDivElement>(null);
   const facets = useRef<Map<HTMLElement, Facet>>(new Map());
-  const last = useRef({ live: false, pull: 0 });
+  const last = useRef({ live: false, blur: [0, 0], stretch: "-", sweep: "", dark: "" });
   const lastPose = useRef<Pose | null>(null);
 
   const register: Register = (el, phi, half, soft) => {
@@ -115,12 +118,26 @@ const Device = forwardRef<DeviceHandle, Props>(function Device({ k, inner, live,
       facets.current.forEach((f) => paintFacet(f, p, finish));
 
       wakeRef.current.forEach((el) => (el.style.opacity = String(1 - p.wake)));
-      // The display wakes with a focus pull, as in Apple's film: soft and
-      // dim, settling sharp. Only while it happens: blur isn't free.
-      const pull = p.wake > 0.02 && p.wake < 0.985 ? (1 - p.wake) * 16 : 0;
-      if (pull !== last.current.pull) {
-        last.current.pull = pull;
-        halves.current.forEach((el) => (el.style.filter = pull ? `blur(${pull.toFixed(1)}px) saturate(${(1 + (1 - p.wake) * 0.4).toFixed(2)})` : ""));
+      // The unfold (unfold.ts): only what changed is written. Blur isn't
+      // free, so it's there only while it shows.
+      const f = unfold(p), was = last.current;
+      blurs(p, f, k).forEach((b, i) => {
+        if (b === was.blur[i]) return;
+        was.blur[i] = b;
+        const el = halves.current[i];
+        if (el) el.style.filter = b ? `blur(${b}px)` : "";
+      });
+      const tf = stretch(f);
+      if (tf !== was.stretch) {
+        was.stretch = tf;
+        stretches.current.forEach((el) => (el.style.transform = tf));
+      }
+      const sw = sweep(f), dk = f.dark.toFixed(3);
+      if (dark.current && (sw !== was.sweep || dk !== was.dark)) {
+        was.sweep = sw;
+        was.dark = dk;
+        dark.current.style.transform = sw;
+        dark.current.style.opacity = dk;
       }
 
       // Hand the screen over between the mirrored halves and the live
@@ -178,10 +195,18 @@ const Device = forwardRef<DeviceHandle, Props>(function Device({ k, inner, live,
               className="pointer-events-none absolute top-0"
               style={{ width: u(INNER.w), height: u(INNER.h), left: isL ? 0 : u(SEAM - INNER.w / 2) }}
             >
-              <div style={{ width: INNER.w, height: INNER.h, zoom: k }}>
-                <Upright portrait={portrait}>{inner(side)}</Upright>
+              <div
+                ref={(el) => {
+                  if (el) stretches.current[isL ? 0 : 1] = el;
+                }}
+                className="absolute inset-0 origin-right"
+              >
+                <div style={{ width: INNER.w, height: INNER.h, zoom: k }}>
+                  <Upright portrait={portrait}>{inner(side)}</Upright>
+                </div>
               </div>
             </div>
+            {isL ? <div ref={dark} className={SWEEP} /> : null}
             <div
               ref={(el) => {
                 if (el) wakeRef.current[isL ? 0 : 1] = el;

@@ -17,11 +17,14 @@ export type Pose = {
   fold: number;
   /** Inner display brightness while it wakes (0 off, 1 on). */
   wake: number;
+  /** How far the unfold's choreography has played (0 folded, 1 settled;
+   *  unfold.ts). */
+  open: number;
   /** Ground shadow strength. */
   shadow: number;
 };
 
-export const POSE_KEYS = ["x", "y", "s", "view", "yaw", "pitch", "roll", "fold", "wake", "shadow"] as const;
+export const POSE_KEYS = ["x", "y", "s", "view", "yaw", "pitch", "roll", "fold", "wake", "open", "shadow"] as const;
 
 export function clonePose(p: Pose): Pose {
   return { ...p };

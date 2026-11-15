@@ -122,6 +122,7 @@ export default function Stage() {
     const introTween = reduced ? null : gsap.to(intro, { v: 1, duration: 2.4, delay: 0.25, ease: "expo.out" });
 
     let drawn = -1;
+    let nearing = false;
     const render = (now: number) => {
       const display = 1 - span(t, 0.05, 0.8) + span(t, 6.6, 7.0) * (1 - span(t, 8.2, 8.7)) + span(t, 9.0, 9.6);
       const w = reduced ? 0 : Math.min(1, display);
@@ -160,6 +161,10 @@ export default function Stage() {
       }
       // Leaving flat, the halves take a copy of the live display first.
       setFlat(pose.fold < 0.4);
+      // Shut and turning to open, they take a fresh one while it can't be seen.
+      const near = t > 1.7 && t < 2.2;
+      if (near && !nearing) scheduleSnapshot();
+      nearing = near;
       device.current?.apply(pose);
       nav.current?.apply(t);
       hero.current?.apply(t);

@@ -8,6 +8,7 @@ import { RectAreaLightUniformsLib } from "three/examples/jsm/lights/RectAreaLigh
 import { HALF, INNER, OUTER } from "../geometry";
 import type { Pose } from "../pose";
 import type { DeviceHandle, Finish } from "../Device";
+import { SWEEP, blurs, stretch, sweep, unfold } from "../unfold";
 import { buildDevice, makeMaterials, SCREENS } from "./model";
 import { studioEnvironment } from "./studio";
 
@@ -60,7 +61,7 @@ type GL = {
 const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, live, outer, portrait = false, finish = "star" }, ref) {
   const host = useRef<HTMLDivElement>(null);
   const gl = useRef<GL | null>(null);
-  const last = useRef<{ pose: Pose | null; live: boolean | null; pull: number }>({ pose: null, live: null, pull: -1 });
+  const last = useRef({ pose: null as Pose | null, live: null as boolean | null, blur: [-1, -1], stretch: "-", sweep: "", dark: "" });
   const [els] = useState(() => {
     if (typeof document === "undefined") return null;
     const make = () => {
@@ -77,6 +78,8 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
   });
   const sleep = useRef<HTMLDivElement[]>([]);
   const mirrors = useRef<HTMLDivElement[]>([]);
+  const stretches = useRef<HTMLDivElement[]>([]);
+  const dark = useRef<HTMLDivElement>(null);
   const m4 = useRef(new THREE.Matrix4()).current, t4 = useRef(new THREE.Matrix4()).current;
 
   // Scene, renderers, camera, lights. Once.
@@ -251,11 +254,25 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
     if (g.cover) g.cover.reflectivity = 0.02 + 0.16 * Math.min(1, p.fold / 30 + Math.abs(1 - p.s) * 1.5);
 
     sleep.current.forEach((el) => (el.style.opacity = (1 - p.wake).toFixed(3)));
-    // Blur steps in half pixels: fewer distinct filters, fewer re-rasters.
-    const pull = p.wake > 0.02 && p.wake < 0.985 ? Math.round((1 - p.wake) * 32) / 2 : 0;
-    if (pull !== last.current.pull) {
-      last.current.pull = pull;
-      mirrors.current.forEach((el) => (el.style.filter = pull ? `blur(${pull}px)` : ""));
+    // The unfold (unfold.ts): only what changed is written.
+    const f = unfold(p), was = last.current;
+    blurs(p, f, k).forEach((b, i) => {
+      if (b === was.blur[i]) return;
+      was.blur[i] = b;
+      const el = mirrors.current[i];
+      if (el) el.style.filter = b ? `blur(${b}px)` : "";
+    });
+    const tf = stretch(f);
+    if (tf !== was.stretch) {
+      was.stretch = tf;
+      stretches.current.forEach((el) => (el.style.transform = tf));
+    }
+    const sw = sweep(f), dk = f.dark.toFixed(3);
+    if (dark.current && (sw !== was.sweep || dk !== was.dark)) {
+      was.sweep = sw;
+      was.dark = dk;
+      dark.current.style.transform = sw;
+      dark.current.style.opacity = dk;
     }
 
     // The live display takes over from the two halves once flat. Opacity,
@@ -275,6 +292,8 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
   useImperativeHandle(ref, () => ({ apply }));
 
   const u = (v: number) => v * k;
+  // Each half: the whole display, slid so its own half shows, then the
+  // left half's dark as it wakes, then the sleeping display's black.
   const half = (side: "L" | "R") => (
     <>
       <div
@@ -284,10 +303,18 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
         className="pointer-events-none absolute isolate"
         style={{ width: u(INNER.w), height: u(INNER.h), top: u(BLEED), left: side === "L" ? u(BLEED) : u(SEAM - INNER.w / 2) }}
       >
-        <div style={{ width: INNER.w, height: INNER.h, zoom: k }}>
-          <Upright portrait={portrait}>{inner(side)}</Upright>
+        <div
+          ref={(el) => {
+            if (el) stretches.current[side === "L" ? 0 : 1] = el;
+          }}
+          className="absolute inset-0 origin-right"
+        >
+          <div style={{ width: INNER.w, height: INNER.h, zoom: k }}>
+            <Upright portrait={portrait}>{inner(side)}</Upright>
+          </div>
         </div>
       </div>
+      {side === "L" ? <div ref={dark} className={SWEEP} /> : null}
       <div
         ref={(el) => {
           if (el) sleep.current[side === "L" ? 0 : 1] = el;

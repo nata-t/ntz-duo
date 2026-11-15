@@ -68,6 +68,17 @@ let queued = 0;
 export function snapshot() {
   cancelAnimationFrame(queued);
   queued = 0;
+  if (!slots.size) return;
+  // The live display joins the document with the device's first frame. A
+  // copy asked for before then waits for it: given up on, the halves would
+  // stay black until the device first lay flat.
+  if (!liveRoot()) {
+    queued = requestAnimationFrame(() => {
+      queued = 0;
+      if (!flat) snapshot();
+    });
+    return;
+  }
   for (const slot of slots) {
     const copy = copyLive();
     if (!copy) return;
