@@ -25,12 +25,16 @@ function build(portrait: boolean) {
   // Turn to show the hinge, then the back with its cameras.
   at(1.15, P({ yaw: 172, s: 0.6, y: 1, view: -12, pitch: 4 }, { s: 1, y: 0 }));
   at(1.55, { yaw: 196, view: -10 });
-  // Edge on, open side facing the viewer. The inner display wakes while
+  // All the way round to the front: shut, outer display facing the viewer,
+  // a little left of centre beside the copy. The inner display wakes while
   // it's still shut, so it's already on as the halves part.
-  at(2.2, P({ yaw: 270, s: 0.6, view: -4, pitch: 0, wake: 1 }, { s: 0.8 }));
-  // Open like a book toward the viewer; the V stays symmetric.
-  // Upright, it turns to stand as it opens, so it never runs off a phone's sides.
-  at(3.15, P({ fold: 16, yaw: 352, s: 0.68, view: -3, open: 1, shadow: 0.6 }, { s: 0.58, roll: 70 }));
+  at(2.2, P({ yaw: 360, x: -7, s: 0.6, view: -4, pitch: 0, wake: 1 }, { x: 0, s: 0.8 }));
+  // The cover swings out toward the viewer, the phone turned a touch so
+  // both displays show: the outer's glint, the inner waking behind it. The
+  // shut phone's mass sits right of the hinge (pose.ts), so it centres
+  // itself as it opens. Upright, it turns to stand as it opens, so it never
+  // runs off a phone's sides.
+  at(3.15, P({ fold: 38, yaw: 382, x: 0, s: 0.68, view: -3, open: 1, shadow: 0.6 }, { s: 0.58, roll: 70, yaw: 370 }));
   // Flatten and come close: the display takes the viewport.
   at(3.9, P({ fold: 0, yaw: 360, s: 1, y: 0, view: 0, shadow: 0 }, { roll: 90 }));
   // Live: the visitor uses the phone.

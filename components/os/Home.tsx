@@ -51,7 +51,7 @@ function Icons({ ids, x0, y0, cell = CELL, row = ROW, mirror }: { ids: string[];
   return (
     <>
       {ids.map((id, i) => (
-        <div key={id} className="absolute" style={{ left: x0 + (i % 4) * cell + (cell - (ICON + 18)) / 2, top: y0 + Math.floor(i / 4) * row }}>
+        <div key={id} data-spring className="absolute" style={{ left: x0 + (i % 4) * cell + (cell - (ICON + 18)) / 2, top: y0 + Math.floor(i / 4) * row }}>
           <AppIcon id={id} size={ICON} mirror={mirror} />
         </div>
       ))}
@@ -82,7 +82,7 @@ function Page({ page, width, height, layout, rail, mirror }: { page: number; wid
       <div className="absolute top-0 h-full" style={style}>
         {page === 0 ? (
           <>
-            <div className="absolute flex" style={{ left: cx, top: TOP + 26, gap: GAP }}>
+            <div data-spring="glass" className="absolute flex" style={{ left: cx, top: TOP + 26, gap: GAP }}>
               <WeatherWidget size={SMALL} />
               <MapWidget size={SMALL} />
             </div>
@@ -90,20 +90,20 @@ function Page({ page, width, height, layout, rail, mirror }: { page: number; wid
           </>
         ) : page === 1 ? (
           <>
-            <div className="absolute" style={{ left: (width - LARGE_W) / 2, top: TOP + 26 }}>
+            <div data-spring="glass" className="absolute" style={{ left: (width - LARGE_W) / 2, top: TOP + 26 }}>
               <PortraitWidget w={LARGE_W} h={largeH} />
             </div>
-            <div className="absolute flex" style={{ left: cx, top: TOP + 26 + largeH + GAP, gap: GAP }}>
+            <div data-spring="glass" className="absolute flex" style={{ left: cx, top: TOP + 26 + largeH + GAP, gap: GAP }}>
               <ClockWidget size={SMALL} />
               <CalendarWidget size={SMALL} />
             </div>
           </>
         ) : (
           <>
-            <div className="absolute" style={{ left: (width - LARGE_W) / 2, top: TOP + 26 }}>
+            <div data-spring="glass" className="absolute" style={{ left: (width - LARGE_W) / 2, top: TOP + 26 }}>
               <ExperienceWidget w={LARGE_W} h={largeH} />
             </div>
-            <div className="absolute" style={{ left: cx, top: TOP + 26 + largeH + GAP }}>
+            <div data-spring="glass" className="absolute" style={{ left: cx, top: TOP + 26 + largeH + GAP }}>
               <StackWidget w={pair} h={SMALL} />
             </div>
           </>
@@ -125,7 +125,7 @@ function Page({ page, width, height, layout, rail, mirror }: { page: number; wid
   return (
     <div className="absolute top-0 h-full" style={style}>
       {full ? (
-        <div className="absolute" style={{ left: (half - LARGE_W) / 2, top: (height - LARGE_H) / 2 }}>
+        <div data-spring="glass" className="absolute" style={{ left: (half - LARGE_W) / 2, top: (height - LARGE_H) / 2 }}>
           {page === 0 ? <PortraitWidget w={LARGE_W} h={LARGE_H} /> : <ExperienceWidget w={LARGE_W} h={LARGE_H} />}
         </div>
       ) : null}
@@ -134,7 +134,7 @@ function Page({ page, width, height, layout, rail, mirror }: { page: number; wid
         <Icons ids={[...GRID, ...DOCK]} x0={x0} y0={56} row={128} mirror={mirror} />
       ) : page === 0 ? (
         <>
-          <div className="absolute flex" style={{ left: wx, top, gap: GAP }}>
+          <div data-spring="glass" className="absolute flex" style={{ left: wx, top, gap: GAP }}>
             <WeatherWidget size={SMALL} />
             <MapWidget size={SMALL} />
           </div>
@@ -142,14 +142,14 @@ function Page({ page, width, height, layout, rail, mirror }: { page: number; wid
         </>
       ) : (
         <>
-          <div className="absolute flex" style={{ left: wx, top, gap: GAP }}>
+          <div data-spring="glass" className="absolute flex" style={{ left: wx, top, gap: GAP }}>
             <ClockWidget size={SMALL} />
             <CalendarWidget size={SMALL} />
           </div>
-          <div className="absolute" style={{ left: wx, top: top + SMALL + GAP }}>
+          <div data-spring="glass" className="absolute" style={{ left: wx, top: top + SMALL + GAP }}>
             <StackWidget w={pair} h={SMALL} />
           </div>
-          <div className="absolute" style={{ left: wx, top: top + 2 * (SMALL + GAP) }}>
+          <div data-spring="glass" className="absolute" style={{ left: wx, top: top + 2 * (SMALL + GAP) }}>
             <WorkWidget w={pair} h={124} />
           </div>
         </>
@@ -231,7 +231,7 @@ export default function Home({ region, mirror = false }: { region: Slot; mirror?
     >
       {/* Pages stop at the rail: the next one waits off to the side. */}
       <div className="absolute inset-y-0 left-0 overflow-hidden" style={{ width: inner }}>
-        <div ref={strip} className="absolute inset-y-0 left-0" style={{ width: inner }}>
+        <div ref={strip} data-home-strip className="absolute inset-y-0 left-0" style={{ width: inner }}>
           {Array.from({ length: pages }, (_, i) => (
             <Page key={i} page={i} width={inner} height={height} layout={layout} rail={rail || portrait} mirror={mirror} />
           ))}
@@ -240,7 +240,7 @@ export default function Home({ region, mirror = false }: { region: Slot; mirror?
 
       {pages > 1 ? (
         // Upright, the dots sit over Search, clear of it.
-        <div className="absolute flex gap-[8px]" style={{ left: dotsX - (pages * 7 + (pages - 1) * 8) / 2, bottom: portrait ? 170 : 26 }}>
+        <div data-spring className="absolute flex gap-[8px]" style={{ left: dotsX - (pages * 7 + (pages - 1) * 8) / 2, bottom: portrait ? 170 : 26 }}>
           {Array.from({ length: pages }, (_, i) => (
             <button
               key={i}
@@ -274,9 +274,9 @@ function Dock({ vertical, width, height, mirror }: { vertical: boolean; width: n
     <>
       {/* A rounded rectangle, not a capsule: its corner is concentric
           with the icons' inside it. */}
-      <div className={`glass-clear absolute flex items-center ${vertical ? "flex-col" : "flex-row"}`} style={{ ...box, padding: pad, gap, borderRadius: iconRadius(size) + pad }}>
+      <div data-dock="panel" className={`glass-clear absolute flex items-center ${vertical ? "flex-col" : "flex-row"}`} style={{ ...box, padding: pad, gap, borderRadius: iconRadius(size) + pad }}>
         {DOCK.map((id) => (
-          <div key={id} style={{ width: size, height: size }} className="grid place-items-center">
+          <div key={id} data-dock style={{ width: size, height: size }} className="grid place-items-center">
             <div className="-mx-[9px]">
               <AppIcon id={id} size={size} label={false} mirror={mirror} />
             </div>
@@ -287,6 +287,7 @@ function Dock({ vertical, width, height, mirror }: { vertical: boolean; width: n
         type="button"
         tabIndex={mirror ? -1 : 0}
         aria-label="Search"
+        data-dock="panel"
         onClick={() => os.set({ overlay: "search" })}
         className="glass-clear absolute grid size-[48px] place-items-center rounded-full text-white transition-[scale] duration-300 ease-ios active:scale-110"
         style={search}

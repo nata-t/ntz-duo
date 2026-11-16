@@ -4,8 +4,11 @@ Portfolio of Natnael Tadele, software engineer in Addis Ababa, told through a
 foldable phone.
 
 **Concept — Hello, hello.** The page is one scroll story around an iPhone Duo.
-It starts closed on its Lock Screen, turns to show its edge and back, opens like
-a book and comes close until its inner display fills the window. There the
+It starts closed on its Lock Screen, turns to show its edge and back, comes
+round to face you again and opens: the cover swings out toward you, outer
+display and all, while the phone centres itself, and it comes close until its
+inner display fills the window. The first time, that display is on its Lock
+Screen: swipe up from the home indicator to open the phone. There the
 phone is live: open apps, put two side by side, page the Home Screen, pull down
 Control Center. Scroll outside the screen and it folds into a tent showing
 StandBy above the footer; keep scrolling and the story starts again, seamlessly.
@@ -37,8 +40,9 @@ components/
   stage/             the scroll story: Stage (pin, loop, snap), story.ts (poses
                      on a clock), HeroCopy, Nav, Footer, Scrollbar (the
                      story's chapters as an iOS page control)
-  device/            the CSS 3D phone: geometry, pose math, Device (slabs,
-                     extruded walls, camera plateau, faces, live display)
+  device/            geometry, pose math, the Lock Screen's art (lockart.ts),
+                     the WebGL phone (gl/: DeviceGL, duo.ts model and fold,
+                     wipe.ts display pipeline) and the CSS 3D fallback (Device)
   os/                iOS 27 on the inner display: InnerDisplay, Home, widgets,
                      icons, Window (launch/close/split), StatusBar,
                      ControlCenter, Search, Alert
@@ -52,10 +56,44 @@ scripts/phone.mjs    headless screenshots of the live phone, full screen
 
 ## How it works
 
-- **The device** is CSS 3D, not WebGL, so its inner display is real DOM:
-  crisp at any size, interactive, accessible. Each half is a slab with a
-  front, a back and a side wall of thin strips stood on edge around its
-  rounded outline. Faces are shaded from their normals every frame.
+- **The device** is a measured model (`public/device/duo/model.usdc`, from
+  [iphone-duo-animation](https://github.com/akashtdev/iphone-duo-animation),
+  MIT) drawn with three.js under a room's reflections, in Star White or Night
+  Sky to follow the appearance; the inner bezel is this site's own. One
+  value, the fold angle, drives it: the cover half turns about the hinge in
+  the vertex shader and the flexible display bends through a short Hermite
+  strip. While a display shows the Lock Screen the GPU draws it
+  (`gl/duo.ts`, `gl/wipe.ts`): three sheets of the wallpaper pushed in by
+  their own depths as the phone shuts, the time painted live behind the
+  ridge, the half that wakes last blurred and dark, a glint sweeping the
+  outer glass. Otherwise the display is a transparent hole over live DOM in
+  a CSS 3D layer beneath the canvas, so the inner display is real DOM: crisp
+  at any size, interactive, accessible. Without WebGL, a CSS 3D build of the
+  phone stands in.
+- **Lock Screen.** The phone starts locked. Flat, the Lock Screen is DOM
+  painted by the same code as the GPU's (`device/lockart.ts`), so the
+  handover can't be seen; swipe up from the home indicator (or press Enter
+  on it) and the clock rides up behind the ridge, then the Home Screen
+  springs in from a blurred, magnified view, centre first, the dock's apps
+  rising in turn (`os/unlock.ts`). It stays unlocked until five minutes
+  without use (`AUTO_LOCK` in `lib/os.ts`).
+- **Folding apps.** Apps and the Home Screen fold through the same GPU
+  pipeline as the Lock Screen, as a picture of the live display
+  (`lib/raster.ts`: the DOM copied into an SVG foreignObject with the page's
+  styles, fonts and images inlined). It's retaken in idle time a beat after
+  anything on the display changes; until a fresh one exists, plain DOM halves
+  stand in. Shut and still, the outer display is live DOM (its notification
+  and controls are real Liquid Glass); the GPU takes over, from the same
+  picture, as it opens.
+- **Buttons.** Volume and the side button work: click them on the model. The
+  side button turns the display off (locking the phone) and on again, on the
+  Lock Screen; only a swipe opens the phone. Volume shows iOS's HUD by
+  the buttons (`lib/buttons.ts`, `os/VolumeHUD.tsx`). Brightness and the
+  backlight are one value for every surface, DOM and GPU (`lib/backlight.ts`).
+- **Finishes.** Star White is the model's own; Night Sky is set part by part
+  from Apple's photographs (`NIGHT_PARTS` in `gl/duo.ts`), with a plain back.
+  Face on, the open front is the UI kit's render (`public/device/inner-*.webp`)
+  laid over the model, as the CSS device always had it.
 - **The story** (`components/stage/story.ts`) lists poses on a clock (one unit
   is one viewport of scrolling). Every pose property follows a monotone cubic
   between keys, so motion carries through without stalls or overshoot.

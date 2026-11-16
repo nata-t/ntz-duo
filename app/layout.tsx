@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Inter } from "next/font/google";
+import { Inter, Sofia_Sans_Extra_Condensed } from "next/font/google";
 import MotionProvider from "@/components/motion/MotionProvider";
 import { profile } from "@/content/site";
 import "./globals.css";
@@ -8,6 +8,9 @@ import "./globals.css";
 // face. Everyone else gets Inter with its optical-size axis, the closest
 // open relative.
 const inter = Inter({ subsets: ["latin"], variable: "--font-inter", axes: ["opsz"], display: "swap" });
+// The Lock Screen's tall clock (iOS 26's numerals stand to fill their box;
+// this condensed face, stretched, is the closest open relative).
+const clock = Sofia_Sans_Extra_Condensed({ subsets: ["latin"], variable: "--font-clock", weight: "variable", display: "swap" });
 
 const SITE_URL = process.env.NEXT_PUBLIC_SITE_URL ?? "https://ntz-duo.vercel.app";
 const DESCRIPTION =
@@ -43,9 +46,12 @@ const PREPAINT = `(function(){try{var a=localStorage.getItem('duo:appearance')||
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={inter.variable} suppressHydrationWarning>
+    <html lang="en" className={`${inter.variable} ${clock.variable}`} suppressHydrationWarning>
       <head>
         <script dangerouslySetInnerHTML={{ __html: PREPAINT }} />
+        {/* The device's model is the largest download: start it early, at
+            low priority, so it never holds up the page. */}
+        <link rel="preload" href="/device/duo/model.usdc" as="fetch" crossOrigin="anonymous" fetchPriority="low" />
       </head>
       <body>
         <MotionProvider>

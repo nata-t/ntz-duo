@@ -1,13 +1,14 @@
 "use client";
 
+import { useEffect, useRef } from "react";
 import { stage } from "@/components/stage/stage-state";
 import { useOS } from "@/lib/os";
 import { OUTER } from "@/components/device/geometry";
 import { useNow } from "@/components/os/widgets";
-import { StatusRing, useBattery } from "@/components/os/StatusRing";
-
-/** The outer camera's centre (from the UI kit): the rail's controls line up under it. */
-const CAM_X = 418.2;
+import Veil from "@/components/os/Veil";
+import VolumeHUD from "@/components/os/VolumeHUD";
+import { gsap } from "@/lib/gsap";
+import { BUTTON_ICONS, DEPTH, OUTER_GLASS, clockText, loadFonts, outerSheet, paintChrome, paintTime, wallpaper } from "@/components/device/lockart";
 
 // The outer display (466 × 678 pt). Closed, it shows the Lock Screen; stood
 // up in a tent at the end of the story, it shows StandBy in landscape. The
@@ -22,38 +23,68 @@ export default function OuterDisplay() {
       <div className={`absolute inset-0 transition-opacity duration-700 ${mode === "standby" ? "opacity-100" : "opacity-0"}`}>
         <StandBy />
       </div>
+      <VolumeHUD where="outer" w={OUTER.w} h={OUTER.h} />
+      <Veil />
     </div>
   );
 }
 
 function LockScreen() {
-  const now = useNow("m");
-  const level = useBattery();
   const dark = useOS((s) => s.dark);
-  const d = now ?? new Date(2026, 10, 3, 9, 41);
-  const time = d.toLocaleTimeString("en-US", { hour: "numeric", minute: "2-digit", hour12: true }).replace(/\s?[AP]M$/, "");
-  const date = d.toLocaleDateString("en-US", { weekday: "long", month: "long", day: "numeric" });
+  const awake = useOS((s) => s.awake);
+  const root = useRef<HTMLDivElement>(null);
+  // Waking, the Lock Screen settles from a touch larger as the light comes up.
+  const wasAwake = useRef(awake);
+  useEffect(() => {
+    if (awake && !wasAwake.current && root.current)
+      gsap.fromTo(root.current, { scale: 1.04 }, { scale: 1, duration: 0.6, ease: "power3.out", clearProps: "transform" });
+    wasAwake.current = awake;
+  }, [awake]);
+  const theme = dark ? "dark" : "light";
+  const time = useRef<HTMLCanvasElement>(null);
+  const chrome = useRef<HTMLCanvasElement>(null);
+  const now = useNow("m");
 
+  // The clock and the chrome, by the same hand as the GPU's.
+  useEffect(() => {
+    let alive = true;
+    const scale = Math.min(3, (window.devicePixelRatio || 1) * 1.5);
+    const w = Math.round(OUTER.w * scale), h = Math.round(OUTER.h * scale);
+    void loadFonts().then(async () => {
+      for (const el of [time.current, chrome.current]) if (el && (el.width !== w || el.height !== h)) Object.assign(el, { width: w, height: h });
+      if (!alive) return;
+      const t = time.current?.getContext("2d");
+      if (t) paintTime(t, w, h, "outer", theme, now ?? new Date());
+      const c = chrome.current?.getContext("2d");
+      if (c) await paintChrome(c, w, h, "outer");
+    });
+    return () => {
+      alive = false;
+    };
+  }, [theme, now]);
+
+  // Shut and still, this is the picture the GPU draws as the phone starts
+  // to open (lockart.ts): each sheet of the wallpaper pushed in by its own
+  // depth, the clock behind the ridge, the chrome in front. Here the
+  // notification and the controls are real Liquid Glass.
+  const sheet = (name: "base" | "sky" | "ridge" | "dune", depth: number) => (
+    <img src={wallpaper(theme, name)} alt="" draggable={false} className="absolute max-w-none" style={outerSheet(depth)} />
+  );
   return (
-    <div className="absolute inset-0">
-      <img src={`/wallpapers/outer-${dark ? "dark" : "light"}.webp`} alt="" draggable={false} className="absolute inset-0 h-full w-full object-cover" />
-      <div className="absolute inset-x-0 top-0 h-[55%] bg-gradient-to-b from-black/10 to-transparent" />
-
-      {/* Rail: the Duo's status circle (battery ring, Wi-Fi, signal) on
-          the trailing edge, centred under the camera. The Lock Screen's own
-          clock stands in for the time. */}
-      <div className="absolute top-[78px] -translate-x-1/2 text-white" style={{ left: CAM_X }}>
-        <StatusRing level={level} size={42} />
-      </div>
-
-      <div className="absolute top-[64px] left-[30px] right-[90px]">
-        <p className="text-[20px] leading-[1.2] font-semibold tracking-[-0.01em] opacity-90">{date}</p>
-        <GlassTime time={time} />
-      </div>
+    <div ref={root} className="absolute inset-0 overflow-hidden">
+      {sheet("base", DEPTH.ridge)}
+      {sheet("sky", DEPTH.sky)}
+      <canvas ref={time} aria-label={now ? clockText(now).time : undefined} className="absolute inset-0 h-full w-full" />
+      {sheet("ridge", DEPTH.ridge)}
+      {sheet("dune", DEPTH.dune)}
+      <canvas ref={chrome} aria-hidden="true" className="absolute inset-0 h-full w-full" />
 
       {/* One notification: the invitation. */}
       {/* Its foot sits on the camera button's: one baseline along the bottom. */}
-      <div className="glass-clear absolute right-[96px] bottom-[28px] left-[18px] rounded-[26px] p-[14px]">
+      <div
+        className="glass-clear absolute rounded-[26px] p-[14px]"
+        style={{ left: N.left, right: N.right, bottom: N.bottom, height: N.h }}
+      >
         <div className="flex items-start gap-[11px]">
           <span className="grid size-[38px] shrink-0 place-items-center overflow-hidden rounded-[9px] bg-[#c9d6ff]">
             <img src="/portrait/source.webp" alt="" className="mt-[6px] w-full" draggable={false} />
@@ -69,9 +100,12 @@ function LockScreen() {
       </div>
 
       {/* Flashlight and camera, stacked in the rail under the camera. */}
-      <div className="absolute bottom-[28px] flex -translate-x-1/2 flex-col items-center gap-[14px]" style={{ left: CAM_X }}>
-        {["M9 2h6v4l-2 4v12h-2V10L9 6z", "M4 8h3l2-3h6l2 3h3v11H4zM12 10.5a3.5 3.5 0 1 0 0 7 3.5 3.5 0 0 0 0-7"].map((d) => (
-          <span key={d} className="glass-clear grid size-[50px] place-items-center rounded-full">
+      <div
+        className="absolute flex -translate-x-1/2 flex-col items-center"
+        style={{ left: OUTER_GLASS.camX, bottom: B.bottom, gap: B.gap }}
+      >
+        {BUTTON_ICONS.map((d) => (
+          <span key={d} className="glass-clear grid place-items-center rounded-full" style={{ width: B.size, height: B.size }}>
             <svg width="22" height="22" viewBox="0 0 24 24" aria-hidden="true">
               <path d={d} fill="none" stroke="#fff" strokeWidth="1.8" strokeLinejoin="round" />
             </svg>
@@ -82,53 +116,7 @@ function LockScreen() {
   );
 }
 
-/** iOS 26's Lock Screen clock: numerals of Liquid Glass. The wallpaper
- *  shows through a pale fill; an embossed bevel catches light on the
- *  upper left of every stroke and a soft shade runs along the lower right.
- *  Pure SVG lighting, so it renders the same in every browser. */
-function GlassTime({ time }: { time: string }) {
-  return (
-    <svg width="340" height="128" viewBox="0 0 340 128" aria-label={time} role="img" className="-mt-[2px] -ml-[4px] overflow-visible">
-      <defs>
-        <filter id="lock-glass" x="-10%" y="-10%" width="120%" height="130%" colorInterpolationFilters="sRGB">
-          {/* The bevel: a rounded height field from the glyphs' alpha. */}
-          <feGaussianBlur in="SourceAlpha" stdDeviation="3.2" result="h" />
-          <feSpecularLighting in="h" surfaceScale="6" specularConstant="1.1" specularExponent="22" lightingColor="#fff" result="spec">
-            <feDistantLight azimuth="225" elevation="42" />
-          </feSpecularLighting>
-          <feComposite in="spec" in2="SourceAlpha" operator="in" result="specIn" />
-          {/* A shade along the far edges, and a thin bright rim. */}
-          <feOffset in="h" dx="-1.6" dy="-1.6" result="hs" />
-          <feComposite in="SourceAlpha" in2="hs" operator="out" result="edge" />
-          <feFlood floodColor="#000" floodOpacity="0.18" />
-          <feComposite in2="edge" operator="in" result="shade" />
-          <feMorphology in="SourceAlpha" operator="erode" radius="1" result="thin" />
-          <feComposite in="SourceAlpha" in2="thin" operator="out" result="rimA" />
-          <feFlood floodColor="#fff" floodOpacity="0.55" />
-          <feComposite in2="rimA" operator="in" result="rim" />
-          <feMerge>
-            <feMergeNode in="SourceGraphic" />
-            <feMergeNode in="shade" />
-            <feMergeNode in="specIn" />
-            <feMergeNode in="rim" />
-          </feMerge>
-        </filter>
-      </defs>
-      <text
-        x="2"
-        y="112"
-        fill="rgba(255,255,255,0.24)"
-        filter="url(#lock-glass)"
-        fontFamily="var(--font-display)"
-        fontSize="132"
-        fontWeight="700"
-        letterSpacing="-4"
-      >
-        {time}
-      </text>
-    </svg>
-  );
-}
+const N = OUTER_GLASS.notice, B = OUTER_GLASS.buttons;
 
 /** StandBy in landscape: an analog clock beside the month, as on iPhone. */
 function StandBy() {
@@ -184,7 +172,7 @@ function StandBy() {
             <span key={i} className="grid place-items-center">
               {n === null ? null : (
                 <span
-                  className={`grid size-[26px] place-items-center rounded-full ${n === today ? "bg-[#ff453a]" : ""} ${
+                  className={`grid size-[26px] place-items-center rounded-full leading-none ${n === today ? "bg-[#ff453a]" : ""} ${
                     n !== today && (i % 7 === 0 || i % 7 === 6) ? "text-[rgba(255,255,255,0.5)]" : "text-white"
                   }`}
                 >

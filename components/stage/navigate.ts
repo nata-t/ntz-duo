@@ -1,6 +1,7 @@
 import { scrollToTarget } from "@/lib/lenis";
 import { enterFull, prefersFull, whenLive } from "@/lib/full";
 import { openApp } from "@/lib/os";
+import { openLock } from "@/components/os/LockScreen";
 import { LENGTH, MARKS } from "./story";
 
 /** The stage's scroll track: its height is the story's length. */
@@ -19,6 +20,10 @@ export function visit(app?: string) {
   scrollToStory(MARKS.liveIn + 0.15);
   whenLive(() => {
     if (prefersFull()) enterFull();
-    if (app) openApp(app, null);
+    // Asked for something on the phone: it opens itself, as a swipe would.
+    if (app) {
+      openLock();
+      openApp(app, null);
+    }
   });
 }

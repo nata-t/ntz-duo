@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { DISPLAY_CORNER, DIVIDER, applyGlass, closeWindow, goHome, homeRegion, os, swapSides, syncAppearance, useDims, useOS } from "@/lib/os";
+import { DISPLAY_CORNER, DIVIDER, applyGlass, closeWindow, goHome, homeRegion, os, swapSides, syncAppearance, touchPhone, useDims, useOS } from "@/lib/os";
 import { exitFull } from "@/lib/full";
 import Home, { homePages } from "./Home";
 import Window from "./Window";
@@ -9,6 +9,9 @@ import StatusBar from "./StatusBar";
 import ControlCenter, { cc } from "./ControlCenter";
 import Search from "./Search";
 import Alert from "./Alert";
+import LockScreen from "./LockScreen";
+import Veil from "./Veil";
+import VolumeHUD from "./VolumeHUD";
 
 // The inner display. Rendered three times: once live (flat, interactive)
 // and once per half while the device folds, as a mirror of the same state.
@@ -16,7 +19,6 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
   const dark = useOS((s) => s.dark);
   const windows = useOS((s) => s.windows);
   const live = useOS((s) => s.live);
-  const brightness = useOS((s) => s.brightness);
   const overlay = useOS((s) => s.overlay);
   const fullScreen = useOS((s) => s.screen !== null);
   const ccShown = cc.use((s) => s.shown);
@@ -52,6 +54,12 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
     let acc = 0, lock = 0;
     const onWheel = (e: WheelEvent) => {
       if (!os.get().live) return;
+      touchPhone();
+      // The Lock Screen opens by a swipe from its foot, never by the wheel.
+      if (os.get().locked) {
+        e.preventDefault();
+        return;
+      }
       const dy = e.deltaY, dx = e.deltaX;
       let n = e.target as HTMLElement | null;
       while (n && n !== el) {
@@ -80,8 +88,16 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
         lock = now + 650;
       }
     };
+    // Any use of the phone holds off Auto-Lock.
+    const use = () => touchPhone();
     el.addEventListener("wheel", onWheel, { passive: false });
-    return () => el.removeEventListener("wheel", onWheel);
+    el.addEventListener("pointerdown", use, { passive: true });
+    el.addEventListener("keydown", use, { passive: true });
+    return () => {
+      el.removeEventListener("wheel", onWheel);
+      el.removeEventListener("pointerdown", use);
+      el.removeEventListener("keydown", use);
+    };
   }, [mirror]);
 
   // Keyboard: Escape goes home (or closes what's on top); at home, it
@@ -90,7 +106,7 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
     if (mirror) return;
     const onKey = (e: KeyboardEvent) => {
       // Apps handle their own Escape first (closing a viewer, leaving an album).
-      if (!os.get().live || e.key !== "Escape" || e.defaultPrevented) return;
+      if (!os.get().live || os.get().locked || e.key !== "Escape" || e.defaultPrevented) return;
       const s = os.get();
       if (s.alert) os.set({ alert: null });
       else if (s.overlay) os.set({ overlay: null });
@@ -160,8 +176,10 @@ export default function InnerDisplay({ mirror = false }: { mirror?: boolean; hal
       ) : null}
       {!mirror ? <Alert /> : null}
 
-      {/* Brightness, as the panel would dim. */}
-      <div className="pointer-events-none absolute inset-0 z-50 bg-black" style={{ opacity: (1 - brightness) * 0.7 }} />
+      <LockScreen />
+      <VolumeHUD where="inner" w={W} h={H} />
+
+      <Veil />
     </div>
   );
 }

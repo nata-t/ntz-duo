@@ -72,6 +72,9 @@ export default function Stage() {
   const [touch, setTouch] = useState(false);
   // The real-3D device where WebGL runs; the CSS build everywhere else.
   const [gl, setGl] = useState(false);
+  // The WebGL device rises in once its model has arrived.
+  const modelIn = useRef(false);
+  const onModel = useRef<() => void>(() => {});
   const dark = useOS((s) => s.dark);
   const fullScreen = useOS((s) => s.screen !== null);
   // The live display renders once, into this node, which moves between the
@@ -119,7 +122,12 @@ export default function Stage() {
     let pressed = false;
     // The device rises into place on first load.
     const intro = { v: reduced ? 1 : 0 };
-    const introTween = reduced ? null : gsap.to(intro, { v: 1, duration: 2.4, delay: 0.25, ease: "expo.out" });
+    let introTween: gsap.core.Tween | null = null;
+    const rise = () => {
+      if (!reduced && !introTween) introTween = gsap.to(intro, { v: 1, duration: 2.4, delay: 0.1, ease: "expo.out" });
+    };
+    if (!gl || modelIn.current) rise();
+    else onModel.current = rise;
 
     let drawn = -1;
     let nearing = false;
@@ -356,6 +364,10 @@ export default function Stage() {
           gl ? (
             <DeviceGL
               ref={device}
+              onReady={() => {
+                modelIn.current = true;
+                onModel.current();
+              }}
               k={k}
               inner={() => <Mirror />}
               live={live}

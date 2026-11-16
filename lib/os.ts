@@ -48,6 +48,13 @@ type OS = {
   screen: Screen | null;
   /** iOS 27's Liquid Glass slider: 0 clear … 1 tinted, 0.5 by default. */
   glass: number;
+  /** The Lock Screen is up: the phone opens on it until it's swiped away,
+   *  and locks itself again after AUTO_LOCK of no use. */
+  locked: boolean;
+  /** The backlight is on (the side button turns it off and on). */
+  awake: boolean;
+  /** Media volume, 0 … 1 in sixteen steps. */
+  volume: number;
 };
 
 export type Screen = { w: number; h: number; z: number };
@@ -69,6 +76,9 @@ export const os = createStore<OS>({
   statusLight: null,
   screen: null,
   glass: 0.5,
+  locked: true,
+  awake: true,
+  volume: 0.5,
 });
 
 export const useOS = os.use;
@@ -94,6 +104,34 @@ export function screenFor(vw: number, vh: number): Screen {
       ? Math.max(Math.min(1, vw / 400), Math.min(vw / 669, vh / 951))
       : Math.min(vw / 951, vh / 669, 1.4);
   return { w: vw / z, h: vh / z, z };
+}
+
+/** Auto-Lock: the phone locks after this long untouched. */
+export const AUTO_LOCK = 5 * 60 * 1000;
+let lastUse = 0;
+let autoLock = 0;
+
+/** The phone was used: Auto-Lock starts counting again. */
+export function touchPhone() {
+  lastUse = Date.now();
+}
+
+/** Swiped up: the Lock Screen gives way, and Auto-Lock starts watching. */
+export function unlock() {
+  touchPhone();
+  os.set({ locked: false });
+  if (typeof window === "undefined") return;
+  window.clearInterval(autoLock);
+  autoLock = window.setInterval(() => {
+    if (Date.now() - lastUse < AUTO_LOCK) return;
+    lock();
+  }, 10000);
+}
+
+/** Back to the Lock Screen. What was open stays open underneath. */
+export function lock() {
+  window.clearInterval(autoLock);
+  os.set({ locked: true, overlay: null, alert: null });
 }
 
 let seq = 0;
