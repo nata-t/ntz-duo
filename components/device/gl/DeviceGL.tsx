@@ -303,12 +303,19 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       return g.duo.buttonAt(ray, eyeLocal);
     };
     const travel: Record<ButtonName, { v: number }> = { volumeUp: { v: 0 }, volumeDown: { v: 0 }, side: { v: 0 }, camera: { v: 0 } };
+    // In fast and firm; out on a little spring. A quick click still shows
+    // the whole press: the release waits for the button to bottom out.
+    const pressedAt: Record<ButtonName, number> = { volumeUp: 0, volumeDown: 0, side: 0, camera: 0 };
     const move = (n: ButtonName, to: number, duration: number) =>
       gsap.to(travel[n], {
         v: to,
         duration,
-        ease: to ? "power2.out" : "back.out(2.2)",
+        delay: to ? 0 : Math.max(0, 0.11 - (performance.now() - pressedAt[n]) / 1000),
+        ease: to ? "power3.out" : "back.out(2.6)",
         overwrite: true,
+        onStart: () => {
+          if (to) pressedAt[n] = performance.now();
+        },
         onUpdate: () => {
           gl.current?.duo?.setPress(n, travel[n].v);
           redraw();
@@ -322,7 +329,8 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       e.preventDefault();
       e.stopPropagation();
       held = n;
-      move(n, 1, 0.06);
+      pressedAt[n] = performance.now();
+      move(n, 1, 0.08);
       if (n === "side") pressSide();
       if (n === "volumeUp" || n === "volumeDown") {
         const dir = n === "volumeUp" ? 1 : -1;
@@ -337,7 +345,7 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       if (!held) return;
       window.clearTimeout(repeat);
       if (held !== "side" && held !== "camera") releaseVolume();
-      move(held, 0, 0.32);
+      move(held, 0, 0.42);
       held = null;
     };
     let hoverAt: { x: number; y: number } | null = null, hovering = false, hoverFrame = 0;

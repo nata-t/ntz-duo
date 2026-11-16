@@ -103,8 +103,9 @@ const SPINE = {
   roughness: 0.36,
 };
 
-/** How far a button travels when pressed, in model units (≈ 1.6 pt). */
-const TRAVEL = 0.027;
+/** How far a button travels when pressed, in model units: about 60% of
+ *  how far it stands out of the frame (≈ 3.8 pt), enough to read on screen. */
+const TRAVEL = 0.063;
 /** Hit zones reach this far around a button: they're thin on screen. */
 const REACH = 0.14;
 
