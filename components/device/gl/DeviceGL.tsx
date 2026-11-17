@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import * as THREE from "three";
 import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import { HALF, INNER, OUTER } from "../geometry";
+import { BODY, HALF, INNER, OUTER, TEX } from "../geometry";
 import type { Pose } from "../pose";
 import type { DeviceHandle, Finish } from "../Device";
 import { os } from "@/lib/os";
@@ -187,10 +187,32 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
     resize();
 
     const loader = new THREE.TextureLoader();
+    // The kit's render draws the volume and side buttons on the body's edge.
+    // Laid over the open front it would hide the model's own buttons behind
+    // a still picture of them, so everything outside the body's outline is
+    // cut away: the buttons go, the bezel stays as drawn.
     const bezel = (url: string) => {
-      const t = loader.load(url, () => redraw());
+      const t = new THREE.Texture();
       t.colorSpace = THREE.SRGBColorSpace;
       t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      loader.load(url, (src) => {
+        const img = src.image as HTMLImageElement;
+        const c = document.createElement("canvas");
+        c.width = img.naturalWidth;
+        c.height = img.naturalHeight;
+        const x = c.getContext("2d")!;
+        x.drawImage(img, 0, 0);
+        const s = c.width / TEX.inner.w;
+        const l = TEX.inner.x * s, top = TEX.inner.y * s, r = (TEX.inner.x + BODY.w) * s, b = (TEX.inner.y + BODY.h) * s;
+        x.clearRect(0, 0, c.width, top);
+        x.clearRect(0, b, c.width, c.height - b);
+        x.clearRect(0, 0, l, c.height);
+        x.clearRect(r, 0, c.width - r, c.height);
+        src.dispose();
+        t.image = c;
+        t.needsUpdate = true;
+        redraw();
+      });
       return t;
     };
     const bezels = { star: bezel("/device/inner-star.webp"), night: bezel("/device/inner-night.webp") };
