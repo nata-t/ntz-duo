@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import * as THREE from "three";
 import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import { BODY, HALF, INNER, OUTER, TEX } from "../geometry";
+import { HALF, INNER, OUTER } from "../geometry";
 import type { Pose } from "../pose";
 import type { DeviceHandle, Finish } from "../Device";
 import { os } from "@/lib/os";
@@ -187,32 +187,10 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
     resize();
 
     const loader = new THREE.TextureLoader();
-    // The kit's render draws the volume and side buttons on the body's edge.
-    // Laid over the open front it would hide the model's own buttons behind
-    // a still picture of them, so everything outside the body's outline is
-    // cut away: the buttons go, the bezel stays as drawn.
     const bezel = (url: string) => {
-      const t = new THREE.Texture();
+      const t = loader.load(url, () => redraw());
       t.colorSpace = THREE.SRGBColorSpace;
       t.anisotropy = renderer.capabilities.getMaxAnisotropy();
-      loader.load(url, (src) => {
-        const img = src.image as HTMLImageElement;
-        const c = document.createElement("canvas");
-        c.width = img.naturalWidth;
-        c.height = img.naturalHeight;
-        const x = c.getContext("2d")!;
-        x.drawImage(img, 0, 0);
-        const s = c.width / TEX.inner.w;
-        const l = TEX.inner.x * s, top = TEX.inner.y * s, r = (TEX.inner.x + BODY.w) * s, b = (TEX.inner.y + BODY.h) * s;
-        x.clearRect(0, 0, c.width, top);
-        x.clearRect(0, b, c.width, c.height - b);
-        x.clearRect(0, 0, l, c.height);
-        x.clearRect(r, 0, c.width - r, c.height);
-        src.dispose();
-        t.image = c;
-        t.needsUpdate = true;
-        redraw();
-      });
       return t;
     };
     const bezels = { star: bezel("/device/inner-star.webp"), night: bezel("/device/inner-night.webp") };
@@ -325,19 +303,12 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       return g.duo.buttonAt(ray, eyeLocal);
     };
     const travel: Record<ButtonName, { v: number }> = { volumeUp: { v: 0 }, volumeDown: { v: 0 }, side: { v: 0 }, camera: { v: 0 } };
-    // In fast and firm; out on a little spring. A quick click still shows
-    // the whole press: the release waits for the button to bottom out.
-    const pressedAt: Record<ButtonName, number> = { volumeUp: 0, volumeDown: 0, side: 0, camera: 0 };
     const move = (n: ButtonName, to: number, duration: number) =>
       gsap.to(travel[n], {
         v: to,
         duration,
-        delay: to ? 0 : Math.max(0, 0.11 - (performance.now() - pressedAt[n]) / 1000),
-        ease: to ? "power3.out" : "back.out(2.6)",
+        ease: to ? "power2.out" : "back.out(2.2)",
         overwrite: true,
-        onStart: () => {
-          if (to) pressedAt[n] = performance.now();
-        },
         onUpdate: () => {
           gl.current?.duo?.setPress(n, travel[n].v);
           redraw();
@@ -351,8 +322,7 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       e.preventDefault();
       e.stopPropagation();
       held = n;
-      pressedAt[n] = performance.now();
-      move(n, 1, 0.08);
+      move(n, 1, 0.06);
       if (n === "side") pressSide();
       if (n === "volumeUp" || n === "volumeDown") {
         const dir = n === "volumeUp" ? 1 : -1;
@@ -367,7 +337,7 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       if (!held) return;
       window.clearTimeout(repeat);
       if (held !== "side" && held !== "camera") releaseVolume();
-      move(held, 0, 0.42);
+      move(held, 0, 0.32);
       held = null;
     };
     let hoverAt: { x: number; y: number } | null = null, hovering = false, hoverFrame = 0;

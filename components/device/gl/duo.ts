@@ -103,12 +103,8 @@ const SPINE = {
   roughness: 0.36,
 };
 
-/** How far a button travels when pressed, in model units: about 80% of
- *  how far it stands out of the frame (≈ 2.2 of 2.8 pt), so it sinks nearly
- *  flush but never into the frame. */
-const TRAVEL = 0.036;
-/** A held button, shadowed in its slot, catches less of the room. */
-const PRESS_SHADE = 0.55;
+/** How far a button travels when pressed, in model units (≈ 1.6 pt). */
+const TRAVEL = 0.027;
 /** Hit zones reach this far around a button: they're thin on screen. */
 const REACH = 0.14;
 
@@ -858,15 +854,7 @@ export function createDuo(
     dirty: () => dirty,
     /** A button pressed in by `amount` (0 out … 1 home). */
     setPress(name: ButtonName, amount: number) {
-      for (const m of buttons[name].meshes) {
-        m.position.copy(BUTTONS[name].dir).multiplyScalar(-TRAVEL * amount);
-        // Face on, a button is only a sliver past the outline: the press
-        // reads as its glints dimming as it sinks into its slot.
-        const mat = m.material as THREE.MeshStandardMaterial;
-        mat.userData.env ??= mat.envMapIntensity;
-        mat.envMapIntensity = mat.userData.env * (1 - PRESS_SHADE * Math.max(0, amount));
-        if (amount <= 0) delete mat.userData.env;
-      }
+      for (const m of buttons[name].meshes) m.position.copy(BUTTONS[name].dir).multiplyScalar(-TRAVEL * amount);
     },
     /** The button a ray (in model units) lands on, unless it's round the back. */
     buttonAt(ray: THREE.Ray, eye: THREE.Vector3): ButtonName | null {
