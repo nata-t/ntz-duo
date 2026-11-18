@@ -8,7 +8,7 @@ import { useNow } from "@/components/os/widgets";
 import Veil from "@/components/os/Veil";
 import VolumeHUD from "@/components/os/VolumeHUD";
 import { gsap } from "@/lib/gsap";
-import { BUTTON_ICONS, DEPTH, OUTER_GLASS, clockText, loadFonts, outerSheet, paintChrome, paintTime, wallpaper } from "@/components/device/lockart";
+import { BUTTON_ICONS, DEPTH, OUTER_GLASS, canvas, clockText, loadFonts, outerSheet, paintChrome, paintScale, paintTime, wallpaper } from "@/components/device/lockart";
 
 // The outer display (466 × 678 pt). Closed, it shows the Lock Screen; stood
 // up in a tent at the end of the story, it shows StandBy in landscape. The
@@ -44,24 +44,32 @@ function LockScreen() {
   const time = useRef<HTMLCanvasElement>(null);
   const chrome = useRef<HTMLCanvasElement>(null);
   const now = useNow("m");
+  const zoom = stage.use((s) => s.zoom);
 
-  // The clock and the chrome, by the same hand as the GPU's.
+  // The clock and the chrome, by the same hand as the GPU's. The chrome is
+  // painted aside first: a canvas clears when it's resized, so both are
+  // resized and drawn in one go, and never show blank.
   useEffect(() => {
     let alive = true;
-    const scale = Math.min(3, (window.devicePixelRatio || 1) * 1.5);
+    const scale = paintScale(zoom);
     const w = Math.round(OUTER.w * scale), h = Math.round(OUTER.h * scale);
     void loadFonts().then(async () => {
-      for (const el of [time.current, chrome.current]) if (el && (el.width !== w || el.height !== h)) Object.assign(el, { width: w, height: h });
+      const [aside, a] = canvas(w, h);
+      await paintChrome(a, w, h, "outer");
       if (!alive) return;
+      for (const el of [time.current, chrome.current]) if (el && (el.width !== w || el.height !== h)) Object.assign(el, { width: w, height: h });
       const t = time.current?.getContext("2d");
       if (t) paintTime(t, w, h, "outer", theme, now ?? new Date());
       const c = chrome.current?.getContext("2d");
-      if (c) await paintChrome(c, w, h, "outer");
+      if (c) {
+        c.clearRect(0, 0, w, h);
+        c.drawImage(aside, 0, 0);
+      }
     });
     return () => {
       alive = false;
     };
-  }, [theme, now]);
+  }, [theme, now, zoom]);
 
   // Shut and still, this is the picture the GPU draws as the phone starts
   // to open (lockart.ts): each sheet of the wallpaper pushed in by its own

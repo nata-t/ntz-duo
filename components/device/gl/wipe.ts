@@ -293,4 +293,17 @@ export class ScreenWipe {
     renderer.setRenderTarget(previousTarget);
     renderer.toneMapping = previousToneMapping;
   }
+
+  dispose(): void {
+    for (const pass of Object.values(this.passes)) {
+      pass.compose.dispose();
+      pass.frame.dispose();
+      pass.first.dispose();
+      pass.second.dispose();
+    }
+    this.composeMaterial.dispose();
+    this.frameMaterial.dispose();
+    this.blurMaterial.dispose();
+    this.quad.geometry.dispose();
+  }
 }

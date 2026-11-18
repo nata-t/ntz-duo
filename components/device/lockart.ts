@@ -76,6 +76,14 @@ export async function loadSheets(theme: Theme): Promise<Sheets> {
   return { base, sky, ridge };
 }
 
+/** Canvas pixels per point for a Lock Screen whose display is shown at
+ *  most `zoom` CSS px per point: every screen pixel gets its own, with a
+ *  touch over for the 4% settle as it wakes. In tenths, so a window being
+ *  resized doesn't repaint it every frame. */
+export function paintScale(zoom: number) {
+  return Math.min(3, Math.ceil((window.devicePixelRatio || 1) * zoom * 1.05 * 10) / 10);
+}
+
 export function canvas(w: number, h: number) {
   const c = document.createElement("canvas");
   c.width = Math.max(1, Math.round(w));

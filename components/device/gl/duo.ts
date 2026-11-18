@@ -1013,7 +1013,13 @@ export function createDuo(
       root.traverse((o) => {
         const m = o as THREE.Mesh;
         m.geometry?.dispose();
+        for (const x of ([] as (THREE.Material | undefined)[]).concat(m.material)) x?.dispose();
       });
+      for (const s of Object.values(screens)) {
+        s.time.tex.dispose();
+        s.chrome.tex.dispose();
+      }
+      wipe.dispose();
       Object.values(sheets ?? {}).forEach((t) => t.dispose());
       turned?.dispose();
       content?.dispose();

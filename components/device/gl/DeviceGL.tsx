@@ -232,11 +232,18 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
     // after anything on the display changes, so a fresh one is usually
     // waiting when the phone starts to fold; until it is, the plain DOM
     // halves stand in.
-    const shot = { seen: 0, taken: -1, busy: false, timer: 0 };
+    //
+    // Every picture is a new data: URL image, and Chrome holds on to each
+    // one for a while after it's dropped, so pictures nobody will see aren't
+    // taken: none while locked (the GPU draws its own Lock Screen), and a
+    // clock's second hand (data-tick) doesn't call for one while the phone
+    // lies flat or shut (the picture isn't on screen) and the page is still.
+    // Once the page scrolls, or the phone is folding, it does again.
+    const shot = { seen: 0, taken: -1, busy: false, timer: 0, ticked: false, scrolled: -Infinity };
     const liveRoot = () => document.querySelector<HTMLElement>('[data-os-root="live"]');
     const capture = async () => {
       const root = liveRoot(), duo = gl.current?.duo;
-      if (!root || !duo || shot.busy || shot.taken === shot.seen) return;
+      if (!root || !duo || shot.busy || shot.taken === shot.seen || os.get().locked) return;
       shot.busy = true;
       const v = shot.seen;
       try {
@@ -264,13 +271,33 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       shot.seen++;
       later();
     };
+    /** A tick held back while flat and still: owed once that ends. */
+    const settleTick = () => {
+      if (!shot.ticked) return false;
+      shot.ticked = false;
+      return true;
+    };
+    const mutated = (list: MutationRecord[]) => {
+      const still = (last.current.flat || last.current.shut) && performance.now() - shot.scrolled > 1500;
+      const tick = (m: MutationRecord) => (m.target instanceof Element ? m.target : m.target.parentElement)?.closest("[data-tick]");
+      if (still && list.every(tick)) shot.ticked = true;
+      else changed();
+    };
+    const onPageScroll = () => {
+      shot.scrolled = performance.now();
+      if (settleTick()) changed();
+    };
+    window.addEventListener("scroll", onPageScroll, { passive: true });
     // Folding, the picture only has to be as new as the moment the phone
     // left flat: what changes after that (a ticking clock) is retaken in
     // the background and swapped in, never shown as a gap.
     let mark = 0;
     picture.current = {
       ready(leaving) {
-        if (leaving) mark = shot.seen;
+        if (leaving) {
+          if (settleTick()) shot.seen++;
+          mark = shot.seen;
+        }
         const ok = shot.taken >= mark;
         if (!ok) {
           window.clearTimeout(shot.timer);
@@ -279,7 +306,7 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
         return ok;
       },
     };
-    const watch = new MutationObserver(changed);
+    const watch = new MutationObserver(mutated);
     let watched: HTMLElement | null = null;
     const find = window.setInterval(() => {
       const root = liveRoot();
@@ -390,6 +417,7 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       document.documentElement.style.cursor = "";
       watch.disconnect();
       watched?.removeEventListener("scroll", changed, true);
+      window.removeEventListener("scroll", onPageScroll);
       window.clearInterval(find);
       window.clearTimeout(shot.timer);
       window.clearInterval(clock);
@@ -398,6 +426,9 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       environment.dispose();
       [...Object.values(bezels), ...Object.values(painted)].forEach((t) => t.dispose());
       renderer.dispose();
+      // dispose() keeps the context itself until GC: let it go now, or every
+      // remount (Strict Mode, Fast Refresh) leaves one behind.
+      renderer.forceContextLoss();
       css.domElement.remove();
       renderer.domElement.remove();
       gl.current = null;

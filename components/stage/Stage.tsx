@@ -92,7 +92,9 @@ export default function Stage() {
         // Full screen lays the OS out for the window itself.
         if (!os.get().screen) os.set({ portrait: p });
         setPortrait(p);
-        setK(fitZoom(p));
+        const zoom = fitZoom(p);
+        setK(zoom);
+        if (stage.get().zoom !== zoom) stage.set({ zoom });
       });
     };
     measure();

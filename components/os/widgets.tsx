@@ -212,8 +212,10 @@ export function ClockWidget({ size }: { size: number }) {
     .split(":")
     .map(Number) as [number, number, number];
   const hourA = ((h % 12) + m / 60) * 30, minA = (m + s / 60) * 6, secA = s * 6;
+  // data-tick: the second hand alone doesn't call for a new display picture
+  // while it's out of sight (DeviceGL).
   return (
-    <div className={`${card} bg-white dark:bg-[#1c1c1e]`} style={{ width: size, height: size, borderRadius: size / 2 }} aria-label="Clock, Addis Ababa">
+    <div data-tick="" className={`${card} bg-white dark:bg-[#1c1c1e]`} style={{ width: size, height: size, borderRadius: size / 2 }} aria-label="Clock, Addis Ababa">
       <svg viewBox="-50 -50 100 100" width={size} height={size} aria-hidden="true" className="text-black dark:text-white">
         {Array.from({ length: 12 }, (_, i) => (
           <text key={i} x={Math.sin((i * Math.PI) / 6) * 36} y={-Math.cos((i * Math.PI) / 6) * 36 + 4} textAnchor="middle" fontSize="11" fontWeight="600" fill="currentColor">

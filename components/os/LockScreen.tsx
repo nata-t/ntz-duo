@@ -3,7 +3,8 @@
 import { useEffect, useLayoutEffect, useRef, useState } from "react";
 import { gsap } from "@/lib/gsap";
 import { os, unlock, useDims, useOS } from "@/lib/os";
-import { BUTTON_ICONS, GLASS_BUTTONS, canvas as makeCanvas, loadFonts, paintChrome, paintTime, wallpaper, type Panel } from "@/components/device/lockart";
+import { BUTTON_ICONS, GLASS_BUTTONS, canvas as makeCanvas, loadFonts, paintChrome, paintScale, paintTime, wallpaper, type Panel } from "@/components/device/lockart";
+import { stage } from "@/components/stage/stage-state";
 import { playUnlock } from "./unlock";
 
 // The inner display's Lock Screen, live. While the phone folds, the GPU
@@ -33,6 +34,11 @@ export default function LockScreen() {
   const dark = useOS((s) => s.dark);
   const live = useOS((s) => s.live);
   const awake = useOS((s) => s.awake);
+  // How large the display shows: in the device, at most its zoom; full
+  // screen, the window's.
+  const screenZoom = useOS((s) => s.screen?.z);
+  const deviceZoom = stage.use((s) => s.zoom);
+  const zoom = screenZoom ?? deviceZoom;
   const { w: W, h: H } = useDims();
   const portrait = H > W;
   const layout: Panel = portrait ? "outer" : "inner";
@@ -52,17 +58,26 @@ export default function LockScreen() {
   useLayoutEffect(() => {
     if (!shown) return;
     let alive = true;
-    const scale = Math.min(3, (window.devicePixelRatio || 1) * 1.5);
+    const scale = paintScale(zoom);
     const paint = async () => {
       await loadFonts();
       if (!alive) return;
       const now = new Date();
+      const w = Math.round(W * scale), h = Math.round(H * scale);
+      // The chrome is painted aside first (its plate may still be loading):
+      // a canvas clears when it's resized, so both are resized and drawn in
+      // one go, and the screen never shows them blank.
+      // Painted at the panel's own proportions, so the circle stays round
+      // on a full screen of another shape; centred, flush to its height.
+      const ph = h, pw = layout === "inner" ? ph * (951 / 669) : ph * (466 / 678);
+      const [c, cx] = makeCanvas(pw, ph);
+      await paintChrome(cx, pw, ph, layout);
+      if (!alive) return;
       for (const [el, kind] of [
         [time.current, "time"],
         [chrome.current, "chrome"],
       ] as const) {
         if (!el) continue;
-        const w = Math.round(W * scale), h = Math.round(H * scale);
         if (el.width !== w || el.height !== h) {
           el.width = w;
           el.height = h;
@@ -70,12 +85,6 @@ export default function LockScreen() {
         const x = el.getContext("2d")!;
         if (kind === "time") paintTime(x, w, h, layout, theme, now);
         else {
-          // Painted at the panel's own proportions, so the circle stays round
-          // on a full screen of another shape; centred, flush to its height.
-          const ph = h, pw = layout === "inner" ? ph * (951 / 669) : ph * (466 / 678);
-          const [c, cx] = makeCanvas(pw, ph);
-          await paintChrome(cx, pw, ph, layout);
-          if (!alive) return;
           x.clearRect(0, 0, w, h);
           x.drawImage(c, (w - pw) / 2, 0);
         }
@@ -87,7 +96,7 @@ export default function LockScreen() {
       alive = false;
       window.clearInterval(id);
     };
-  }, [shown, W, H, layout, theme]);
+  }, [shown, W, H, layout, theme, zoom]);
 
   // Coming back to the Lock Screen: everything in its place.
   useEffect(() => {
