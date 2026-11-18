@@ -68,11 +68,14 @@ const LINER = "xdyyaajWsatVNxN";
  *  further from the hinge), the side button with Touch ID and, below it,
  *  Camera Control on the far edge. Each presses in along its edge. */
 export type ButtonName = "volumeUp" | "volumeDown" | "side" | "camera";
-const BUTTONS: Record<ButtonName, { meshes: string[]; dir: THREE.Vector3 }> = {
-  volumeUp: { meshes: ["YhaSRqOjDUQrQTc"], dir: new THREE.Vector3(0, 1, 0) },
-  volumeDown: { meshes: ["FcJBPLgEScWGyXd"], dir: new THREE.Vector3(0, 1, 0) },
-  side: { meshes: ["UXtkILReLwCJaov", "fbvEqfwjsAMSDkr", "tkSBzAjLTdhANqx"], dir: new THREE.Vector3(1, 0, 0) },
-  camera: { meshes: ["AjfIgUpXxKaENDl", "VNIQJMrwFmXgrBf", "ejUvJHtjfcqjSvM"], dir: new THREE.Vector3(1, 0, 0) },
+/** proud: how much further out than the model a button sits at rest. The
+ *  kit's render stands volume and side 3.9 pt proud of the outline, the
+ *  model only 2.8; Camera Control stays flush, as on the real phone. */
+const BUTTONS: Record<ButtonName, { meshes: string[]; dir: THREE.Vector3; proud: number }> = {
+  volumeUp: { meshes: ["YhaSRqOjDUQrQTc"], dir: new THREE.Vector3(0, 1, 0), proud: 0.018 },
+  volumeDown: { meshes: ["FcJBPLgEScWGyXd"], dir: new THREE.Vector3(0, 1, 0), proud: 0.018 },
+  side: { meshes: ["UXtkILReLwCJaov", "fbvEqfwjsAMSDkr", "tkSBzAjLTdhANqx"], dir: new THREE.Vector3(1, 0, 0), proud: 0.018 },
+  camera: { meshes: ["AjfIgUpXxKaENDl", "VNIQJMrwFmXgrBf", "ejUvJHtjfcqjSvM"], dir: new THREE.Vector3(1, 0, 0), proud: 0 },
 };
 /** The spine, measured off a film of the real phone (model units; 1 pt ≈
  *  0.0166). Shut and seen edge on it's a rounded bar about 70% of the
@@ -107,6 +110,12 @@ const SPINE = {
 const TRAVEL = 0.027;
 /** Hit zones reach this far around a button: they're thin on screen. */
 const REACH = 0.14;
+/** The painted buttons' cards: past each end, and out from the outline. */
+const KEY_PAD = 0.06;
+const KEY_DEPTH = 0.12;
+/** Cosines of the phone's turn off face on: the painted buttons show fully
+ *  within 4°, and are gone by 10° (the model's own then). */
+const KEY_FADE = [Math.cos(THREE.MathUtils.degToRad(4)), Math.cos(THREE.MathUtils.degToRad(10))] as const;
 
 const UI_REFERENCE_EYE = new THREE.Vector3(0, 0, 40);
 const INNER_UI_FRAME = new THREE.Vector4(-7.89935, 0.34562 - MODEL_DROP, 15.7987, 11.1035);
@@ -289,6 +298,47 @@ export function loadModel(onProgress?: (fraction: number) => void): Promise<THRE
   return new USDLoader().loadAsync(MODEL_URL, (e) => onProgress?.(Math.min(e.loaded / (e.total || MODEL_BYTES), 1)));
 }
 
+/** The kit's render paints the volume and side buttons on, standing out of
+ *  the outline with their ends lit over the rim line. The model's own press
+ *  in, so the render's are lifted off: wherever something is painted just
+ *  past the top or right edge, the edge's band is redrawn across from the
+ *  clean rim either side. */
+export function clearPaintedButtons(t: THREE.Texture) {
+  const image = t.image as HTMLImageElement;
+  const W = image.width, H = image.height, s = W / TEX.inner.w;
+  const [c, x] = canvas(W, H);
+  x.drawImage(image, 0, 0);
+  const img = x.getImageData(0, 0, W, H), d = img.data;
+  const top = Math.round(TEX.inner.y * s), right = Math.round((TEX.inner.x + BODY.w) * s);
+  // Sampled 1.5 pt past the outline, where only a button is painted; the
+  // band runs 6 pt in, past the rim line (4 pt) and the buttons' lit ends.
+  const probe = Math.round(1.5 * s), band = Math.round(6 * s), pad = Math.round(2 * s);
+  const at = (px: number, py: number) => (py * W + px) * 4;
+  // Each run of painted columns (or rows) along an edge, padded, blended
+  // across from the clean pixel either side, line by line.
+  const clear = (length: number, painted: (i: number) => boolean, line: (i: number, j: number) => number, depth: number) => {
+    for (let i = 0; i < length; i++) {
+      if (!painted(i)) continue;
+      let end = i;
+      while (end + 1 < length && painted(end + 1)) end++;
+      const a = Math.max(0, i - pad - 1), b = Math.min(length - 1, end + pad + 1);
+      for (let j = 0; j < depth; j++)
+        for (let k = a + 1; k < b; k++) {
+          const f = (k - a) / (b - a), p = line(k, j), pa = line(a, j), pb = line(b, j);
+          for (let ch = 0; ch < 4; ch++) d[p + ch] = d[pa + ch]! * (1 - f) + d[pb + ch]! * f;
+        }
+      i = end + pad;
+    }
+  };
+  // Volume, along the top edge, from the canvas's edge down into the rim.
+  clear(W, (i) => d[at(i, top - probe) + 3]! > 8, (i, j) => at(i, j), top + band);
+  // The side button, along the right edge, in from the canvas's edge.
+  clear(H, (i) => d[at(right + probe, i) + 3]! > 8, (i, j) => at(W - 1 - j, i), W - right + band);
+  x.putImageData(img, 0, 0);
+  t.image = c;
+  t.needsUpdate = true;
+}
+
 /** What a display shows: the Lock Screen composed on the GPU, a picture of
  *  the live display (apps, the Home Screen) through the same pipeline, or
  *  a hole over the live DOM. */
@@ -309,7 +359,15 @@ export type Duo = ReturnType<typeof createDuo>;
 
 export function createDuo(
   model: THREE.Group,
-  opts: { anisotropy: number; environment: THREE.Texture; bezel: Record<Finish, THREE.Texture>; cover: THREE.Material; hole: THREE.Material },
+  opts: {
+    anisotropy: number;
+    environment: THREE.Texture;
+    /** The kit's render, its painted buttons lifted off (clearPaintedButtons), and as shipped. */
+    bezel: Record<Finish, THREE.Texture>;
+    painted: Record<Finish, THREE.Texture>;
+    cover: THREE.Material;
+    hole: THREE.Material;
+  },
 ) {
   const { anisotropy, environment } = opts;
   const root = new THREE.Group();
@@ -419,6 +477,9 @@ export function createDuo(
   type Saved = { color: THREE.Color; roughness: number; metalness: number; clearcoat: number; clearcoatRoughness: number; env: number; map: THREE.Texture | null; visible: boolean };
   const parts: { material: THREE.MeshPhysicalMaterial; star: Saved; night: Look }[] = [];
   const bezels: (THREE.MeshPhysicalMaterial | THREE.MeshBasicMaterial)[] = [];
+  /** The kit's painted buttons, on their own cards. */
+  const painted: THREE.MeshBasicMaterial[] = [];
+  let keyFade = 1;
   const buttons = Object.fromEntries(
     (Object.keys(BUTTONS) as ButtonName[]).map((n) => [n, { meshes: [] as THREE.Mesh[], box: new THREE.Box3() }]),
   ) as Record<ButtonName, { meshes: THREE.Mesh[]; box: THREE.Box3 }>;
@@ -511,6 +572,7 @@ export function createDuo(
       geometry.computeBoundingBox();
       buttons[n].meshes.push(mesh);
       buttons[n].box.union(geometry.boundingBox!);
+      mesh.position.copy(BUTTONS[n].dir).multiplyScalar(BUTTONS[n].proud);
     }
 
     if (kind) {
@@ -652,6 +714,10 @@ export function createDuo(
       m.map = opts.bezel[finish];
       m.needsUpdate = true;
     });
+    painted.forEach((m) => {
+      m.map = opts.painted[finish];
+      m.needsUpdate = true;
+    });
   }
 
   let ready: Promise<void> = Promise.resolve();
@@ -743,14 +809,11 @@ export function createDuo(
   const PLATE_Z = 0.29;
   // Shut, the plates lie in the phone's middle, and the render's titanium
   // band would show between the halves' rounded ends: they're only drawn
-  // while the front can be seen.
-  const plates: THREE.Mesh[] = [];
-  for (const side of ["L", "R"] as const) {
-    const x0 = side === "L" ? -(TEX.inner.x + BODY.w / 2) / UNIT : 0;
-    const x1 = side === "L" ? 0 : (TEX.inner.w - TEX.inner.x - BODY.w / 2) / UNIT;
-    const yTop = (BODY.h / 2 + TEX.inner.y) / UNIT, yBottom = -(TEX.inner.h - TEX.inner.y - BODY.h / 2) / UNIT;
-    const geometry = new THREE.PlaneGeometry(x1 - x0, yTop - yBottom, 8, 1);
-    geometry.translate((x0 + x1) / 2, (yTop + yBottom) / 2, PLATE_Z);
+  // while the front can be seen. They stop at the body's outline: past it
+  // the render paints the volume and side buttons, drawn as their own cards
+  // below so they can press in.
+  /** The kit's render laid flat across the open front, in points. */
+  const frontUV = (geometry: THREE.BufferGeometry) => {
     const position = geometry.getAttribute("position");
     const uv = new Float32Array(position.count * 2);
     for (let i = 0; i < position.count; i++) {
@@ -758,10 +821,12 @@ export function createDuo(
       uv[i * 2 + 1] = 1 - (TEX.inner.y + BODY.h / 2 - position.getY(i) * UNIT) / TEX.inner.h;
     }
     geometry.setAttribute("uv", new THREE.BufferAttribute(uv, 2));
-    // Unlit: the render has its light painted in. A faint sheen of the
-    // room on top, as cover glass gives it.
-    const m = new THREE.MeshBasicMaterial({
-      map: opts.bezel.star,
+  };
+  // Unlit: the render has its light painted in. A faint sheen of the room
+  // on top, as cover glass gives it.
+  const frontMaterial = (map: THREE.Texture) =>
+    new THREE.MeshBasicMaterial({
+      map,
       envMap: environment,
       combine: THREE.AddOperation,
       reflectivity: 0.035,
@@ -772,6 +837,16 @@ export function createDuo(
       polygonOffsetFactor: -1,
       polygonOffsetUnits: -6,
     });
+  const plates: THREE.Mesh[] = [];
+  for (const side of ["L", "R"] as const) {
+    const edge = BODY.w / 2 / UNIT, top = BODY.h / 2 / UNIT;
+    const x0 = side === "L" ? -edge : 0;
+    const x1 = side === "L" ? 0 : edge;
+    const yTop = top, yBottom = -top;
+    const geometry = new THREE.PlaneGeometry(x1 - x0, yTop - yBottom, 8, 1);
+    geometry.translate((x0 + x1) / 2, (yTop + yBottom) / 2, PLATE_Z);
+    frontUV(geometry);
+    const m = frontMaterial(opts.bezel.star);
     if (side === "L") {
       m.onBeforeCompile = (shader) => fold(shader, false, true);
       m.customProgramCacheKey = () => "duo-plate-cover";
@@ -786,6 +861,48 @@ export function createDuo(
   }
   for (const p of plates) p.visible = bend.value < THREE.MathUtils.degToRad(150);
 
+  // Face on, the volume and side buttons are the kit's painted pills too,
+  // lit as Apple lit them, where the model's read as a flat line. Each is a
+  // card running out from the outline over its own button; pressed, its
+  // picture slides in under the edge as far as the model's travels. They
+  // give way to the model's own as the edge turns toward the eye, before
+  // the two could part.
+  const keys = (["volumeUp", "volumeDown", "side"] as const).map((name) => {
+    const { box } = buttons[name];
+    const top = BUTTONS[name].dir.y > 0;
+    const out = (top ? BODY.h : BODY.w) / 2 / UNIT;
+    const [a, b] = top ? [box.min.x, box.max.x] : [box.min.y, box.max.y];
+    const along = b - a + 2 * KEY_PAD, across = KEY_DEPTH;
+    const geometry = new THREE.PlaneGeometry(top ? along : across, top ? across : along);
+    geometry.translate(top ? (a + b) / 2 : out + across / 2, top ? out + across / 2 : (a + b) / 2, PLATE_Z);
+    frontUV(geometry);
+    const shift = { value: new THREE.Vector2() };
+    const m = frontMaterial(opts.painted.star);
+    m.onBeforeCompile = (shader) => {
+      shader.uniforms.keyShift = shift;
+      shader.fragmentShader = `uniform vec2 keyShift;\n${shader.fragmentShader}`.replace(
+        "#include <map_fragment>",
+        THREE.ShaderChunk.map_fragment.replace("vMapUv", "vMapUv + keyShift"),
+      );
+    };
+    m.customProgramCacheKey = () => "duo-key";
+    painted.push(m);
+    const mesh = new THREE.Mesh(geometry, m);
+    mesh.name = `key-${name}`;
+    mesh.frustumCulled = false;
+    mesh.renderOrder = 2;
+    root.add(mesh);
+    return { name, mesh, shift, top };
+  });
+  /** Shown while the plates are, as far as the phone faces the eye. */
+  function showKeys() {
+    for (const k of keys) {
+      k.mesh.visible = plates[1]!.visible && keyFade > 0.02;
+      (k.mesh.material as THREE.MeshBasicMaterial).opacity = keyFade;
+    }
+  }
+  showKeys();
+
   ready = Promise.all([setTheme("light"), paintChromes()]).then(() => paintClock(new Date()));
 
   return {
@@ -797,6 +914,7 @@ export function createDuo(
       bend.value = angle;
       spine.fold(angle);
       for (const p of plates) p.visible = deg < 150;
+      showKeys();
       openness = 1 - THREE.MathUtils.clamp(deg / 180, 0, 1);
       dirty = true;
       light();
@@ -835,6 +953,8 @@ export function createDuo(
       referenceEye.value.copy(eye);
       const reach = eye.length();
       viewAmount = reach > 0 ? THREE.MathUtils.clamp(eye.z / reach, 0, 1) ** 1.5 : 1;
+      keyFade = reach > 0 ? THREE.MathUtils.smoothstep(eye.z / reach, KEY_FADE[1], KEY_FADE[0]) : 1;
+      showKeys();
       sync();
     },
     /** Repaints the clock when the minute turns; true when it did. */
@@ -854,7 +974,11 @@ export function createDuo(
     dirty: () => dirty,
     /** A button pressed in by `amount` (0 out … 1 home). */
     setPress(name: ButtonName, amount: number) {
-      for (const m of buttons[name].meshes) m.position.copy(BUTTONS[name].dir).multiplyScalar(-TRAVEL * amount);
+      const { dir, proud } = BUTTONS[name];
+      for (const m of buttons[name].meshes) m.position.copy(dir).multiplyScalar(proud - TRAVEL * amount);
+      const key = keys.find((k) => k.name === name);
+      // The picture's taken from further out: it moves in.
+      if (key) key.shift.value.set(key.top ? 0 : (TRAVEL * amount * UNIT) / TEX.inner.w, key.top ? (TRAVEL * amount * UNIT) / TEX.inner.h : 0);
     },
     /** The button a ray (in model units) lands on, unless it's round the back. */
     buttonAt(ray: THREE.Ray, eye: THREE.Vector3): ButtonName | null {

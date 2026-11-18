@@ -15,7 +15,7 @@ import { gsap } from "@/lib/gsap";
 import { pressSide, releaseVolume, stepVolume } from "@/lib/buttons";
 import { wake } from "@/lib/backlight";
 import { stage } from "@/components/stage/stage-state";
-import { HINGE, INNER_Z, OUTER_X, OUTER_Z, UNIT, createDuo, loadModel, type ButtonName, type Duo } from "./duo";
+import { HINGE, INNER_Z, OUTER_X, OUTER_Z, UNIT, clearPaintedButtons, createDuo, loadModel, type ButtonName, type Duo } from "./duo";
 
 type Props = {
   k: number;
@@ -187,18 +187,28 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
     resize();
 
     const loader = new THREE.TextureLoader();
-    const bezel = (url: string) => {
-      const t = loader.load(url, () => redraw());
-      t.colorSpace = THREE.SRGBColorSpace;
-      t.anisotropy = renderer.capabilities.getMaxAnisotropy();
+    // The kit's render twice: as shipped for the buttons' own cards, and
+    // with its painted buttons lifted off for the plates.
+    const painted = { star: new THREE.Texture(), night: new THREE.Texture() };
+    const bezel = (finish: Finish) => {
+      const t = loader.load(`/device/inner-${finish}.webp`, () => {
+        painted[finish].image = t.image;
+        painted[finish].needsUpdate = true;
+        clearPaintedButtons(t);
+        redraw();
+      });
+      for (const x of [t, painted[finish]]) {
+        x.colorSpace = THREE.SRGBColorSpace;
+        x.anisotropy = renderer.capabilities.getMaxAnisotropy();
+      }
       return t;
     };
-    const bezels = { star: bezel("/device/inner-star.webp"), night: bezel("/device/inner-night.webp") };
+    const bezels = { star: bezel("star"), night: bezel("night") };
 
     loadModel()
       .then(async (group) => {
         if (!alive || !gl.current) return;
-        const duo = createDuo(group, { anisotropy: renderer.capabilities.getMaxAnisotropy(), environment, bezel: bezels, cover, hole });
+        const duo = createDuo(group, { anisotropy: renderer.capabilities.getMaxAnisotropy(), environment, bezel: bezels, painted, cover, hole });
         model.add(duo.root);
         gl.current.duo = duo;
         await duo.setDark(finishRef.current === "night");
@@ -386,7 +396,7 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       objects.forEach((o) => o.removeFromParent());
       gl.current?.duo?.dispose();
       environment.dispose();
-      Object.values(bezels).forEach((t) => t.dispose());
+      [...Object.values(bezels), ...Object.values(painted)].forEach((t) => t.dispose());
       renderer.dispose();
       css.domElement.remove();
       renderer.domElement.remove();
