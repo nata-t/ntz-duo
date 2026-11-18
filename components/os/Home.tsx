@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef } from "react";
+import { useLayoutEffect, useRef } from "react";
 import { gsap } from "@/lib/gsap";
 import { os, useDims, useOS, type Slot } from "@/lib/os";
 import { projects } from "@/content/site";
@@ -185,14 +185,22 @@ export default function Home({ region, mirror = false }: { region: Slot; mirror?
   const rail = !portrait && (full || region === "right");
   const inner = rail ? width - SIDE : width;
 
-  useEffect(() => {
+  // Turning a page slides the strip. A new layout (the Home Screen growing
+  // back to full as a split app closes, or mounting again) takes its page at
+  // once, before paint: the pages are laid out afresh, so sliding from the old
+  // offset would sweep another page through view, and a closing window
+  // measures its icon right after this commit.
+  const laid = useRef<number | null>(null);
+  useLayoutEffect(() => {
     const el = strip.current;
     if (!el) return;
     if (mirror) {
       el.style.transform = `translate3d(${-at * inner}px,0,0)`;
       return;
     }
-    gsap.to(el, { x: -at * inner, duration: 0.55, ease: "expo.out", overwrite: true });
+    if (laid.current === inner) gsap.to(el, { x: -at * inner, duration: 0.55, ease: "expo.out", overwrite: true });
+    else gsap.set(el, { x: -at * inner, overwrite: true });
+    laid.current = inner;
   }, [at, inner, mirror]);
 
   const onDown = (e: React.PointerEvent) => {

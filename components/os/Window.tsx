@@ -149,6 +149,8 @@ export default function Window({ win, mirror }: { win: Win; mirror: boolean }) {
   }, [win.slot, split, W, H, mirror, win.closing]);
 
   // Close: shrink back into the icon when it is on screen, else sink away.
+  // Every page's icons are in the DOM, so an icon on a page that isn't
+  // showing still has a rect, off to the side under the page clip.
   useEffect(() => {
     if (!win.closing || mirror) return;
     showChrome(false);
@@ -157,7 +159,9 @@ export default function Window({ win, mirror }: { win: Win; mirror: boolean }) {
     let to: Frame | null = null;
     if (icon && root && homeRegion(os.get().windows) !== null) {
       const r = root.getBoundingClientRect(), e = icon.getBoundingClientRect(), s = r.width / dims().w;
-      to = { x: (e.left - r.left) / s, y: (e.top - r.top) / s, w: e.width / s, h: e.height / s, r: round(iconRadius(e.width / s)) };
+      const clip = icon.closest("[data-home-strip]")?.parentElement?.getBoundingClientRect();
+      const shown = !clip || (e.left >= clip.left - 1 && e.right <= clip.right + 1 && e.top >= clip.top - 1 && e.bottom <= clip.bottom + 1);
+      if (shown) to = { x: (e.left - r.left) / s, y: (e.top - r.top) / s, w: e.width / s, h: e.height / s, r: round(iconRadius(e.width / s)) };
     }
     const splash = splashEl.current;
     if (to) {
