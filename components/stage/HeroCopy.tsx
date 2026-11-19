@@ -54,10 +54,10 @@ const HeroCopy = forwardRef<HeroCopyHandle>(function HeroCopy(_, ref) {
         ref={title}
         className="pointer-events-none absolute inset-x-0 top-[clamp(64px,10vh,120px)] z-10 text-center will-change-transform"
       >
-        <p className="animate-intro font-display text-[clamp(19px,1.9vw,24px)] leading-[1.17] font-semibold tracking-[0.009em] [animation-delay:0.15s] motion-reduce:animate-none">
+        <p className="animate-intro font-display text-[clamp(19px,1.9vw,24px)] leading-[1.17] font-semibold tracking-[0.009em] [animation-delay:0.15s] motion-reduce:animate-none booting:[animation-play-state:paused]">
           ntz duo
         </p>
-        <h1 className="mt-[0.15em] animate-intro font-display text-[clamp(56px,8.4vw,128px)] leading-[1.05] font-semibold tracking-[-0.015em] [animation-delay:0.3s] motion-reduce:animate-none">
+        <h1 className="mt-[0.15em] animate-intro font-display text-[clamp(56px,8.4vw,128px)] leading-[1.05] font-semibold tracking-[-0.015em] [animation-delay:0.3s] motion-reduce:animate-none booting:[animation-play-state:paused]">
           Hello, hello.
         </h1>
       </div>
@@ -88,7 +88,7 @@ const HeroCopy = forwardRef<HeroCopyHandle>(function HeroCopy(_, ref) {
         ref={bar}
         className="absolute bottom-[max(clamp(20px,5vh,56px),env(safe-area-inset-bottom))] left-1/2 z-20 flex w-[min(640px,calc(100vw-32px))] items-center justify-between gap-4 rounded-full bg-[color-mix(in_srgb,var(--page-alt)_82%,transparent)] py-3 pr-3 pl-7 backdrop-blur-xl backdrop-saturate-150 transform-[translate3d(-50%,0,0)] max-phone:pl-5"
       >
-        <div className="min-w-0 animate-intro text-[14px] leading-[1.43] tracking-[-0.016em] text-ink [animation-delay:1.1s] motion-reduce:animate-none">
+        <div className="min-w-0 animate-intro text-[14px] leading-[1.43] tracking-[-0.016em] text-ink [animation-delay:1.1s] motion-reduce:animate-none booting:[animation-play-state:paused]">
           <p className="truncate">
             {profile.name}
             <span className="max-phone:hidden">, {profile.title.toLowerCase()} in Addis Ababa.</span>

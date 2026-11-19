@@ -24,6 +24,7 @@ import Mount, { Mirror } from "./Mount";
 import { scrollToStory, visit } from "./navigate";
 import { HERO, LENGTH, MARKS, createStory, span } from "./story";
 import { stage } from "./stage-state";
+import { whenRevealed } from "@/lib/boot";
 
 /** Phones and narrow tall windows hold the open device upright. */
 function isPortrait() {
@@ -122,14 +123,17 @@ export default function Stage() {
     let dir = 1;
     // The last press landed on the live phone (keys go to it, not the page).
     let pressed = false;
-    // The device rises into place on first load.
+    // The device rises into place as the loader lifts (it only lifts once
+    // the model is in, unless the model never comes).
     const intro = { v: reduced ? 1 : 0 };
     let introTween: gsap.core.Tween | null = null;
     const rise = () => {
       if (!reduced && !introTween) introTween = gsap.to(intro, { v: 1, duration: 2.4, delay: 0.1, ease: "expo.out" });
     };
-    if (!gl || modelIn.current) rise();
-    else onModel.current = rise;
+    const offReveal = whenRevealed(() => {
+      if (!gl || modelIn.current) rise();
+      else onModel.current = rise;
+    });
 
     let drawn = -1;
     let nearing = false;
@@ -291,7 +295,7 @@ export default function Stage() {
     // Deep links: /#about (or any app id) unfolds the phone and opens it.
     const linked = window.location.hash.slice(1);
     let deep = 0;
-    if (linked && APPS[linked]?.kind === "app") deep = window.setTimeout(() => visit(linked), 900);
+    const offDeep = linked && APPS[linked]?.kind === "app" ? whenRevealed(() => (deep = window.setTimeout(() => visit(linked), 900))) : () => {};
 
     // Keep the folding halves in step with the phone while it's closed.
     const offOS = os.subscribe(scheduleSnapshot);
@@ -301,6 +305,8 @@ export default function Stage() {
     gsap.ticker.add(tick);
     return () => {
       gsap.ticker.remove(tick);
+      offReveal();
+      offDeep();
       introTween?.kill();
       st.kill();
       window.removeEventListener("scroll", onScroll);

@@ -294,8 +294,11 @@ function drawCover(x: CanvasRenderingContext2D, image: CanvasImageSource & { wid
   x.drawImage(image, (w - image.width * s) / 2, (h - image.height * s) / 2, image.width * s, image.height * s);
 }
 
-export function loadModel(onProgress?: (fraction: number) => void): Promise<THREE.Group> {
-  return new USDLoader().loadAsync(MODEL_URL, (e) => onProgress?.(Math.min(e.loaded / (e.total || MODEL_BYTES), 1)));
+export function loadModel(onProgress?: (fraction: number, bytes: number) => void): Promise<THREE.Group> {
+  return new USDLoader().loadAsync(MODEL_URL, (e) => {
+    const bytes = e.total || MODEL_BYTES;
+    onProgress?.(Math.min(e.loaded / bytes, 1), bytes);
+  });
 }
 
 /** The kit's render paints the volume and side buttons on, standing out of

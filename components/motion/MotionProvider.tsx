@@ -5,6 +5,7 @@ import Lenis from "lenis";
 import { gsap, ScrollTrigger } from "@/lib/gsap";
 import { lenisRef } from "@/lib/lenis";
 import { observeGlass } from "@/lib/glass";
+import { whenRevealed } from "@/lib/boot";
 
 // Site-wide scroll runtime: Lenis driven by GSAP's ticker so smooth scroll
 // and every ScrollTrigger advance on the same frame (artcraft's wiring).
@@ -19,6 +20,9 @@ export default function MotionProvider({ children }: { children: React.ReactNode
     const lenis = new Lenis({ lerp: 0.11, wheelMultiplier: 0.9 });
     lenisRef.current = lenis;
     lenis.on("scroll", ScrollTrigger.update);
+    // The page holds still under the loader.
+    lenis.stop();
+    const offBoot = whenRevealed(() => lenis.start());
 
     const tick = (time: number) => lenis.raf(time * 1000);
     gsap.ticker.add(tick);
@@ -28,6 +32,7 @@ export default function MotionProvider({ children }: { children: React.ReactNode
     document.fonts?.ready.then(() => ScrollTrigger.refresh());
 
     return () => {
+      offBoot();
       gsap.ticker.remove(tick);
       lenis.destroy();
       lenisRef.current = null;

@@ -15,6 +15,7 @@ import { gsap } from "@/lib/gsap";
 import { pressSide, releaseVolume, stepVolume } from "@/lib/buttons";
 import { wake } from "@/lib/backlight";
 import { stage } from "@/components/stage/stage-state";
+import { GL_TASKS, complete, report } from "@/lib/boot";
 import { HINGE, INNER_Z, OUTER_X, OUTER_Z, UNIT, clearPaintedButtons, createDuo, loadModel, type ButtonName, type Duo } from "./duo";
 
 type Props = {
@@ -76,6 +77,10 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
   const picture = useRef<{ ready: (leaving: boolean) => boolean }>({ ready: () => false });
   const readyRef = useRef(onReady);
   readyRef.current = onReady;
+  /** Whether the GPU may draw yet. Until its programs are compiled and its
+   *  textures up, a draw would compile and upload them all at once, on the
+   *  main thread, freezing the page (and its loader) for seconds. */
+  const warm = useRef(false);
   const [els] = useState(() => {
     if (typeof document === "undefined") return null;
     const make = () => {
@@ -190,13 +195,22 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
     // The kit's render twice: as shipped for the buttons' own cards, and
     // with its painted buttons lifted off for the plates.
     const painted = { star: new THREE.Texture(), night: new THREE.Texture() };
+    const bezelIn = { star: Promise.resolve(), night: Promise.resolve() };
     const bezel = (finish: Finish) => {
-      const t = loader.load(`/device/inner-${finish}.webp`, () => {
-        painted[finish].image = t.image;
-        painted[finish].needsUpdate = true;
-        clearPaintedButtons(t);
-        redraw();
-      });
+      let landed = () => {};
+      bezelIn[finish] = new Promise<void>((resolve) => (landed = resolve));
+      const t = loader.load(
+        `/device/inner-${finish}.webp`,
+        () => {
+          painted[finish].image = t.image;
+          painted[finish].needsUpdate = true;
+          clearPaintedButtons(t);
+          redraw();
+          landed();
+        },
+        undefined,
+        () => landed(),
+      );
       for (const x of [t, painted[finish]]) {
         x.colorSpace = THREE.SRGBColorSpace;
         x.anisotropy = renderer.capabilities.getMaxAnisotropy();
@@ -205,25 +219,70 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
     };
     const bezels = { star: bezel("star"), night: bezel("night") };
 
-    loadModel()
+    // Each step tells the loader (lib/boot.ts) how far it's got: the
+    // model's bytes, then its textures and the finish, the Lock Screen,
+    // and the GPU's programs and uploads.
+    const mb = (v: number) => (v / 1e6).toFixed(1);
+    loadModel((f, bytes) => {
+      report("model", f, `${mb(f * bytes)} of ${mb(bytes)} MB`);
+      // The bytes are in; the model's own textures come next.
+      if (f >= 1) report("finish", 0.05);
+    })
       .then(async (group) => {
         if (!alive || !gl.current) return;
+        complete("model");
+        report("finish", 0.5);
         const duo = createDuo(group, { anisotropy: renderer.capabilities.getMaxAnisotropy(), environment, bezel: bezels, painted, cover, hole });
         model.add(duo.root);
         gl.current.duo = duo;
-        await duo.setDark(finishRef.current === "night");
+        await Promise.all([duo.setDark(finishRef.current === "night"), bezelIn[finishRef.current]]);
         duo.setPortrait(portraitRef.current);
+        complete("finish");
         await duo.ready();
         if (!alive) return;
-        // Compile every program now, so the first turn doesn't stall.
+        complete("lock");
+        // The GPU's work, a step a frame, so the loader keeps moving: every
+        // program compiled off the main thread where the driver can, then
+        // every texture uploaded (the device rises in from out of view, where
+        // nothing would be drawn or uploaded until it was on screen), then
+        // the Lock Screens composed, then the first frame.
+        await breathe();
         await renderer.compileAsync(scene, camera).catch(() => {});
+        if (!alive) return;
+        report("gpu", 0.4);
+        const textures = new Set<THREE.Texture>();
+        scene.traverse((o) => {
+          const m = (o as THREE.Mesh).material;
+          for (const mat of Array.isArray(m) ? m : m ? [m] : []) {
+            for (const v of Object.values(mat)) if (v instanceof THREE.Texture && v.image) textures.add(v);
+          }
+        });
+        let slice = performance.now(), n = 0;
+        for (const t of textures) {
+          renderer.initTexture(t);
+          report("gpu", 0.4 + (0.4 * ++n) / textures.size);
+          if (performance.now() - slice > 24) {
+            await breathe();
+            if (!alive) return;
+            slice = performance.now();
+          }
+        }
+        await breathe();
+        if (!alive) return;
+        warm.current = true;
+        duo.render(renderer);
+        await breathe();
         if (!alive) return;
         redraw();
         renderer.domElement.style.opacity = "1";
+        complete("gpu");
         readyRef.current?.();
       })
       .catch((e) => {
         console.error(e);
+        warm.current = true;
+        // The CSS fallback isn't coming either: let the page open.
+        complete(...GL_TASKS);
         readyRef.current?.();
       });
 
@@ -530,7 +589,7 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       duo.setMode("outer", outerMode);
       g.scene.updateMatrixWorld();
       duo.setViewpoint(g.model.worldToLocal(eye.copy(g.camera.position)));
-      duo.render(g.renderer);
+      if (warm.current) duo.render(g.renderer);
     }
     const was = last.current;
     if (outerMode !== was.outer) {
@@ -550,7 +609,7 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       els.L.style.opacity = els.R.style.opacity = !flat && innerMode === "hole" ? "1" : "0";
     }
 
-    g.renderer.render(g.scene, g.camera);
+    if (warm.current) g.renderer.render(g.scene, g.camera);
     g.css.render(g.scene, g.camera);
   }
 
@@ -610,6 +669,15 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
 });
 
 export default DeviceGL;
+
+/** Lets a frame paint before the next step (or moves on after a moment
+ *  where frames don't come, in a background tab). */
+function breathe() {
+  return new Promise<void>((resolve) => {
+    requestAnimationFrame(() => setTimeout(resolve, 0));
+    setTimeout(resolve, 100);
+  });
+}
 
 /** Holds the inner display's content, turned a quarter for portrait. */
 function Upright({ portrait, children }: { portrait: boolean; children: React.ReactNode }) {

@@ -232,7 +232,7 @@ function Chapters() {
     <nav
       ref={root}
       aria-label="Chapters"
-      className={`group/bar fixed inset-y-0 right-[10px] z-40 my-auto h-fit animate-dock touch-none select-none transition-opacity duration-500 before:absolute before:-inset-y-[14px] before:-right-[10px] before:-left-[14px] before:content-[''] ${
+      className={`group/bar fixed inset-y-0 right-[10px] z-40 my-auto h-fit animate-dock touch-none booting:[animation-play-state:paused] select-none transition-opacity duration-500 before:absolute before:-inset-y-[14px] before:-right-[10px] before:-left-[14px] before:content-[''] ${
         full ? "pointer-events-none opacity-0" : ""
       }`}
     >

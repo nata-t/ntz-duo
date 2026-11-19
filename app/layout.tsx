@@ -1,6 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Inter, Sofia_Sans_Extra_Condensed } from "next/font/google";
 import MotionProvider from "@/components/motion/MotionProvider";
+import Loader from "@/components/stage/Loader";
 import { profile } from "@/content/site";
 import "./globals.css";
 
@@ -41,8 +42,9 @@ export const viewport: Viewport = {
 };
 
 // Runs before first paint: resolve the stored appearance (or the system's)
-// so the page never flashes the wrong theme.
-const PREPAINT = `(function(){try{var a=localStorage.getItem('duo:appearance')||'auto';var d=a==='dark'||(a==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=d?'dark':'light';}catch(e){document.documentElement.dataset.theme='light'}})();`;
+// so the page never flashes the wrong theme, and put up the loader
+// (data-boot), which only a page that runs script can take down.
+const PREPAINT = `(function(){document.documentElement.dataset.boot='hold';try{var a=localStorage.getItem('duo:appearance')||'auto';var d=a==='dark'||(a==='auto'&&matchMedia('(prefers-color-scheme: dark)').matches);document.documentElement.dataset.theme=d?'dark':'light';}catch(e){document.documentElement.dataset.theme='light'}})();`;
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
@@ -55,6 +57,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       </head>
       <body>
         <MotionProvider>
+          <Loader />
           <main id="main">{children}</main>
         </MotionProvider>
       </body>
