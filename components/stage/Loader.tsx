@@ -5,13 +5,14 @@ import { gsap } from "@/lib/gsap";
 import { GL_TASKS, TASKS, boot, complete, loaded, report } from "@/lib/boot";
 import { reducedMotion, webglAvailable } from "@/lib/env";
 import { profile } from "@/content/site";
+import { dropHome } from "./Drop";
 
 // The first load, after the hello screen an iPhone opens on: greetings in
 // one language after another while everything the opening needs comes in
 // (lib/boot.ts sums it, each step reporting what it's really doing). A
-// drop of Liquid Glass drifts over the word and follows the pointer, a
-// click says hello in the next language, and once everything is in, the
-// page opens down the middle like the phone, and the device rises into it.
+// drop of Liquid Glass (Drop.tsx) drifts over the word, a click says hello
+// in the next language, and once everything is in, the page opens down the
+// middle like the phone, and the device rises into it.
 //
 // The markup is in the server's HTML, shown by the prepaint script
 // (html[data-boot]), so it covers the page from the first paint; without
@@ -58,7 +59,6 @@ export default function Loader() {
   const right = useRef<HTMLDivElement>(null);
   const crease = useRef<HTMLDivElement>(null);
   const word = useRef<HTMLDivElement>(null);
-  const lens = useRef<HTMLDivElement>(null);
   const fill = useRef<HTMLDivElement>(null);
   const meter = useRef<HTMLDivElement>(null);
   const percent = useRef<HTMLSpanElement>(null);
@@ -164,30 +164,13 @@ export default function Loader() {
       beat();
     };
 
-    // --- The glass drop -----------------------------------------------------
-    // It drifts over the word on its own; a mouse takes it for as long as
-    // it moves (and a moment after), a finger while it's down.
-    const drop = { x: innerWidth / 2, y: innerHeight / 2, vx: 0, vy: 0, stretch: 1, angle: 0, scale: 0 };
-    const aim = { x: 0, y: 0, until: 0 };
-    let home = { x: innerWidth / 2, y: innerHeight / 2, w: 300, h: 120 };
+    // The glass drop (Drop.tsx) drifts over whichever word is up.
     const measure = () => {
       const r = word.current?.getBoundingClientRect();
-      if (r) home = { x: r.left + r.width / 2, y: r.top + r.height / 2, w: Math.max(r.width, 200), h: r.height };
+      if (r) Object.assign(dropHome, { x: r.left + r.width / 2, y: r.top + r.height / 2, w: Math.max(r.width, 200), h: r.height });
     };
     measure();
-    drop.x = home.x - home.w * 0.4;
-    drop.y = home.y;
-    const onMove = (e: PointerEvent) => {
-      if (e.pointerType === "mouse" || e.buttons) {
-        aim.x = e.clientX;
-        aim.y = e.clientY;
-        aim.until = performance.now() + (e.pointerType === "mouse" ? 2600 : 1600);
-      }
-    };
-    window.addEventListener("pointermove", onMove, { passive: true });
-    window.addEventListener("pointerdown", onMove, { passive: true });
     window.addEventListener("resize", measure);
-    const entrance = reduced ? null : gsap.to(drop, { scale: 1, duration: 1.1, delay: 0.5, ease: "back.out(1.7)" });
 
     // --- Progress -----------------------------------------------------------
     // Steps with no progress of their own creep toward done while they run,
@@ -250,29 +233,6 @@ export default function Loader() {
       const l = label();
       if (l !== lastLabel && status.current) status.current.textContent = lastLabel = l;
 
-      // The drop.
-      const el = lens.current;
-      if (el && !reduced) {
-        const s = now / 1000;
-        const mine = aim.until > now;
-        const tx = mine ? aim.x : home.x + Math.sin(s * 0.62) * home.w * 0.42;
-        const ty = mine ? aim.y : home.y + Math.sin(s * 0.97 + 0.8) * home.h * 0.22;
-        const k = 1 - Math.exp(-dt * (mine ? 11 : 2.6));
-        const nx = drop.x + (tx - drop.x) * k, ny = drop.y + (ty - drop.y) * k;
-        drop.vx = (nx - drop.x) / Math.max(dt, 1e-3);
-        drop.vy = (ny - drop.y) / Math.max(dt, 1e-3);
-        drop.x = nx;
-        drop.y = ny;
-        // Moving fast, it pulls long along its path, the way a drop would.
-        const speed = Math.hypot(drop.vx, drop.vy);
-        const want = 1 + Math.min(0.26, speed / 3800);
-        drop.stretch += (want - drop.stretch) * (1 - Math.exp(-dt * 10));
-        if (speed > 30) drop.angle = Math.atan2(drop.vy, drop.vx);
-        const a = (drop.angle * 180) / Math.PI;
-        const sx = drop.stretch * drop.scale, sy = (drop.scale / drop.stretch) * (0.96 + 0.04 * drop.stretch);
-        el.style.transform = `translate3d(${drop.x}px, ${drop.y}px, 0) translate(-50%, -50%) rotate(${a}deg) scale(${sx}, ${sy}) rotate(${-a}deg)`;
-      }
-
       // Everything's in: the greetings come home to English, as the page
       // greets, while the bar runs out.
       if (all && !leaving) {
@@ -318,7 +278,6 @@ export default function Loader() {
 
       tl = gsap
         .timeline({ onComplete: done })
-        .to(drop, { scale: 0, duration: 0.45, ease: "back.in(1.6)" }, 0)
         .to(content.current, { opacity: 0, y: -14, scale: 0.985, filter: "blur(12px)", duration: 0.6, ease: "power2.in" }, 0.05)
         // A line of light where the fold is, then the page opens along it.
         .fromTo(crease.current, { scaleY: 0, opacity: 0 }, { scaleY: 1, opacity: 1, duration: 0.5, ease: "expo.out" }, 0.3)
@@ -333,14 +292,11 @@ export default function Loader() {
     return () => {
       alive = false;
       gsap.ticker.remove(frame);
-      entrance?.kill();
       tl?.kill();
       release();
       window.clearTimeout(cycle);
       window.clearTimeout(imagesAt);
       window.clearTimeout(hardStop);
-      window.removeEventListener("pointermove", onMove);
-      window.removeEventListener("pointerdown", onMove);
       window.removeEventListener("resize", measure);
     };
   }, []);
@@ -431,15 +387,6 @@ export default function Loader() {
         </div>
       </div>
 
-      {/* A drop of Liquid Glass (lib/glass.ts bends what's under it). A
-          sibling of the copy, never inside it: the copy fades, and opacity
-          on a glass element's ancestor blanks its backdrop. */}
-      <div
-        ref={lens}
-        aria-hidden="true"
-        className="glass-lens pointer-events-none absolute top-0 left-0 size-[clamp(96px,10.5vw,148px)] rounded-full [--lg-bezel:34] [--lg-depth:30] [--lg-blur:0.2] motion-reduce:hidden"
-        style={{ transform: "scale(0)" }}
-      />
     </div>
   );
 }

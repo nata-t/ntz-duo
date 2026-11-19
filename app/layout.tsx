@@ -2,6 +2,7 @@ import type { Metadata, Viewport } from "next";
 import { Inter, Sofia_Sans_Extra_Condensed } from "next/font/google";
 import MotionProvider from "@/components/motion/MotionProvider";
 import Loader from "@/components/stage/Loader";
+import Drop from "@/components/stage/Drop";
 import { profile } from "@/content/site";
 import "./globals.css";
 
@@ -59,6 +60,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
         <MotionProvider>
           <Loader />
           <main id="main">{children}</main>
+          <Drop />
         </MotionProvider>
       </body>
     </html>

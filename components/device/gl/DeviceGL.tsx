@@ -5,7 +5,7 @@ import { createPortal } from "react-dom";
 import * as THREE from "three";
 import { CSS3DObject, CSS3DRenderer } from "three/examples/jsm/renderers/CSS3DRenderer.js";
 import { RoomEnvironment } from "three/examples/jsm/environments/RoomEnvironment.js";
-import { HALF, INNER, OUTER } from "../geometry";
+import { HALF, INNER, OUTER, PLATEAU, T } from "../geometry";
 import type { Pose } from "../pose";
 import type { DeviceHandle, Finish } from "../Device";
 import { os } from "@/lib/os";
@@ -14,7 +14,7 @@ import { rasterize } from "@/lib/raster";
 import { gsap } from "@/lib/gsap";
 import { pressSide, releaseVolume, stepVolume } from "@/lib/buttons";
 import { wake } from "@/lib/backlight";
-import { stage } from "@/components/stage/stage-state";
+import { deviceRect, stage } from "@/components/stage/stage-state";
 import { GL_TASKS, complete, report } from "@/lib/boot";
 import { HINGE, INNER_Z, OUTER_X, OUTER_Z, UNIT, clearPaintedButtons, createDuo, loadModel, type ButtonName, type Duo } from "./duo";
 
@@ -95,6 +95,7 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
   const sleep = useRef<HTMLDivElement[]>([]);
   const m4 = useRef(new THREE.Matrix4()).current, t4 = useRef(new THREE.Matrix4()).current;
   const eye = useRef(new THREE.Vector3()).current;
+  const corner = useRef(new THREE.Vector3()).current, fold4 = useRef(new THREE.Matrix4()).current;
 
   // Scene, renderers, camera, environment, then the model. Once.
   useEffect(() => {
@@ -185,6 +186,7 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       camera.aspect = w / h;
       camera.fov = (2 * Math.atan(h / 2 / DISTANCE) * 180) / Math.PI;
       camera.updateProjectionMatrix();
+      camera.updateMatrixWorld();
       redraw();
     };
     const ro = new ResizeObserver(resize);
@@ -491,6 +493,7 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
       css.domElement.remove();
       renderer.domElement.remove();
       gl.current = null;
+      deviceRect.on = false;
     };
     // Built once per mount; finish, zoom and orientation have their own effects.
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -611,6 +614,27 @@ const DeviceGL = forwardRef<DeviceHandle, Props>(function DeviceGL({ k, inner, l
 
     if (warm.current) g.renderer.render(g.scene, g.camera);
     g.css.render(g.scene, g.camera);
+    outline(g, p);
+  }
+
+  /** The box round the phone on screen (stage-state's deviceRect): each
+   *  slab's corners, glass face to camera plateau, projected. */
+  function outline(g: GL, p: Pose) {
+    const near = 2, far = -(T + PLATEAU.depth + 6);
+    fold4.copy(m4).multiply(t4.makeRotationY(rad(p.fold)));
+    let l = Infinity, t = Infinity, r = -Infinity, b = -Infinity;
+    for (const [m, x0, x1] of [[m4, 0, HALF.w], [fold4, -HALF.w, 0]] as const)
+      for (const x of [x0, x1])
+        for (const y of [-HALF.h / 2, HALF.h / 2])
+          for (const z of [near, far]) {
+            corner.set(x, y, z).applyMatrix4(m).project(g.camera);
+            const sx = ((corner.x + 1) / 2) * g.size.w, sy = ((1 - corner.y) / 2) * g.size.h;
+            l = Math.min(l, sx);
+            r = Math.max(r, sx);
+            t = Math.min(t, sy);
+            b = Math.max(b, sy);
+          }
+    Object.assign(deviceRect, { x: l, y: t, w: r - l, h: b - t, on: warm.current && !!g.duo });
   }
 
   useImperativeHandle(ref, () => ({ apply }));
